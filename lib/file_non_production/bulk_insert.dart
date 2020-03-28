@@ -1,0 +1,170 @@
+import 'package:keuangan/database/dao_event.dart';
+import 'package:keuangan/database/keuangan/dao_itemname.dart';
+import 'package:keuangan/database/keuangan/dao_keuangan.dart';
+import 'package:keuangan/database/keuangan/dao_kategori.dart';
+import 'package:keuangan/model/enum_keuangan.dart';
+import 'package:keuangan/model/event.dart';
+import 'package:keuangan/model/keuangan.dart';
+import 'package:keuangan/util/colors_utility.dart';
+import 'package:keuangan/util/global_string_database.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'dart:convert';
+
+class Persiapan {
+  static final int tahunMulai = 1965;
+  static final int tahunAkhir = 2050;
+
+  bulkInsert() async {
+    TbSpecialDay tb = new TbSpecialDay();
+    String jsonString = await rootBundle.loadString('assets/special_day.json');
+    Map<String, dynamic> user = jsonDecode(jsonString);
+    Map<String, dynamic> map = user['menu'];
+
+    for (int i = 1965; i < 2051; i++) {
+      List<dynamic> list = map['$i'];
+      if (list != null) {
+        for (int j = 0; j < list.length; j++) {
+          String tanggal = '$i-${list[j][tb.sdTanggal]}';
+          SpecialDay specialDay = new SpecialDay(tanggal,
+              list[j][tb.sdArrayTanggal], list[j][tb.sdStringTanggal]);
+
+          DaoSpecialDay daoSpecialDay = new DaoSpecialDay();
+          daoSpecialDay.saveSpecialDay(specialDay);
+        }
+      }
+    }
+  }
+
+  bulkInsertWithBatch() async {
+    TbSpecialDay tb = new TbSpecialDay();
+    String jsonString = await rootBundle.loadString('assets/special_day.json');
+    Map<String, dynamic> user = jsonDecode(jsonString);
+    Map<String, dynamic> map = user['menu'];
+    List<SpecialDay> listSpecial = new List();
+    for (int i = 1965; i < 2051; i++) {
+      List<dynamic> list = map['$i'];
+      if (list != null) {
+        for (int j = 0; j < list.length; j++) {
+          String tanggal = '$i-${list[j][tb.sdTanggal]}';
+          SpecialDay specialDay = new SpecialDay(tanggal,
+              list[j][tb.sdArrayTanggal], list[j][tb.sdStringTanggal]);
+
+          listSpecial.add(specialDay);
+        }
+      }
+    }
+    DaoSpecialDay daoSpecialDay = new DaoSpecialDay();
+    daoSpecialDay.saveBatchSpecialDay(listSpecial);
+  }
+
+  insertKategoriDummy() {
+    var colors = ColorManagement.colors;
+    DaoKategori daoKategori = DaoKategori();
+    daoKategori.saveKategori(new Kategori('Other', 0,EnumJenisTransaksi.pemasukan,'mencoba catatan',colors[0]));
+    daoKategori.saveKategori(new Kategori('Donation', 0,EnumJenisTransaksi.pengeluaran,'',colors[1]));
+    daoKategori.saveKategori(new Kategori('k13ffffff', 0,EnumJenisTransaksi.pengeluaran,'',colors[2]));
+    daoKategori.saveKategori(new Kategori('k14cccccccc', 0,EnumJenisTransaksi.pengeluaran,'',colors[3]));
+    daoKategori.saveKategori(new Kategori('k15rrrrrrr', 0,EnumJenisTransaksi.pengeluaran,'',colors[4]));
+    daoKategori.saveKategori(new Kategori('Gift', 0,EnumJenisTransaksi.pengeluaran,'',colors[5]));
+    daoKategori.saveKategori(new Kategori('k10dddddddd', 0,EnumJenisTransaksi.pengeluaran,'',colors[6]));
+
+    daoKategori.saveKategori(new Kategori('k11dddddddd', 1,EnumJenisTransaksi.pengeluaran,'',colors[0]));
+    daoKategori.saveKategori(new Kategori('k12ddddddddd', 1,EnumJenisTransaksi.pengeluaran,'',colors[1]));
+
+    daoKategori.saveKategori(new Kategori('Entertainment', 2,EnumJenisTransaksi.pengeluaran,'',colors[0]));
+    daoKategori.saveKategori(new Kategori('Food', 2,EnumJenisTransaksi.pengeluaran,'',colors[1]));
+    daoKategori.saveKategori(new Kategori('k6pajanng', 2,EnumJenisTransaksi.pemasukan,'',colors[2]));
+    daoKategori.saveKategori(new Kategori('k7aaaaaaaaa', 2,EnumJenisTransaksi.pemasukan,'',colors[3]));
+    daoKategori.saveKategori(new Kategori('k8aaaaaaa', 2,EnumJenisTransaksi.pemasukan,'',colors[4]));
+    daoKategori.saveKategori(new Kategori('k9sssssss', 2,EnumJenisTransaksi.pengeluaran,'',colors[5]));
+
+    daoKategori.saveKategori(new Kategori('Insurance',5,EnumJenisTransaksi.pengeluaran,'',colors[0]));
+
+    daoKategori.saveKategori(new Kategori('k16ttttttt', 7,EnumJenisTransaksi.pengeluaran,'',colors[0]));
+
+  }
+
+  deleteAllKategori() {
+    DaoKategori daoKategori = new DaoKategori();
+    daoKategori.deleteAllKategori();
+  }
+
+  insertItemNameDummy(){
+    DaoItemName daoItemName = new DaoItemName();
+    daoItemName.saveItemName(new ItemName('Makan', 1));
+    daoItemName.saveItemName(new ItemName('pulsa', 1));
+    daoItemName.saveItemName(new ItemName('Internet Telkomsel', 2));
+    daoItemName.saveItemName(new ItemName('Internet XL', 2));
+    daoItemName.saveItemName(new ItemName('Shop', 3));
+    daoItemName.saveItemName(new ItemName('Transport Operasional', 3));
+    daoItemName.saveItemName(new ItemName('Kosan', 4));
+    daoItemName.saveItemName(new ItemName('Jajan', 4));
+//    daoItemName.saveItemName(new ItemName('Keperluan bulanan', 3));
+//    daoItemName.saveItemName(new ItemName('keperluan Motor', 3));
+//    daoItemName.saveItemName(new ItemName('Mobil', 4));
+//    daoItemName.saveItemName(new ItemName('Anak Sekolah', 4));
+//    daoItemName.saveItemName(new ItemName('Belanja Harian', 4));
+//    daoItemName.saveItemName(new ItemName('Ngirim Orang Tua', 4));
+//    daoItemName.saveItemName(new ItemName('Makan malam', 6));
+//    daoItemName.saveItemName(new ItemName('Makan Siang', 6));
+//    daoItemName.saveItemName(new ItemName('Makan Pagi', 6));
+//    daoItemName.saveItemName(new ItemName('Makan Kantor', 6));
+//    daoItemName.saveItemName(new ItemName('Salon', 5));
+//    daoItemName.saveItemName(new ItemName('Bekam', 5));
+//    daoItemName.saveItemName(new ItemName('Transport Jakarta', 5));
+  }
+
+  deleteAllItemName(){
+    DaoItemName daoItemName = new DaoItemName();
+    daoItemName.deleteAllItemName();
+  }
+
+  bulkinsertKeuangan(){
+    DaoKeuangan daoKeuangan = new DaoKeuangan();
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-1', 1, 50000, 'ct'));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-2', 2, 50000, 'ct'));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-3', 3, 13700, 'ct'));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-4', 4, 1700000, 'ct'));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-5', 5, 532000, 'ct'));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-6', 6, 32000, 'ct'));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-7', 7, 10000, 'ct'));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-8', 8, 5000, 'ct'));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-7', 4, 500, 'ct'));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-6', 5, 1000, 'ct'));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-5', 6, 23000, 'ct'));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-4', 7, 13000, 'ct'));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-4', 8, 15000, 'ct'));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-28', 1, 5, '', 1));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-29', 10, 5, '', 1));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-29', 11, 5, '', 0));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-29', 12, 5, '', 1));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-30', 13, 5, '', 0));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-30', 14, 5, '', 1));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-30', 1, 5, '', 0));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-30', 2, 5, '', 1));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-01', 3, 5, '', 0));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-01', 4, 5, '', 1));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-01', 5, 5, '', 1));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-02-02', 14, 50000, '', 1));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-02-03', 16, 50000, '', 0));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-02-03', 16, 50000, '', 0));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-02-04', 16, 50000, '', 1));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-02-04', 16, 50000, '', 0));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-02-04', 8, 50000, '', 0));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-02-05', 9, 50000, '', 1));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-02-06', 2, 50000, '', 0));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-02', 2, 50001, '', 1));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-03', 4, 50002, '', 0));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-03', 14, 50003, '', 0));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-04', 14, 50004, '', 1));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-04', 14, 50005, '', 0));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-04', 14, 50006, '', 0));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-05', 14, 50007, '', 1));
+//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-06', 14, 50008, '', 0));
+  }
+
+  deleteAllKeuangan(){
+    DaoKeuangan daoKeuangan = new DaoKeuangan();
+    daoKeuangan.deleteAllKeuangan();
+  }
+}
