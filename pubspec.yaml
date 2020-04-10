@@ -1,5 +1,5 @@
 name: keuangan
-description: Calendar Todolist Expense Management
+description: Expense Management
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -13,26 +13,39 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
-  rxdart: ^0.22.0
+  flutter_native_splash: ^0.1.9
+  share: ^0.6.3+6
+  firebase_admob: ^0.9.3+1
+  rxdart: ^0.23.1
   flutter:
     sdk: flutter
   sqflite: any
   path_provider: any
-  json_annotation: ^2.0.0
-
+  json_annotation: ^3.0.1
+  http: ^0.12.0+4
+  flutter_launcher_icons: ^0.7.4
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
-  intl: ^0.15.8
-  charts_flutter: ^0.6.0
+  intl: ^0.16.1
+  charts_flutter: ^0.9.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner: ^1.0.0
-  json_serializable: ^2.0.0
+  build_runner: ^1.8.1
+  json_serializable: ^3.3.0
 
+  #flutter packages get
+  #flutter packages pub run flutter_launcher_icons:main
+flutter_icons:
+  ios: true
+  android: true
+  image_path_ios: "assets/icon/icon.png"
+  image_path_android: "assets/icon/icon.png"
+  adaptive_icon_background: "assets/icon/ic_app_bg.png"
+  adaptive_icon_foreground: "assets/icon/ic_app_top.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
@@ -44,8 +57,6 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-  assets:
-    - assets/special_day.json
   fonts:
     - family: Opensans
       fonts:
