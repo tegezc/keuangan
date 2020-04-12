@@ -5,12 +5,13 @@ import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 
 import '../main.dart';
-import 'itemname/homepage_itemname.dart';
-import 'kategori/homepage_kategori.dart';
 import 'keuangan_transaksi.dart';
-import 'reporting_by_kategori/reporting_bykategori.dart';
 
 class HomepageKeuangan extends StatefulWidget {
+  final Widget drawer;
+
+  HomepageKeuangan({this.drawer});
+
   @override
   _HomepageKeuanganState createState() => _HomepageKeuanganState();
 }
@@ -18,12 +19,9 @@ class HomepageKeuangan extends StatefulWidget {
 class _HomepageKeuanganState extends State<HomepageKeuangan> {
   final TextStyle _textStyleSmall = new TextStyle(fontSize: 10);
 
-
-
-  int pengeluaran=0;
-  int pemasukan=0;
-  int balance=0;
-
+  int pengeluaran = 0;
+  int pemasukan = 0;
+  int balance = 0;
 
   @override
   void initState() {
@@ -33,29 +31,32 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
 
   _setupBalance() {
     DaoKeuangan daoKeuangan = new DaoKeuangan();
-    daoKeuangan.getKeuanganByJenisTransaksi(EnumJenisTransaksi.pemasukan).then((lkp){
+    daoKeuangan
+        .getKeuanganByJenisTransaksi(EnumJenisTransaksi.pemasukan)
+        .then((lkp) {
       pemasukan = this._hitungTotal(lkp);
-      daoKeuangan.getKeuanganByJenisTransaksi(EnumJenisTransaksi.pengeluaran).then((lkk){
+      daoKeuangan
+          .getKeuanganByJenisTransaksi(EnumJenisTransaksi.pengeluaran)
+          .then((lkk) {
         pengeluaran = this._hitungTotal(lkk);
         balance = pemasukan - pengeluaran;
-        setState(() {
-
-        });
+        setState(() {});
       });
     });
   }
 
-  int _hitungTotal(List<Keuangan> lk){
-    if(lk !=null){
+  int _hitungTotal(List<Keuangan> lk) {
+    if (lk != null) {
       double tmpJum = 0;
-      lk.forEach((k){
-        tmpJum = tmpJum+k.jumlah;
+      lk.forEach((k) {
+        tmpJum = tmpJum + k.jumlah;
       });
       return tmpJum.toInt();
-    }else{
+    } else {
       return 0;
     }
   }
+
   Widget _textSmall(String text) {
     return Text(
       text,
@@ -63,8 +64,8 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
     );
   }
 
-  Widget _textNormal(String text,Color color) {
-    final TextStyle _textStyleM = new TextStyle(fontSize: 13,color: color);
+  Widget _textNormal(String text, Color color) {
+    final TextStyle _textStyleM = new TextStyle(fontSize: 13, color: color);
     return Padding(
       padding: const EdgeInsets.only(top: 3.0, bottom: 5.0),
       child: Text(
@@ -74,23 +75,21 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
     );
   }
 
-  Widget _textL(String text,Color color) {
-
-
-    final TextStyle _textStyleL = new TextStyle(fontSize: 20,color: color);
+  Widget _textL(String text, Color color) {
+    final TextStyle _textStyleL = new TextStyle(fontSize: 20, color: color);
     return Text(
       text,
       style: _textStyleL,
     );
   }
 
-  Widget _widgetBalance(Size sizeWidget,int pmsk,int pngl,int blc) {
+  Widget _widgetBalance(Size sizeWidget, int pmsk, int pngl, int blc) {
     final formatCurrency = new NumberFormat("#,##0", "idr");
     final txtPemasukan = formatCurrency.format(pmsk);
     final txtPengeluran = formatCurrency.format(pngl);
     final txtBalance = formatCurrency.format(blc);
     Color color = Colors.green;
-    if(blc <0){
+    if (blc < 0) {
       color = Colors.red;
     }
     return Column(
@@ -103,7 +102,7 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
             _textSmall('Balance'),
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
-              child: _textL('Rp $txtBalance',color),
+              child: _textL('Rp $txtBalance', color),
             ),
           ],
         ),
@@ -117,7 +116,7 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
               child: Column(
                 children: <Widget>[
                   _textSmall('Pengeluaran'),
-                  _textNormal('Rp $txtPengeluran',Colors.red),
+                  _textNormal('Rp $txtPengeluran', Colors.red),
                 ],
               ),
             ),
@@ -131,7 +130,7 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
               child: Column(
                 children: <Widget>[
                   _textSmall('Pemasukan'),
-                  _textNormal('Rp $txtPemasukan',Colors.green),
+                  _textNormal('Rp $txtPemasukan', Colors.green),
                 ],
               ),
             ),
@@ -153,28 +152,7 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
       width: sizeWidget.width - 20,
       child: RaisedButton(
         onPressed: () async {
-          switch (page) {
-            case 1:
-              {
-                await openPage(context, TransactionKeuangan.byDefault());
-              }
-              break;
-            case 2:
-              {
-                await openPage(context, ReportByCategories());
-              }
-              break;
-            case 3:
-              {
-                await openPage(context, HomePageKategori());
-              }
-              break;
-            case 4:
-              {
-                await openPage(context, HomePageItemName());
-              }
-              break;
-          }
+          await openPage(context, TransactionKeuangan.byDefault());
         },
         textColor: Colors.white,
         color: Colors.blue,
@@ -200,24 +178,25 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
   Widget build(BuildContext context) {
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     Size _sizeWidget = mediaQueryData.size;
-    return Container(
-      height: double.infinity,
-      width: double.infinity,
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          _widgetBalance(_sizeWidget,pemasukan,pengeluaran,balance),
-          Divider(
-            height: 10.0,
-          ),
-          _buttonNav('Transaksi', _sizeWidget, context, 1),
-          _spaceBetweenButton(),
-          _buttonNav('Laporan', _sizeWidget, context, 2),
-          _spaceBetweenButton(),
-          _buttonNav('Kategori', _sizeWidget, context, 3),
-          _spaceBetweenButton(),
-          _buttonNav('Quick Item', _sizeWidget, context, 4),
-        ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Keuangan'),
+      ),
+      drawer: widget.drawer,
+      body: Container(
+        height: double.infinity,
+        width: double.infinity,
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            _widgetBalance(_sizeWidget, pemasukan, pengeluaran, balance),
+            Divider(
+              height: 10.0,
+            ),
+            _buttonNav('Transaksi', _sizeWidget, context, 1),
+            _spaceBetweenButton(),
+          ],
+        ),
       ),
     );
   }

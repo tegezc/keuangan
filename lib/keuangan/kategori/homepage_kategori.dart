@@ -8,6 +8,8 @@ import 'add_kategori.dart';
 import 'homepage_kategori_bloc.dart';
 
 class HomePageKategori extends StatefulWidget {
+  final Widget drawer;
+  HomePageKategori({this.drawer});
   @override
   _HomePageKategoriState createState() => _HomePageKategoriState();
 }
@@ -121,6 +123,7 @@ class _HomePageKategoriState extends State<HomePageKategori> {
 
             return Scaffold(
               key: _scaffoldKey,
+              drawer: widget.drawer,
               appBar: new AppBar(
                 title: new Text('Kategori'),
               ),
@@ -154,6 +157,7 @@ class _HomePageKategoriState extends State<HomePageKategori> {
           } else {
             _enumState = null;
             return Scaffold(
+              drawer: widget.drawer,
               appBar: new AppBar(
                 title: new Text('Transaksi'),
               ),

@@ -1,56 +1,38 @@
 import 'dart:async';
 
-import 'package:keuangan/bloc_main.dart';
 import 'package:keuangan/file_non_production/bulk_insert.dart';
+import 'package:keuangan/keuangan/itemname/homepage_itemname.dart';
+import 'package:keuangan/keuangan/kategori/homepage_kategori.dart';
+import 'package:keuangan/keuangan/keuangan_transaksi.dart';
 import 'package:keuangan/keuangan/reporting_by_kategori/reporting_bykategori.dart';
-import 'package:keuangan/main_scaffold.dart';
 import 'package:flutter/material.dart';
 
 import 'keuangan/homepage_keuangan.dart';
 
 void main() {
-  final blocApp = BlocApp();
-  return runApp(MyApp(blocApp));
+  return runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
-  final BlocApp blocApp;
-
-  MyApp(this.blocApp);
+  MyApp();
 
   @override
   Widget build(BuildContext context) {
-    return MainProvider(
-      blocApp: blocApp,
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          fontFamily: 'Opensans',
-        ),
-        home: MyHomePage(),
-        navigatorObservers: <NavigatorObserver>[
-          SwipeBackObserver(),
-        ],
+    return MaterialApp(
+      title: 'Expense Management',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        fontFamily: 'Opensans',
       ),
+      home: MyHomePage(),
+      navigatorObservers: <NavigatorObserver>[
+        SwipeBackObserver(),
+      ],
     );
   }
 }
 
-class DrawerItem {
-  String title;
-  IconData icon;
-
-  DrawerItem(this.title, this.icon);
-}
-
 class MyHomePage extends StatefulWidget {
-  final drawerItems = [
-    new DrawerItem("Kalender Nasional", Icons.rss_feed),
-    new DrawerItem("TodoList", Icons.local_pizza),
-    new DrawerItem("Keuangan", Icons.info),
-  ];
 
   @override
   State<StatefulWidget> createState() {
@@ -60,14 +42,10 @@ class MyHomePage extends StatefulWidget {
 
 class MyHomePageState extends State<MyHomePage> {
   int _selectedDrawerIndex = 0;
-  Widget _leadingAppbar;
-  List<Widget> _actionButtons;
-  bool _isEditModeHomepageTodolist;
 
   @override
   initState() {
-    _actionButtons = new List();
-    _isEditModeHomepageTodolist = false;
+
     _testingonly();
 
     super.initState();
@@ -90,12 +68,33 @@ class MyHomePageState extends State<MyHomePage> {
   _getDrawerItemWidget(int pos) {
     switch (pos) {
       case 0:
-        return HomepageKeuangan();
+        {
+          return HomepageKeuangan(drawer:_createDrawer(pos));
+        }
         break;
       case 1:
-        return new ReportByCategories();
+        {
+          return new TransactionKeuangan.byDefault(drawer:_createDrawer(pos));
+        }
+        break;
+      case 2:
+        {
+          return new ReportByCategories(drawer:_createDrawer(pos));
+        }
+        break;
+      case 3:
+        {
+          return new HomePageKategori(drawer:_createDrawer(pos));
+        }
+        break;
+      case 4:
+        {
+          return new HomePageItemName(drawer:_createDrawer(pos));
+        }
+        break;
       default:
         return new Text("Error");
+        break;
     }
   }
 
@@ -104,84 +103,101 @@ class MyHomePageState extends State<MyHomePage> {
     Navigator.of(context).pop(); // close the drawer
   }
 
+  List<Widget> _createDrawerItem(int pos) {
+    final textStyleNormal = new TextStyle(fontSize: 16, color: Colors.black);
+    final textStyleSelected = new TextStyle(fontSize: 16, color: Colors.blue);
+    final textStyleLabel = new TextStyle(fontSize: 12);
+    final textStyleLabelVersi = new TextStyle(fontSize: 9);
+    List<Widget> drawerOptions = [];
+    drawerOptions.add(new SizedBox(
+      height: 8.0,
+    ));
+    drawerOptions.add(new ListTile(
+      leading: new Icon(Icons.monetization_on,
+          color: _selectedDrawerIndex == 0 ? Colors.blue : Colors.black),
+      title: new Text("Keuangan",
+          style:
+              _selectedDrawerIndex == 0 ? textStyleSelected : textStyleNormal),
+      onTap: () => _onSelectItem(0),
+    ));
+    drawerOptions.add(new ListTile(
+      leading: new Icon(Icons.pie_chart,
+          color: _selectedDrawerIndex == 1 ? Colors.blue : Colors.black),
+      title: new Text("Transaksi",
+          style:
+          _selectedDrawerIndex == 1 ? textStyleSelected : textStyleNormal),
+      onTap: () => _onSelectItem(1),
+    ));
+    drawerOptions.add(new ListTile(
+      leading: new Icon(Icons.pie_chart,
+          color: _selectedDrawerIndex == 2 ? Colors.blue : Colors.black),
+      title: new Text("Laporan",
+          style:
+              _selectedDrawerIndex == 2 ? textStyleSelected : textStyleNormal),
+      onTap: () => _onSelectItem(2),
+    ));
+    drawerOptions.add(new ListTile(
+      leading: new Icon(
+        Icons.playlist_add_check,
+        color: _selectedDrawerIndex == 3 ? Colors.blue : Colors.black,
+      ),
+      title: new Text("Manage Kategori",
+          style:
+              _selectedDrawerIndex == 3 ? textStyleSelected : textStyleNormal),
+      //selected: i == _selectedDrawerIndex,
+      onTap: () => _onSelectItem(3),
+    ));
+
+    drawerOptions.add(new ListTile(
+      leading: new Icon(
+        Icons.fast_forward,
+        color: _selectedDrawerIndex == 4 ? Colors.blue : Colors.black,
+      ),
+      title: new Text("Manage Item Cepat",
+          style:
+              _selectedDrawerIndex == 4 ? textStyleSelected : textStyleNormal),
+      onTap: () => _onSelectItem(4),
+    ));
+
+    drawerOptions.add(new Divider());
+
+    return drawerOptions;
+  }
+
+  Widget _createDrawer(int pos) {
+    return new Drawer(
+      child: new Column(
+        children: <Widget>[
+          _createHeader(),
+          new Column(children: _createDrawerItem(pos))
+        ],
+      ),
+    );
+  }
+
+  Widget _createHeader() {
+    return Container(
+        color: Colors.blueAccent,
+        height: 100,
+        width: double.infinity,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 60.0, left: 10.0),
+          child: Text("Keuangan",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.w500)),
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<Widget> drawerOptions = [];
-    for (var i = 0; i < widget.drawerItems.length; i++) {
-      var d = widget.drawerItems[i];
-      drawerOptions.add(new ListTile(
-        leading: new Icon(d.icon),
-        title: new Text(d.title),
-        //selected: i == _selectedDrawerIndex,
-        onTap: () => _onSelectItem(i),
-      ));
-    }
-
-
-    final p = MainProvider.of(context);
-
-    return StreamBuilder<MainState>(
-        stream: p.blocMain.mainState,
-        builder: (context, snapshot) {
-          var title = widget.drawerItems[_selectedDrawerIndex].title;
-          if (snapshot.data != null) {
-            if (snapshot.data.isHomePageTodoEdit) {
-              title = '${snapshot.data.countItemSelected} item selected';
-              _leadingAppbar = FlatButton(
-                  onPressed: () {
-                    p.changeEditMode(false);
-                  },
-                  child: Icon(Icons.close));
-              _actionButtons.clear();
-              _actionButtons.add(IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: snapshot.data.countItemSelected == 0
-                      ? null
-                      : () {
-                          p.afterDelete();
-                        }));
-            } else {
-              _leadingAppbar = null;
-              _actionButtons.clear();
-              _isEditModeHomepageTodolist = false;
-            }
-          }
-
-          return WillPopScope(
-            onWillPop: () async {
-              _leadingAppbar = null;
-              setState(() {});
-              return true;
-            },
-            child: new Scaffold(
-              appBar: new AppBar(
-                // here we display the title corresponding to the fragment
-                // you can instead choose to have a static title
-                title: new Text(title),
-                leading: _leadingAppbar,
-                actions: _actionButtons,
-              ),
-              drawer: new Drawer(
-                child: new Column(
-                  children: <Widget>[
-                    new UserAccountsDrawerHeader(
-                        accountName: new Text("John Doe"), accountEmail: null),
-                    new Column(children: drawerOptions)
-                  ],
-                ),
-              ),
-              body: _getDrawerItemWidget(_selectedDrawerIndex),
-              floatingActionButton: _selectedDrawerIndex == 1 &&
-                      _isEditModeHomepageTodolist == false
-                  ? new FloatingActionButton(
-                      onPressed: () {},
-                      tooltip: 'add transaction',
-                      child: new Icon(Icons.add),
-                    )
-                  : null,
-            ),
-          );
-        });
+    return WillPopScope(
+      onWillPop: (){
+        return new Future(() => true);
+      },
+      child: _getDrawerItemWidget(_selectedDrawerIndex),
+    );
   }
 }
 

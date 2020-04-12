@@ -8,6 +8,8 @@ import 'package:keuangan/util/loading_view.dart';
 import '../../main.dart';
 
 class HomePageItemName extends StatefulWidget {
+  final Widget drawer;
+  HomePageItemName({this.drawer});
   @override
   _HomePageItemNameState createState() => _HomePageItemNameState();
 }
@@ -84,8 +86,9 @@ class _HomePageItemNameState extends State<HomePageItemName> {
 
             return Scaffold(
               key: _scaffoldKey,
+              drawer: widget.drawer,
               appBar: new AppBar(
-                title: new Text('Item'),
+                title: new Text('Item Cepat'),
               ),
               body: ListView(
                 scrollDirection: Axis.vertical,
@@ -116,8 +119,9 @@ class _HomePageItemNameState extends State<HomePageItemName> {
           } else {
             _enumState = null;
             return Scaffold(
+              drawer: widget.drawer,
               appBar: new AppBar(
-                title: new Text('Transaksi'),
+                title: new Text('Item Cepat'),
               ),
               body: LoadingView(),
             );

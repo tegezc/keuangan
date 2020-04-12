@@ -13,6 +13,8 @@ import 'package:keuangan/util/loading_view.dart';
 import 'package:keuangan/util/process_string.dart';
 
 class ReportByCategories extends StatefulWidget {
+  final Widget drawer;
+  ReportByCategories({this.drawer});
   @override
   _ReportByCategoriesState createState() => _ReportByCategoriesState();
 }
@@ -335,10 +337,12 @@ class _ReportByCategoriesState extends State<ReportByCategories> {
         appBar: new AppBar(
           title: new Text('Laporan'),
         ),
+        drawer: widget.drawer,
         body: LoadingView(),
       );
     } else {
       return Scaffold(
+        drawer: widget.drawer,
           appBar: new AppBar(
             title: new Text('Laporan'),
           ),

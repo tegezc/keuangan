@@ -19,8 +19,9 @@ class TransactionKeuangan extends StatefulWidget {
   final Kategori kategori;
   final ItemName itemName;
   final StateTransaksi stateTransaksi;
+  final Widget drawer;
 
-  TransactionKeuangan.byDefault()
+  TransactionKeuangan.byDefault({this.drawer})
       : this.stateTransaksi = StateTransaksi.byDefault,
         this.posisiCombobox = null,
         this.kategori = null,
@@ -30,12 +31,14 @@ class TransactionKeuangan extends StatefulWidget {
   TransactionKeuangan.byKategori(
       {this.kategori, this.listCombobox, this.posisiCombobox})
       : this.stateTransaksi = StateTransaksi.byKategori,
-        this.itemName = null;
+        this.itemName = null,
+        this.drawer = null;
 
   TransactionKeuangan.byItemName(
       {this.itemName, this.listCombobox, this.posisiCombobox})
       : this.stateTransaksi = StateTransaksi.byItemName,
-        this.kategori = null;
+        this.kategori = null,
+        this.drawer = null;
 
   @override
   _TransactionKeuanganState createState() => _TransactionKeuanganState();
@@ -126,7 +129,7 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
 
   _getDataKeuanganByPeriode(DateTime startDate, DateTime endDate) {
     DaoKeuangan daoKeuangan = new DaoKeuangan();
-    daoKeuangan.getAllKeuangan().then((lk){
+    daoKeuangan.getAllKeuangan().then((lk) {
       daoKeuangan
           .getKeuanganByPeriode(startDate, endDate)
           .then((List<Keuangan> list) {
@@ -140,7 +143,6 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
         setState(() {});
       });
     });
-
   }
 
   _sortingListKeuangan(List<Keuangan> listK) {
@@ -260,7 +262,6 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
   }
 
   Widget _widgetComboBoxTanggal() {
-
     return new DropdownButton(
       value: _currentEntryCombo,
       items: _dropDownEntry,
@@ -375,6 +376,7 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
 
     if (_listEntry == null) {
       return Scaffold(
+        drawer: widget.drawer,
         appBar: new AppBar(
           title: new Text('Transaksi'),
         ),
@@ -382,6 +384,7 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
       );
     } else {
       return Scaffold(
+        drawer: widget.drawer,
         appBar: new AppBar(
           title: new Text('Transaksi'),
         ),
@@ -395,9 +398,9 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
                   isEditMode: false,
                   keuangan: null,
                 ));
-            if(res == EnumFinalResult.success){
+            if (res == EnumFinalResult.success) {
               _fullReload();
-            }else{
+            } else {
               /// TODO gagal
             }
           },
@@ -408,5 +411,3 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
     }
   }
 }
-
-// One entry in the multilevel list displayed by this app.
