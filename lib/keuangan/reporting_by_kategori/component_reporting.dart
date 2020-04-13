@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:intl/intl.dart';
-import 'package:keuangan/keuangan/model_keuangan_ui.dart';
+import 'package:keuangan/keuangan/transaksi/model_keuangan_ui.dart';
 import 'package:keuangan/util/colors_utility.dart';
 import 'package:keuangan/util/global_data.dart';
 

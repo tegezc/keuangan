@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:keuangan/file_non_production/bulk_insert.dart';
 import 'package:keuangan/keuangan/itemname/homepage_itemname.dart';
 import 'package:keuangan/keuangan/kategori/homepage_kategori.dart';
-import 'package:keuangan/keuangan/keuangan_transaksi.dart';
+import 'package:keuangan/keuangan/transaksi/keuangan_transaksi.dart';
 import 'package:keuangan/keuangan/reporting_by_kategori/reporting_bykategori.dart';
 import 'package:flutter/material.dart';
 
@@ -115,13 +115,13 @@ class MyHomePageState extends State<MyHomePage> {
     drawerOptions.add(new ListTile(
       leading: new Icon(Icons.monetization_on,
           color: _selectedDrawerIndex == 0 ? Colors.blue : Colors.black),
-      title: new Text("Keuangan",
+      title: new Text("Home",
           style:
               _selectedDrawerIndex == 0 ? textStyleSelected : textStyleNormal),
       onTap: () => _onSelectItem(0),
     ));
     drawerOptions.add(new ListTile(
-      leading: new Icon(Icons.pie_chart,
+      leading: new Icon(Icons.swap_horizontal_circle,
           color: _selectedDrawerIndex == 1 ? Colors.blue : Colors.black),
       title: new Text("Transaksi",
           style:

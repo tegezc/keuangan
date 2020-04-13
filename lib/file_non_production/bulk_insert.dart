@@ -1,61 +1,14 @@
-import 'package:keuangan/database/dao_event.dart';
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/database/keuangan/dao_keuangan.dart';
 import 'package:keuangan/database/keuangan/dao_kategori.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
-import 'package:keuangan/model/event.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/colors_utility.dart';
-import 'package:keuangan/util/global_string_database.dart';
-import 'package:flutter/services.dart' show rootBundle;
-import 'dart:convert';
 
 class Persiapan {
   static final int tahunMulai = 1965;
   static final int tahunAkhir = 2050;
 
-  bulkInsert() async {
-    TbSpecialDay tb = new TbSpecialDay();
-    String jsonString = await rootBundle.loadString('assets/special_day.json');
-    Map<String, dynamic> user = jsonDecode(jsonString);
-    Map<String, dynamic> map = user['menu'];
-
-    for (int i = 1965; i < 2051; i++) {
-      List<dynamic> list = map['$i'];
-      if (list != null) {
-        for (int j = 0; j < list.length; j++) {
-          String tanggal = '$i-${list[j][tb.sdTanggal]}';
-          SpecialDay specialDay = new SpecialDay(tanggal,
-              list[j][tb.sdArrayTanggal], list[j][tb.sdStringTanggal]);
-
-          DaoSpecialDay daoSpecialDay = new DaoSpecialDay();
-          daoSpecialDay.saveSpecialDay(specialDay);
-        }
-      }
-    }
-  }
-
-  bulkInsertWithBatch() async {
-    TbSpecialDay tb = new TbSpecialDay();
-    String jsonString = await rootBundle.loadString('assets/special_day.json');
-    Map<String, dynamic> user = jsonDecode(jsonString);
-    Map<String, dynamic> map = user['menu'];
-    List<SpecialDay> listSpecial = new List();
-    for (int i = 1965; i < 2051; i++) {
-      List<dynamic> list = map['$i'];
-      if (list != null) {
-        for (int j = 0; j < list.length; j++) {
-          String tanggal = '$i-${list[j][tb.sdTanggal]}';
-          SpecialDay specialDay = new SpecialDay(tanggal,
-              list[j][tb.sdArrayTanggal], list[j][tb.sdStringTanggal]);
-
-          listSpecial.add(specialDay);
-        }
-      }
-    }
-    DaoSpecialDay daoSpecialDay = new DaoSpecialDay();
-    daoSpecialDay.saveBatchSpecialDay(listSpecial);
-  }
 
   insertKategoriDummy() {
     var colors = ColorManagement.colors;
@@ -121,19 +74,19 @@ class Persiapan {
 
   bulkinsertKeuangan(){
     DaoKeuangan daoKeuangan = new DaoKeuangan();
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-1', 1, 50000, 'ct'));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-2', 2, 50000, 'ct'));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-3', 3, 13700, 'ct'));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-4', 4, 1700000, 'ct'));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-5', 5, 532000, 'ct'));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-6', 6, 32000, 'ct'));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-7', 7, 10000, 'ct'));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-8', 8, 5000, 'ct'));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-7', 4, 500, 'ct'));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-6', 5, 1000, 'ct'));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-5', 6, 23000, 'ct'));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-4', 7, 13000, 'ct'));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-4', 8, 15000, 'ct'));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-1', 1, 50000, 'ct',DateTime(2019,8,1).millisecondsSinceEpoch));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-2', 2, 50000, 'ct',DateTime(2019,8,2).millisecondsSinceEpoch));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-3', 3, 13700, 'ct',DateTime(2019,8,3).millisecondsSinceEpoch));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-4', 4, 1700000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-5', 5, 532000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-6', 6, 32000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-7', 7, 10000, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-8', 8, 5000, 'ct',DateTime(2019,8,8).millisecondsSinceEpoch));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-7', 4, 500, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-6', 5, 1000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-5', 6, 23000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-4', 7, 13000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-4', 8, 15000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch));
 //    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-28', 1, 5, '', 1));
 //    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-29', 10, 5, '', 1));
 //    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-29', 11, 5, '', 0));

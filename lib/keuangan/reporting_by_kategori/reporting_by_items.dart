@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/database/keuangan/dao_kategori.dart';
 import 'package:keuangan/database/keuangan/dao_keuangan.dart';
-import 'package:keuangan/keuangan/model_keuangan_ui.dart';
+import 'package:keuangan/keuangan/transaksi/model_keuangan_ui.dart';
 import 'package:keuangan/keuangan/reporting_by_kategori/component_reporting.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/datepicker_singlescrollview.dart';

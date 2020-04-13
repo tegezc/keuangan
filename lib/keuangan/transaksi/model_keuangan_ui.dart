@@ -7,8 +7,8 @@ import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/global_string_database.dart';
 
-import '../main.dart';
-import 'entry_item/keuangan_item.dart';
+import '../../main.dart';
+import '../entry_item/keuangan_item.dart';
 
 class Entry {
   Entry(this.title, this.kategori, this.tanggal, this.keuangan,this.flag,this.isLast);

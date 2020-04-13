@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/database/keuangan/dao_kategori.dart';
 import 'package:keuangan/database/keuangan/dao_keuangan.dart';
-import 'package:keuangan/keuangan/model_keuangan_ui.dart';
+import 'package:keuangan/keuangan/transaksi/model_keuangan_ui.dart';
 import 'package:keuangan/keuangan/reporting_by_kategori/component_reporting.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
@@ -10,8 +10,8 @@ import 'package:keuangan/util/datepicker_singlescrollview.dart';
 import 'package:keuangan/util/loading_view.dart';
 import 'package:keuangan/util/process_string.dart';
 
-import '../main.dart';
-import 'entry_item/keuangan_item.dart';
+import '../../main.dart';
+import '../entry_item/keuangan_item.dart';
 
 class TransactionKeuangan extends StatefulWidget {
   final List<EntryCombobox> listCombobox;
@@ -314,9 +314,7 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
   Widget _bodyTransaksi(Size dimensi) {
     return Container(
       width: double.infinity,
-      child: ListView(
-        physics: NeverScrollableScrollPhysics(),
-        scrollDirection: Axis.vertical,
+      child: Column(
         children: <Widget>[
           Container(
             height: 60,
@@ -333,13 +331,11 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
               ],
             ),
           ),
-          Container(
-            width: double.infinity,
-            height: 1,
-            color: Colors.grey,
+          Divider(
+            color: Colors.blueAccent,
           ),
           new Container(
-            height: dimensi.height - 140,
+            height: dimensi.height - 200,
             child: ListView.builder(
               itemBuilder: (BuildContext context, int index) {
                 if (index < _listEntry.length) {

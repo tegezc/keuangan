@@ -5,7 +5,7 @@ import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 
 import '../main.dart';
-import 'keuangan_transaksi.dart';
+import 'transaksi/keuangan_transaksi.dart';
 
 class HomepageKeuangan extends StatefulWidget {
   final Widget drawer;

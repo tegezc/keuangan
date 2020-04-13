@@ -34,29 +34,12 @@ class DatabaseHelper {
 //  }
 
   void _onCreate(Database db, int version) async {
-    TbTodolistItem tbTodolistItem = new TbTodolistItem();
-    TbTodolist tbTodolist = new TbTodolist();
     TbKategori tbKategori = new TbKategori();
     TbItemName tbItemName = new TbItemName();
     TbKeuangan tbKeuangan = new TbKeuangan();
     TbSetup tbSetup = new TbSetup();
     // When creating the db, create the table
 
-//    await db.execute(
-//        "CREATE TABLE ${GSD.tableEvent}(${GSD.evId} INTEGER PRIMARY KEY, ${GSD.evArrayTanggal} TEXT, ${GSD.evStringEvent} TEXT)");
-//    await db.execute(
-//        "CREATE TABLE ${GSD.tableEventBulan}(${GSD.evBlnId} INTEGER PRIMARY KEY, ${GSD.evBlnKeyEvent} INTEGER, ${GSD.evBlnTanggal} TEXT)");
-//    await db.execute(
-//        "CREATE TABLE ${GSD.tableSpecialDay}(${GSD.sdId} INTEGER PRIMARY KEY, ${GSD.sdTanggal} TEXT,${GSD.sdArrayTanggal} TEXT, ${GSD.sdStringTanggal} TEXT)");
-    await db.execute(
-        "CREATE TABLE ${tbTodolist.name}(${tbTodolist.fId} INTEGER PRIMARY KEY, "
-            "${tbTodolist.fTanggal} TEXT)");
-    await db.execute(
-        "CREATE TABLE ${tbTodolistItem.name}(${tbTodolistItem.fId} INTEGER PRIMARY KEY, "
-            "${tbTodolistItem.fIdTodolist} INTEGER,"
-            "${tbTodolistItem.fNoUrut} INTEGER,"
-            "${tbTodolistItem.fText} TEXT,"
-            "${tbTodolistItem.fIsChecked} INTEGER)");
     await db.execute(
         "CREATE TABLE "
             "${tbKategori.name}(${tbKategori.fId} INTEGER PRIMARY KEY, "
@@ -74,7 +57,8 @@ class DatabaseHelper {
             "${tbKeuangan.fTgl} TEXT, "
             "${tbKeuangan.fIdItemName} INTEGER,"
             "${tbKeuangan.fJumlah} REAL,"
-            "${tbKeuangan.fCatatan} TEXT)");
+            "${tbKeuangan.fCatatan} TEXT,"
+            "${tbKeuangan.fLastUpdate} INTEGER)");
 
     await db.execute(
         "CREATE TABLE ${tbSetup.name}(${tbSetup.fId} INTEGER PRIMARY KEY, "

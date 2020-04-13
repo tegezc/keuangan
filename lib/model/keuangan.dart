@@ -93,6 +93,7 @@ class Keuangan {
   int _idItemName;
   double _jumlah;
   String _catatan;
+  int _lastupdate;
 
   Keuangan();
 
@@ -102,15 +103,17 @@ class Keuangan {
     this._idItemName = idItemName;
     this._jumlah = jumlah;
     this._catatan = catatan;
+    this._lastupdate = DateTime.now().millisecondsSinceEpoch;
   }
 
   Keuangan.fromDB(
-      String tanggal, int idItemName, double jumlah, String catatan) {
+      String tanggal, int idItemName, double jumlah, String catatan,int newlastupdate) {
     ProcessString processString = new ProcessString();
     this._tanggal = processString.dateFromDbToDateTime(tanggal);
     this._idItemName = idItemName;
     this._jumlah = jumlah;
     this._catatan = catatan;
+    this._lastupdate = newlastupdate;
   }
 
   DateTime get tanggal => this._tanggal;
@@ -121,6 +124,8 @@ class Keuangan {
 
   String get catatan => _catatan;
 
+  int get lastupdate => this._lastupdate;
+
   Map<String, dynamic> toMap() {
     ProcessString processString = new ProcessString();
     var map = new Map<String, dynamic>();
@@ -128,6 +133,7 @@ class Keuangan {
     map[tb.fIdItemName] = _idItemName;
     map[tb.fJumlah] = _jumlah;
     map[tb.fCatatan] = _catatan;
+    map[tb.fLastUpdate] = _lastupdate;
 
     return map;
   }
@@ -150,6 +156,10 @@ class Keuangan {
 
   void setCatatan(String ctt) {
     this._catatan = ctt;
+  }
+
+  void setLastupdate(int newvalue) {
+    this._lastupdate = newvalue;
   }
 
   bool isValid() {
