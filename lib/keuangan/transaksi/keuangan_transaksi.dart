@@ -129,19 +129,18 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
 
   _getDataKeuanganByPeriode(DateTime startDate, DateTime endDate) {
     DaoKeuangan daoKeuangan = new DaoKeuangan();
-    daoKeuangan.getAllKeuangan().then((lk) {
-      daoKeuangan
-          .getKeuanganByPeriode(startDate, endDate)
-          .then((List<Keuangan> list) {
-        if (_listKeuangan == null) {
-          _listKeuangan = new List();
-        } else {
-          _listKeuangan.clear();
-        }
-        _listKeuangan.addAll(list);
-        _sortingListKeuangan(_listKeuangan);
-        setState(() {});
-      });
+
+    daoKeuangan
+        .getKeuanganByPeriode(startDate, endDate)
+        .then((List<Keuangan> list) {
+      if (_listKeuangan == null) {
+        _listKeuangan = new List();
+      } else {
+        _listKeuangan.clear();
+      }
+      _listKeuangan.addAll(list);
+      _sortingListKeuangan(_listKeuangan);
+      setState(() {});
     });
   }
 
@@ -317,7 +316,7 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
       child: Column(
         children: <Widget>[
           Container(
-            height: 60,
+            height: 59,
             width: double.infinity,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -333,16 +332,23 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
           ),
           Divider(
             color: Colors.blueAccent,
+            thickness: 10,
           ),
           new Container(
             height: dimensi.height - 200,
             child: ListView.builder(
               itemBuilder: (BuildContext context, int index) {
                 if (index < _listEntry.length) {
-                  return CellKeuangan(
-                    entry: _listEntry[index],
-                    callbackDelete: _callbackActionDelete,
-                  );
+                  Entry e = _listEntry[index];
+                  if(e.flag){
+                    return CellKeuangan(
+                      entry: _listEntry[index],
+                      callbackDelete: _callbackActionDelete,
+                    );
+                  }else{
+                    return HeaderCellTanggalTransaksi(e.tanggal);
+                  }
+
                 } else {
                   return SizedBox(
                     height: 70,

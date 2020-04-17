@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:keuangan/database/keuangan/dao_keuangan.dart';
+import 'package:keuangan/keuangan/bloc_hpkeuangan.dart';
+import 'package:keuangan/keuangan/entry_item/keuangan_item.dart';
+import 'package:keuangan/keuangan/transaksi/model_keuangan_ui.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
-import 'package:keuangan/model/keuangan.dart';
+import 'package:keuangan/util/loading_view.dart';
 
 import '../main.dart';
-import 'transaksi/keuangan_transaksi.dart';
 
 class HomepageKeuangan extends StatefulWidget {
   final Widget drawer;
@@ -19,42 +20,13 @@ class HomepageKeuangan extends StatefulWidget {
 class _HomepageKeuanganState extends State<HomepageKeuangan> {
   final TextStyle _textStyleSmall = new TextStyle(fontSize: 10);
 
-  int pengeluaran = 0;
-  int pemasukan = 0;
-  int balance = 0;
+  int _counterBlock = 0;
+  BlocHpKeuangan _blocHpKeuangan;
 
   @override
   void initState() {
-    _setupBalance();
+    _blocHpKeuangan = new BlocHpKeuangan();
     super.initState();
-  }
-
-  _setupBalance() {
-    DaoKeuangan daoKeuangan = new DaoKeuangan();
-    daoKeuangan
-        .getKeuanganByJenisTransaksi(EnumJenisTransaksi.pemasukan)
-        .then((lkp) {
-      pemasukan = this._hitungTotal(lkp);
-      daoKeuangan
-          .getKeuanganByJenisTransaksi(EnumJenisTransaksi.pengeluaran)
-          .then((lkk) {
-        pengeluaran = this._hitungTotal(lkk);
-        balance = pemasukan - pengeluaran;
-        setState(() {});
-      });
-    });
-  }
-
-  int _hitungTotal(List<Keuangan> lk) {
-    if (lk != null) {
-      double tmpJum = 0;
-      lk.forEach((k) {
-        tmpJum = tmpJum + k.jumlah;
-      });
-      return tmpJum.toInt();
-    } else {
-      return 0;
-    }
   }
 
   Widget _textSmall(String text) {
@@ -140,29 +112,65 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
     );
   }
 
-  Widget _spaceBetweenButton() {
-    return SizedBox(
-      height: 10,
-    );
+  _showDialogPilihan(Entry entry) {
+    showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => SimpleDialog(
+              title: Text('Pilihan'),
+              children: <Widget>[
+                new OutlineButton(
+                  onPressed: () {
+                    _edit(entry);
+                  },
+                  child: Text('edit'),
+                ),
+                new OutlineButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _showDialogConfirmDelete(entry);
+                  },
+                  child: Text('delete'),
+                ),
+              ],
+            ));
   }
 
-  Widget _buttonNav(
-      String text, Size sizeWidget, BuildContext context, int page) {
-    return SizedBox(
-      width: sizeWidget.width - 20,
-      child: RaisedButton(
-        onPressed: () async {
-          await openPage(context, TransactionKeuangan.byDefault());
-        },
-        textColor: Colors.white,
-        color: Colors.blue,
-        padding: const EdgeInsets.all(0.0),
-        child: Container(
-          padding: const EdgeInsets.all(10.0),
-          child: Text(text, style: TextStyle(fontSize: 15)),
-        ),
-      ),
-    );
+  _showDialogConfirmDelete(Entry entry) {
+    showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => SimpleDialog(
+              title: Text('Apakah anda yakin akan menghapus record ini?'),
+              children: <Widget>[
+                new OutlineButton(
+                  onPressed: () {
+                    _deleteConfirmed(entry);
+                  },
+                  child: Text('ya'),
+                ),
+                new OutlineButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('tidak'),
+                ),
+              ],
+            ));
+  }
+
+  _edit(Entry entry) async {
+    int res = await openPage(
+        context,
+        KeuanganItemView(
+          dateTime: DateTime.now(),
+          isEditMode: true,
+          keuangan: entry.keuangan,
+        ));
+    Navigator.of(context).pop(res);
+  }
+
+  _deleteConfirmed(Entry entry) {
+    _blocHpKeuangan.deleteTransaksi(entry);
+    Navigator.of(context).pop();
   }
 
   Future openPage(context, Widget builder) async {
@@ -174,29 +182,125 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
     );
   }
 
+  List<Widget> listWidget(Size sizeWidget, UIHPKeuangan data) {
+    List<Widget> lw = new List();
+    lw.add(_widgetBalance(
+        sizeWidget, data.pemasukan, data.pengeluaran, data.balance));
+    lw.add(Divider());
+    lw.add(Center(
+      child: Text('Transaksi terakhir'),
+    ));
+    lw.add(SizedBox(height: 3,));
+    if (data.lentry != null) {
+      data.lentry.forEach((e) {
+        if (e.flag) {
+          lw.add(FlatButton(
+              onPressed: () {
+                _showDialogPilihan(e);
+              },
+              child: CellKeuanganStateLess(e)));
+        }
+
+        // lw.add(Text('asu'));
+      });
+    }
+    return lw;
+  }
+
   @override
   Widget build(BuildContext context) {
     MediaQueryData mediaQueryData = MediaQuery.of(context);
-    Size _sizeWidget = mediaQueryData.size;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Keuangan'),
-      ),
-      drawer: widget.drawer,
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          children: <Widget>[
-            _widgetBalance(_sizeWidget, pemasukan, pengeluaran, balance),
-            Divider(
-              height: 10.0,
-            ),
-            _buttonNav('Transaksi', _sizeWidget, context, 1),
-            _spaceBetweenButton(),
-          ],
-        ),
+    Size sizeWidget = mediaQueryData.size;
+    if (_counterBlock == 0) {
+      _blocHpKeuangan.fullReload();
+      _counterBlock++;
+    }
+
+    return StreamBuilder<UIHPKeuangan>(
+        stream: _blocHpKeuangan.uiHPKeuangan,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Scaffold(
+              appBar: AppBar(
+                title: Text('Keuangan'),
+              ),
+              drawer: widget.drawer,
+              body: Container(
+                height: double.infinity,
+                width: double.infinity,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: listWidget(sizeWidget, snapshot.data),
+                  ),
+                ),
+              ),
+            );
+          } else {
+            return Scaffold(
+                appBar: AppBar(
+                  title: Text('Keuangan'),
+                ),
+                body: LoadingView());
+          }
+        });
+  }
+}
+
+class CellKeuanganStateLess extends StatelessWidget {
+  final Entry entry;
+
+  CellKeuanganStateLess(this.entry);
+
+  final _styleTextItem = TextStyle(fontWeight: FontWeight.normal, fontSize: 14);
+
+  final _styleTextKategori = TextStyle(fontSize: 10, color: Colors.blueAccent);
+
+  @override
+  Widget build(BuildContext context) {
+    final formatCurrency = new NumberFormat("#,##0", "idr");
+    int uang = entry.keuangan.jumlah.toInt();
+    TextStyle textStyle;
+    if (entry.kategori.type == EnumJenisTransaksi.pemasukan) {
+      textStyle = TextStyle(color: Colors.green);
+    } else {
+      textStyle = TextStyle(color: Colors.red);
+    }
+    return Container(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Text(
+                entry.title,
+                style: _styleTextItem,
+              ),
+              Spacer(),
+              Text(
+                'Rp ${formatCurrency.format(uang)}',
+                style: textStyle,
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 3,
+          ),
+          Text(
+            '${entry.kategori.nama}-${entry.tanggal}',
+            style: _styleTextKategori,
+          ),
+          SizedBox(
+            height: 3,
+          ),
+          entry.isLast
+              ? SizedBox(
+                  height: 2,
+                )
+              : Divider(),
+        ],
       ),
     );
   }

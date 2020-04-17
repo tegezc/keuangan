@@ -86,7 +86,7 @@ class Persiapan {
     daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-6', 5, 1000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch));
     daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-5', 6, 23000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch));
     daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-4', 7, 13000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-4', 8, 15000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-4', 7, 15000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch));
 //    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-28', 1, 5, '', 1));
 //    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-29', 10, 5, '', 1));
 //    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-29', 11, 5, '', 0));

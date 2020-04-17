@@ -37,10 +37,10 @@ class DaoKeuangan {
     return keuangans;
   }
 
-  Future<List<Keuangan>> get7LastKeuangan() async {
+  Future<List<Keuangan>> get5LastKeuangan() async {
     var dbClient = await DatabaseHelper().db;
     List<Map> list = await dbClient.rawQuery(
-        'SELECT * FROM ${tb.name} ORDER BY ${tb.fLastUpdate} DESC limit 7');
+        'SELECT * FROM ${tb.name} ORDER BY ${tb.fLastUpdate} DESC limit 5');
     List<Keuangan> keuangans = new List();
     for (int i = 0; i < list.length; i++) {
       var keuangan = new Keuangan.fromDB(

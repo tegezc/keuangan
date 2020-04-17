@@ -21,9 +21,10 @@ class DatabaseHelper {
   DatabaseHelper.internal();
 
   initDb() async {
-    io.Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, "main.db");
-    var theDb = await openDatabase(path, version: 1, onCreate: _onCreate);
+    Sqflite.devSetDebugModeOn(true);
+//    io.Directory documentsDirectory = await getApplicationDocumentsDirectory();
+//    String path = join(documentsDirectory.path, "keuangan.db");
+    var theDb = await openDatabase(join(await getDatabasesPath(), 'keuangan.db'), version: 1, onCreate: _onCreate);
     return theDb;
   }
 
