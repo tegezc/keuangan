@@ -44,14 +44,14 @@ class Persiapan {
 
   insertItemNameDummy(){
     DaoItemName daoItemName = new DaoItemName();
-    daoItemName.saveItemName(new ItemName('Makan', 1));
-    daoItemName.saveItemName(new ItemName('pulsa', 1));
-    daoItemName.saveItemName(new ItemName('Internet Telkomsel', 2));
-    daoItemName.saveItemName(new ItemName('Internet XL', 2));
-    daoItemName.saveItemName(new ItemName('Shop', 3));
-    daoItemName.saveItemName(new ItemName('Transport Operasional', 3));
-    daoItemName.saveItemName(new ItemName('Kosan', 4));
-    daoItemName.saveItemName(new ItemName('Jajan', 4));
+    daoItemName.saveItemName(new ItemName('Makan', 1,0));
+    daoItemName.saveItemName(new ItemName('pulsa', 1,0));
+    daoItemName.saveItemName(new ItemName('Internet Telkomsel', 2,0));
+    daoItemName.saveItemName(new ItemName('Internet XL', 2,0));
+    daoItemName.saveItemName(new ItemName('Shop', 3,0));
+    daoItemName.saveItemName(new ItemName('Transport Operasional', 3,0));
+    daoItemName.saveItemName(new ItemName('Kosan', 4,0));
+    daoItemName.saveItemName(new ItemName('Jajan', 4,0));
 //    daoItemName.saveItemName(new ItemName('Keperluan bulanan', 3));
 //    daoItemName.saveItemName(new ItemName('keperluan Motor', 3));
 //    daoItemName.saveItemName(new ItemName('Mobil', 4));

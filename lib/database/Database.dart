@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'dart:io' as io;
 
 import 'package:keuangan/util/global_string_database.dart';
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
@@ -52,7 +50,8 @@ class DatabaseHelper {
     await db.execute(
         "CREATE TABLE ${tbItemName.name}(${tbItemName.fId} INTEGER PRIMARY KEY, "
             "${tbItemName.fNama} TEXT, "
-            "${tbItemName.fIdKategori} INTEGER)");
+            "${tbItemName.fIdKategori} INTEGER,"
+            "${tbItemName.fDeleted} INTEGER)");
     await db.execute(
         "CREATE TABLE ${tbKeuangan.name}(${tbKeuangan.fId} INTEGER PRIMARY KEY, "
             "${tbKeuangan.fTgl} TEXT, "

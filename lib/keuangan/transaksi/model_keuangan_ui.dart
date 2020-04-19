@@ -14,7 +14,7 @@ class Entry {
 
   final String title;
   final Kategori kategori;
-  final String tanggal;
+  final String tanggal; ///ex: 23 Maret 2019
   final Keuangan keuangan;
   final bool flag;
   final bool isLast;

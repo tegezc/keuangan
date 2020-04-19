@@ -26,7 +26,8 @@ class _HomePageItemNameState extends State<HomePageItemName> {
     super.initState();
   }
 
-  Widget _cellKategori(ItemName itemName) {
+  Widget _itemNameCell(ItemName itemName) {
+   // print(itemName);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -50,10 +51,10 @@ class _HomePageItemNameState extends State<HomePageItemName> {
     );
   }
 
-  List<Widget> _listKategori(List<ItemName> lKategori) {
+  List<Widget> _listWidgetItemName(List<ItemName> lin) {
     List<Widget> lW = new List();
-    for (int i = 0; i < lKategori.length; i++) {
-      lW.add(_cellKategori(lKategori[i]));
+    for (int i = 0; i < lin.length; i++) {
+      lW.add(_itemNameCell(lin[i]));
     }
     return lW;
   }
@@ -92,7 +93,7 @@ class _HomePageItemNameState extends State<HomePageItemName> {
               ),
               body: ListView(
                 scrollDirection: Axis.vertical,
-                children: _listKategori(snapshot.data.listItemName),
+                children: _listWidgetItemName(snapshot.data.listItemName),
               ),
               floatingActionButton: new FloatingActionButton(
                 onPressed: () async {
@@ -102,9 +103,9 @@ class _HomePageItemNameState extends State<HomePageItemName> {
                   if (res == null) {
                     _enumState = null;
                   } else {
-                    _blocHomepageItemName.populateAllKategoriFromDb(
+                    _blocHomepageItemName.populateSemuaItemNameFromDb(
                         EnumStatePopulateItemName.savesuccess);
-                    String messageSnackBar = 'Kategori berhasil di simpan.';
+                    String messageSnackBar = 'Item berhasil di simpan.';
                     _scaffoldKey.currentState.showSnackBar(SnackBar(
                       content: SizedBox(
                           height: 30.0, child: Center(child: Text(messageSnackBar))),
@@ -112,7 +113,7 @@ class _HomePageItemNameState extends State<HomePageItemName> {
                     ));
                   }
                 },
-                tooltip: 'add kategori',
+                tooltip: 'add Item',
                 child: new Icon(Icons.add),
               ),
             );
@@ -189,11 +190,11 @@ class _HomePageItemNameState extends State<HomePageItemName> {
     //prevent snacbar showing
     if (res == null) {
       _enumState = null;
-    } else {
-      _blocHomepageItemName.populateAllKategoriFromDb(
+    } else if(res == 2){
+      _blocHomepageItemName.populateSemuaItemNameFromDb(
           EnumStatePopulateItemName.editsuccess);
 
-      String messageSnackBar = 'Kategori berhasil di update';
+      String messageSnackBar = 'Item berhasil di update';
       _scaffoldKey.currentState.showSnackBar(SnackBar(
         content: SizedBox(
             height: 30.0, child: Center(child: Text(messageSnackBar))),

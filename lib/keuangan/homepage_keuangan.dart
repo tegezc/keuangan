@@ -4,7 +4,9 @@ import 'package:keuangan/keuangan/bloc_hpkeuangan.dart';
 import 'package:keuangan/keuangan/entry_item/keuangan_item.dart';
 import 'package:keuangan/keuangan/transaksi/model_keuangan_ui.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
+import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/loading_view.dart';
+import 'package:keuangan/util/process_string.dart';
 
 import '../main.dart';
 
@@ -112,7 +114,11 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
     );
   }
 
-  _showDialogPilihan(Entry entry) {
+  _showDialogPilihan(Keuangan k) {
+    ProcessString processString = new ProcessString();
+    ItemName inm = k.lazyItemName;
+    String tanggal = processString.dateToStringDdMmmmYyyy(k.tanggal);
+    Entry entry = new Entry(inm.nama, inm.kategori, tanggal, k, true, true);
     showDialog<String>(
         context: context,
         builder: (BuildContext context) => SimpleDialog(
@@ -191,17 +197,15 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
       child: Text('Transaksi terakhir'),
     ));
     lw.add(SizedBox(height: 3,));
-    if (data.lentry != null) {
-      data.lentry.forEach((e) {
-        if (e.flag) {
+    if (data.listKeuangan != null) {
+      data.listKeuangan.forEach((k) {
+       print('idkeuangan: ${k.id}');
           lw.add(FlatButton(
               onPressed: () {
-                _showDialogPilihan(e);
+                _showDialogPilihan(k);
               },
-              child: CellKeuanganStateLess(e)));
-        }
-
-        // lw.add(Text('asu'));
+              child: CellKeuanganStateLess(k)));
+       
       });
     }
     return lw;
@@ -248,9 +252,9 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
 }
 
 class CellKeuanganStateLess extends StatelessWidget {
-  final Entry entry;
+  final Keuangan keuangan;
 
-  CellKeuanganStateLess(this.entry);
+  CellKeuanganStateLess(this.keuangan);
 
   final _styleTextItem = TextStyle(fontWeight: FontWeight.normal, fontSize: 14);
 
@@ -259,9 +263,10 @@ class CellKeuanganStateLess extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final formatCurrency = new NumberFormat("#,##0", "idr");
-    int uang = entry.keuangan.jumlah.toInt();
+    int uang = keuangan.jumlah.toInt();
+    ItemName itemName = keuangan.lazyItemName;
     TextStyle textStyle;
-    if (entry.kategori.type == EnumJenisTransaksi.pemasukan) {
+    if (itemName.kategori.type == EnumJenisTransaksi.pemasukan) {
       textStyle = TextStyle(color: Colors.green);
     } else {
       textStyle = TextStyle(color: Colors.red);
@@ -275,7 +280,7 @@ class CellKeuanganStateLess extends StatelessWidget {
           Row(
             children: <Widget>[
               Text(
-                entry.title,
+                itemName.nama,
                 style: _styleTextItem,
               ),
               Spacer(),
@@ -289,17 +294,12 @@ class CellKeuanganStateLess extends StatelessWidget {
             height: 3,
           ),
           Text(
-            '${entry.kategori.nama}-${entry.tanggal}',
+            '${itemName.kategori.nama}-${keuangan.tanggal}',
             style: _styleTextKategori,
           ),
           SizedBox(
             height: 3,
           ),
-          entry.isLast
-              ? SizedBox(
-                  height: 2,
-                )
-              : Divider(),
         ],
       ),
     );

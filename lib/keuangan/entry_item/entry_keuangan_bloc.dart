@@ -22,7 +22,7 @@ class BlocEntryKeuangan {
       mapKategori: Map(),
       mapItemName: Map(),
       jenisKeuangan: EnumJenisTransaksi.pengeluaran,
-      itemName: new ItemName('', 0),
+      itemName: new ItemName('', 0, 0),
       stateEntryKeuangan: null,
       finalResult: EnumFinalResult.inprogres,
     );
@@ -119,7 +119,7 @@ class BlocEntryKeuangan {
     daoItemName
         .getItemNameByNamaNIdKategori(
             strItemName, entryKeuangan.itemName.idKategori)
-        .then((ItemName iName) {
+        .then((iName) {
       if (iName != null) {
         entryKeuangan.keuangan.setIdItemName(iName.id);
         daoKeuangan.saveKeuangan(entryKeuangan.keuangan).then((value) {
@@ -129,7 +129,7 @@ class BlocEntryKeuangan {
       } else {
         ItemName itemName = entryKeuangan.itemName;
         daoItemName.saveItemName(itemName).then((v) {
-          if (v>0) {
+          if (v > 0) {
             entryKeuangan.keuangan.setIdItemName(v);
             daoKeuangan.saveKeuangan(entryKeuangan.keuangan).then((value) {
               StateFinishLagi stateFinishLagi = StateFinishLagi();
@@ -141,7 +141,7 @@ class BlocEntryKeuangan {
     });
   }
 
-  Future<EnumFinalResult> simpan1(String nama,String catatan) async{
+  Future<EnumFinalResult> simpan1(String nama, String catatan) async {
     _cacheEntry.itemName.setNama(nama);
     _cacheEntry.keuangan.setCatatan(catatan);
 
@@ -150,35 +150,35 @@ class BlocEntryKeuangan {
     DaoItemName daoItemName = new DaoItemName();
     DaoKeuangan daoKeuangan = new DaoKeuangan();
     String strItemName = entryKeuangan.itemName.nama;
-    EnumFinalResult enumFinalResult ;
+    EnumFinalResult enumFinalResult;
 
-    ItemName itemName = await daoItemName.getItemNameByNamaNIdKategori(strItemName, entryKeuangan.itemName.idKategori);
-    if(itemName !=null){
+    ItemName itemName = await daoItemName.getItemNameByNamaNIdKategori(
+        strItemName, entryKeuangan.itemName.idKategori);
+    if (itemName != null) {
       entryKeuangan.keuangan.setIdItemName(itemName.id);
       int resDb = await daoKeuangan.saveKeuangan(entryKeuangan.keuangan);
 
-      if(resDb>0){
+      if (resDb > 0) {
         enumFinalResult = EnumFinalResult.success;
-      }else{
+      } else {
         enumFinalResult = EnumFinalResult.failed;
       }
-    }else{
+    } else {
       ItemName itemName =
-      new ItemName(strItemName, entryKeuangan.itemName.idKategori);
+          new ItemName(strItemName, entryKeuangan.itemName.idKategori, 0);
       int resDb = await daoItemName.saveItemName(itemName);
 
-      if(resDb>0){
+      if (resDb > 0) {
         entryKeuangan.keuangan.setIdItemName(resDb);
         int resK = await daoKeuangan.saveKeuangan(entryKeuangan.keuangan);
-        if(resK > 0){
+        if (resK > 0) {
           enumFinalResult = EnumFinalResult.success;
-        }else{
+        } else {
           enumFinalResult = EnumFinalResult.failed;
         }
-      }else{
+      } else {
         enumFinalResult = EnumFinalResult.failed;
       }
-
     }
 
     return enumFinalResult;
@@ -230,19 +230,22 @@ class BlocEntryKeuangan {
           _cacheEntry.itemName.setKategori(kategories[0]);
         }
 
-        daoItemName.getAllItemName().then((itemNames) {
+        daoItemName.getAllItemNameVisible().then((itemNames) {
           if (itemNames != null) {
             _cacheMapItemName = this._lItmNameToMap(itemNames);
           }
-
-          if (isEditMode && kngan != null) {
+        });
+        if (isEditMode && kngan != null) {
+          daoItemName.getItemNameById(kngan.idItemName).then((item) {
             _cacheEntry.keuangan = kngan;
-            _cacheEntry.itemName = _cacheMapItemName[kngan.idItemName];
+            _cacheEntry.itemName = item;
             _cacheEntry.itemName.setKategori(
                 _cacheEntry.mapKategori[_cacheEntry.itemName.idKategori]);
-          }
+            this._sinkEntryKeuangan(_cacheEntry);
+          });
+        }else{
           this._sinkEntryKeuangan(_cacheEntry);
-        });
+        }
       });
     }
   }
@@ -273,8 +276,6 @@ class EntryKeuangan {
     @required this.finalResult,
   });
 }
-
-
 
 class StateEntryKeuangan {
   EnumEntryKeuangan stateEntry;

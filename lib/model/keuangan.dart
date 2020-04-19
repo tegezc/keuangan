@@ -12,7 +12,11 @@ class Kategori {
   List<Kategori> listKategori;
   String _color;
 
-  Kategori(this._nama, this._idParent, this._type, this._catatan, this._color);
+  Kategori(this._nama, this._idParent, this._type, this._catatan, this._color)
+      : assert(_nama != null &&
+            _idParent != null &&
+            _type != null &&
+            _catatan != null);
 
   String get nama => this._nama;
 
@@ -47,7 +51,6 @@ class Kategori {
   String toString() {
     return '|ID: $id |nama: $_nama |Catatan: $catatan |ID Parent: $_idParent |Type: $_type |color: $_color';
   }
-
 }
 
 class ItemName {
@@ -56,8 +59,10 @@ class ItemName {
   String _nama;
   int _idKategori;
   Kategori _kategori;
+  int _isDeleted;
 
-  ItemName(this._nama, this._idKategori);
+  ItemName(this._nama, this._idKategori, this._isDeleted)
+      : assert(_nama != null && _idKategori != null && _isDeleted != null);
 
   Kategori get kategori => this._kategori;
 
@@ -65,10 +70,13 @@ class ItemName {
 
   int get idKategori => this._idKategori;
 
+  int get isDeleted => this._isDeleted;
+
   Map<String, dynamic> toMap() {
     var map = new Map<String, dynamic>();
     map[tb.fNama] = _nama;
     map[tb.fIdKategori] = _idKategori;
+    map[tb.fDeleted] = _isDeleted;
     return map;
   }
 
@@ -80,9 +88,18 @@ class ItemName {
     this._nama = nm;
   }
 
+  void setIsDeleted(int value) {
+    this._isDeleted = value;
+  }
+
   void setKategori(Kategori k) {
     this._kategori = k;
     this._idKategori = k.id;
+  }
+
+  @override
+  String toString() {
+    return '$id | $_nama | $_idKategori | $_isDeleted';
   }
 }
 
@@ -91,14 +108,15 @@ class Keuangan {
   int id;
   DateTime _tanggal;
   int _idItemName;
+  ItemName lazyItemName;
   double _jumlah;
   String _catatan;
   int _lastupdate;
 
   Keuangan();
 
-  Keuangan.fromUI(DateTime tanggal, int idItemName, double jumlah,
-      String catatan) {
+  Keuangan.fromUI(
+      DateTime tanggal, int idItemName, double jumlah, String catatan) {
     this._tanggal = tanggal;
     this._idItemName = idItemName;
     this._jumlah = jumlah;
@@ -106,8 +124,8 @@ class Keuangan {
     this._lastupdate = DateTime.now().millisecondsSinceEpoch;
   }
 
-  Keuangan.fromDB(
-      String tanggal, int idItemName, double jumlah, String catatan,int newlastupdate) {
+  Keuangan.fromDB(String tanggal, int idItemName, double jumlah, String catatan,
+      int newlastupdate) {
     ProcessString processString = new ProcessString();
     this._tanggal = processString.dateFromDbToDateTime(tanggal);
     this._idItemName = idItemName;
@@ -142,7 +160,7 @@ class Keuangan {
     this.id = id;
   }
 
-  void setIdItemName(int id){
+  void setIdItemName(int id) {
     this._idItemName = id;
   }
 
@@ -163,7 +181,7 @@ class Keuangan {
   }
 
   bool isValid() {
-    if(_idItemName >0 && _tanggal !=null){
+    if (_idItemName > 0 && _tanggal != null) {
       return true;
     }
     return false;

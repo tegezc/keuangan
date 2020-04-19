@@ -1,10 +1,7 @@
-import 'package:keuangan/database/keuangan/dao_itemname.dart';
-import 'package:keuangan/database/keuangan/dao_kategori.dart';
 import 'package:keuangan/database/keuangan/dao_keuangan.dart';
 import 'package:keuangan/keuangan/transaksi/model_keuangan_ui.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
-import 'package:keuangan/util/process_string.dart';
 import 'package:rxdart/subjects.dart';
 
 class BlocHpKeuangan {
@@ -13,9 +10,7 @@ class BlocHpKeuangan {
   final BehaviorSubject<UIHPKeuangan> _uiHPKeuangan = BehaviorSubject();
 
   BlocHpKeuangan() {
-
-    List<Entry> lentry = new List();
-    _uihpKeuanganItem = new UIHPKeuangan(0, 0, lentry);
+    _uihpKeuanganItem = new UIHPKeuangan(0, 0, null);
   }
 
   Stream<UIHPKeuangan> get uiHPKeuangan => _uiHPKeuangan.stream;
@@ -31,16 +26,15 @@ class BlocHpKeuangan {
   fullReload() async {
     print('jancuk: ${counterJangkrik++}');
     _setupBalance().then((item) {
-
       this._sinkUIHPKeuangan(item);
     });
   }
 
-  deleteTransaksi(Entry entry){
+  deleteTransaksi(Entry entry) {
     DaoKeuangan daoKeuangan = new DaoKeuangan();
     daoKeuangan.deleteKeuangan(entry.keuangan).then((v) {
       if (v == 1) {
-       fullReload();
+        fullReload();
       } else {
         ///TODO delete gagal
       }
@@ -56,7 +50,7 @@ class BlocHpKeuangan {
     List<Keuangan> lkk = await daoKeuangan
         .getKeuanganByJenisTransaksi(EnumJenisTransaksi.pengeluaran);
     _uihpKeuanganItem.pengeluaran = this._hitungTotal(lkk);
-    _uihpKeuanganItem.lentry = await _sortingListKeuangan();
+    _uihpKeuanganItem.listKeuangan = await _getLazyListKeuangan();
     return _uihpKeuanganItem;
   }
 
@@ -72,54 +66,10 @@ class BlocHpKeuangan {
     }
   }
 
-  Future<List<Entry>> _sortingListKeuangan() async {
-    DaoKategori daoKategori = new DaoKategori();
-    DaoItemName daoItemName = new DaoItemName();
+  Future<List<Keuangan>> _getLazyListKeuangan() async {
     DaoKeuangan daoKeuangan = new DaoKeuangan();
-    ProcessString _processString = new ProcessString();
-
-    Map<int, Kategori> _kategoriMap = await daoKategori.getAllKategoriMap();
-    Map<int, ItemName> _itemNameMap = await daoItemName.getAllItemNameMap();
-    List<Keuangan> filteredKeuangan = await daoKeuangan.get5LastKeuangan();
-
-    Map<DateTime, List<Keuangan>> mapK = new Map();
-    for (int i = 0; i < filteredKeuangan.length; i++) {
-      if (mapK[filteredKeuangan[i].tanggal] == null) {
-        List<Keuangan> lk = new List();
-        lk.add(filteredKeuangan[i]);
-        mapK[filteredKeuangan[i].tanggal] = lk;
-      } else {
-        List<Keuangan> lk = mapK[filteredKeuangan[i].tanggal];
-        lk.add(filteredKeuangan[i]);
-        mapK[filteredKeuangan[i].tanggal] = lk;
-      }
-    }
-
-    List<EntrySort> list = new List();
-    mapK.forEach((key, value) {
-      var entrySort = new EntrySort(key, value);
-      list.add(entrySort);
-    });
-
-    List<Entry> _listEntry = new List();
-    list.forEach((value) {
-      String tanggal = _processString.dateToStringDdMmmmYyyy(value.key);
-      Entry entry = new Entry('', null, tanggal, null, false, false);
-      _listEntry.add(entry);
-      int lgth = value.listKeuangan.length;
-
-      for (int i = 0; i < lgth; i++) {
-        var k = value.listKeuangan[i];
-        var itemName = _itemNameMap[k.idItemName];
-
-        var ktg = _kategoriMap[itemName.idKategori];
-        bool isLast = (i + 1) == lgth ? true : false;
-
-        var e = Entry(itemName.nama, ktg, tanggal, k, true, isLast);
-        _listEntry.add(e);
-      }
-    });
-    return _listEntry;
+    List<Keuangan> filteredKeuangan = await daoKeuangan.get5LastKeuanganLazy();
+    return filteredKeuangan;
   }
 }
 
@@ -128,7 +78,7 @@ class UIHPKeuangan {
   int pemasukan;
 
   int get balance => pemasukan - pengeluaran;
-  List<Entry> lentry;
+  List<Keuangan> listKeuangan;
 
-  UIHPKeuangan(this.pemasukan, this.pengeluaran, this.lentry);
+  UIHPKeuangan(this.pemasukan, this.pengeluaran, this.listKeuangan);
 }

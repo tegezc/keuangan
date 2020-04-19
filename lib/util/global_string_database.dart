@@ -27,6 +27,7 @@ class TbItemName{
    final fId = 'id';
    final fNama = 'nama';
    final fIdKategori = 'id_kategori';
+   final fDeleted = 'isdeleted'; //1 : sudah di delete, 0 : active
 
 }
 

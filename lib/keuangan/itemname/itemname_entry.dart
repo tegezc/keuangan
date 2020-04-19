@@ -32,6 +32,7 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
 
   @override
   void initState() {
+    print(widget.itemName.toString());
     _txtController = new TextEditingController();
     _populateKategori();
     super.initState();
@@ -57,7 +58,7 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
           for (int i = 0; i < _dropDownKategory.length; i++) {
             Kategori k = _dropDownKategory[i].value;
 
-            if (k.id == widget.itemName.id) {
+            if (k.id == widget.itemName.idKategori) {
               _currentCatogery = _dropDownKategory[i].value;
               break;
             }
@@ -69,24 +70,29 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
     });
   }
 
+  /// ada 2 kondisi
+  /// 1. itemname baru maka cek item name dgn isDeleted 0 apakah duplikasi atau tidak.
+  /// jika tidak maka insert baru
+  /// 2. kondisi edit: maka cek data isDeleted 0 apakah duplikasi, jika tidak,
+  /// maka insert baru itemname dan yang ori di edit dengan isDeleted menjadi 1.
   _saveKategori() {
     bool isShowSnackbar = false;
     String messageSnackBar = '';
     String nama = _txtController.text;
     DaoItemName daoItemName = new DaoItemName();
     if (widget.stateItemName == StateItemNameEntry.baru) {
-      ItemName k;
+      ItemName iname;
       if (_currentCatogery.idParent == null) {
-        k = new ItemName(nama, 0);
+        iname = new ItemName(nama, 0,0);
       } else {
-        k = new ItemName(nama, _currentCatogery.id);
+        iname = new ItemName(nama, _currentCatogery.id,0);
       }
 
       daoItemName
-          .getItemNameByNamaNIdKategori(k.nama, k.idKategori)
+          .getItemNameByNamaNIdKategoriVisible(iname.nama, iname.idKategori)
           .then((itemName) {
         if (itemName == null) {
-          daoItemName.saveItemName(k).then((value) {
+          daoItemName.saveItemName(iname).then((value) {
             if (value > 0) {
               Navigator.of(context).pop(1);
             } else {
@@ -106,36 +112,46 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
         }
       });
     } else {
-      ItemName k;
-      if (_currentCatogery.idParent == null) {
-        k = new ItemName(nama, 0);
-      } else {
-        k = new ItemName(nama, _currentCatogery.id);
-      }
-      k.setId(widget.itemName.id);
-      daoItemName
-          .getItemNameByNamaNIdKategori(k.nama, k.idKategori)
-          .then((itemName) {
-        if (itemName == null) {
-          daoItemName.update(k).then((value) {
-            if (value == EnumResultDb.success) {
-              Navigator.of(context).pop(2);
-            } else {
-              isShowSnackbar = true;
-              messageSnackBar = 'Item gagal disimpan';
-            }
-          });
+      if(nama.trim() == widget.itemName.nama && widget.itemName.idKategori == _currentCatogery.id){
+        /// kondisi user klik edit, namun tidak melakukan perubahan apapun
+        Navigator.of(context).pop(3);
+      }else{
+        ItemName k;
+        if (_currentCatogery.idParent == null) {
+          k = new ItemName(nama, 0,0);
         } else {
-          isShowSnackbar = true;
-          messageSnackBar = 'Item sudah ada';
+          k = new ItemName(nama, _currentCatogery.id,0);
         }
-        if (isShowSnackbar) {
-          _scaffoldKey.currentState.showSnackBar(SnackBar(
-            content: Text(messageSnackBar),
-            duration: Duration(seconds: 3),
-          ));
-        }
-      });
+       ItemName oldItemName = widget.itemName;
+        oldItemName.setIsDeleted(1);
+        print('new item: ${k.toString()}');
+        print('old item: ${oldItemName.toString()}');
+        daoItemName
+            .getItemNameByNamaNIdKategoriVisible(k.nama, k.idKategori)
+            .then((itemName) {
+          if (itemName == null) {
+            daoItemName.saveItemName(k);
+            daoItemName.update(oldItemName).then((value) {
+              if (value == EnumResultDb.success) {
+                Navigator.of(context).pop(2);
+              } else {
+                isShowSnackbar = true;
+                messageSnackBar = 'Item gagal disimpan';
+              }
+            });
+          } else {
+            isShowSnackbar = true;
+            messageSnackBar = 'Item sudah ada';
+          }
+          if (isShowSnackbar) {
+            _scaffoldKey.currentState.showSnackBar(SnackBar(
+              content: Text(messageSnackBar),
+              duration: Duration(seconds: 3),
+            ));
+          }
+        });
+      }
+
     }
   }
 

@@ -90,6 +90,7 @@ class _HomePageKategoriState extends State<HomePageKategori> {
   List<Widget> _listKategori(List<Kategori> lKategori) {
     List<Widget> lW = new List();
     for (int i = 0; i < lKategori.length; i++) {
+      print('${lKategori[i].toString()}');
       lW.add(_cellKategori(lKategori[i]));
     }
     return lW;

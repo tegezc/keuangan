@@ -1,4 +1,6 @@
 import 'package:keuangan/database/Database.dart';
+import 'package:keuangan/database/keuangan/dao_itemname.dart';
+import 'package:keuangan/database/keuangan/dao_kategori.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/global_string_database.dart';
@@ -37,10 +39,12 @@ class DaoKeuangan {
     return keuangans;
   }
 
-  Future<List<Keuangan>> get5LastKeuangan() async {
+  Future<List<Keuangan>> get5LastKeuanganLazy() async {
+    DaoItemName daoItemName = new DaoItemName();
+    DaoKategori daoKategori = new DaoKategori();
     var dbClient = await DatabaseHelper().db;
     List<Map> list = await dbClient.rawQuery(
-        'SELECT * FROM ${tb.name} ORDER BY ${tb.fLastUpdate} DESC limit 5');
+        'SELECT * FROM ${tb.name} ORDER BY ${tb.fId} DESC limit 5');
     List<Keuangan> keuangans = new List();
     for (int i = 0; i < list.length; i++) {
       var keuangan = new Keuangan.fromDB(
@@ -51,8 +55,15 @@ class DaoKeuangan {
           list[i][tb.fLastUpdate]);
       keuangan.setId(list[i][tb.fId]);
 
+      /// lazy di process
+      int iditemname = keuangan.idItemName;
+      ItemName itemName = await daoItemName.getItemNameById(iditemname);
+      Kategori k = await daoKategori.getKategoriById(itemName.idKategori);
+      itemName.setKategori(k);
+      keuangan.lazyItemName = itemName;
       keuangans.add(keuangan);
     }
+
     return keuangans;
   }
 

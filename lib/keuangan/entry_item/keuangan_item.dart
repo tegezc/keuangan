@@ -13,7 +13,8 @@ class KeuanganItemView extends StatefulWidget {
   final bool isEditMode;
   final Keuangan keuangan;
 
-  KeuanganItemView({this.dateTime,@required this.isEditMode,@required this.keuangan});
+  KeuanganItemView(
+      {this.dateTime, @required this.isEditMode, @required this.keuangan});
 
   @override
   _KeuanganItemViewState createState() => _KeuanganItemViewState();
@@ -59,24 +60,23 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
     WidgetsBinding.instance.addObserver(this);
     _txtNoteController = TextEditingController();
 
-    _controllerAutoComplete =
-        ScrollController();
+    _controllerAutoComplete = ScrollController();
     _controllerTextItem = TextEditingController()
       ..addListener(_editingListener);
-    if(widget.isEditMode){
+    if (widget.isEditMode) {
       int idItemname = widget.keuangan.idItemName;
       DaoItemName daoItemName = new DaoItemName();
-      daoItemName.getItemNameById(idItemname).then((item){
-        if(item != null){
+      daoItemName.getItemNameById(idItemname).then((item) {
+        if (item != null) {
           _txtNoteController.text = widget.keuangan.catatan;
           _controllerTextItem.text = item.nama;
-          _blocEntryKeuangan.firstTimeLoadData(widget.isEditMode,widget.keuangan);
+          _blocEntryKeuangan.firstTimeLoadData(
+              widget.isEditMode, widget.keuangan);
         }
       });
-    }else{
-      _blocEntryKeuangan.firstTimeLoadData(widget.isEditMode,widget.keuangan);
+    } else {
+      _blocEntryKeuangan.firstTimeLoadData(widget.isEditMode, widget.keuangan);
     }
-
 
     super.initState();
   }
@@ -128,20 +128,20 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
   }
 
   //edited
-  _simpanKeuangan(BuildContext context, bool isSavenLagi)async {
-
+  _simpanKeuangan(BuildContext context, bool isSavenLagi) async {
     if (isSavenLagi) {
       StateSimpanLagi stateSimpanLagi = new StateSimpanLagi(
           _controllerTextItem.text, _txtNoteController.text);
       _blocEntryKeuangan.sinkState(stateSimpanLagi);
     } else {
-      EnumFinalResult enumFinalResult = await _blocEntryKeuangan.simpan1(_controllerTextItem.text, _txtNoteController.text);
-      Navigator.pop(context,enumFinalResult);
+      EnumFinalResult enumFinalResult = await _blocEntryKeuangan.simpan1(
+          _controllerTextItem.text, _txtNoteController.text);
+      Navigator.pop(context, enumFinalResult);
     }
   }
 
   PropertyAutoComplete _setupAutoComplete(Size sizeWidget, double insetsBottom,
-      EnumEntryKeuangan stateEntry, Map<int,ItemName> lItemName) {
+      EnumEntryKeuangan stateEntry, Map<int, ItemName> lItemName) {
     double paddingKananAutoComplete = 55.0;
     double paddingKiriAutoComplete = 15.0;
 
@@ -235,12 +235,12 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
   Future _selectDate() async {
     int _startDate = widget.dateTime.year - 5;
     int _endDate = widget.dateTime.year + 5;
-    if(widget.isEditMode){
-       _startDate = widget.keuangan.tanggal.year - 5;
-       _endDate = widget.keuangan.tanggal.year + 5;
-    }else{
-       _startDate = widget.dateTime.year - 5;
-       _endDate = widget.dateTime.year + 5;
+    if (widget.isEditMode) {
+      _startDate = widget.keuangan.tanggal.year - 5;
+      _endDate = widget.keuangan.tanggal.year + 5;
+    } else {
+      _startDate = widget.dateTime.year - 5;
+      _endDate = widget.dateTime.year + 5;
     }
 
     DateTime picked = await showDatePicker(
@@ -258,10 +258,10 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
   }
 
   Future<Kategori> _asyncSimpleDialog1(
-      BuildContext context, Map<int,Kategori> lKategori) async {
+      BuildContext context, Map<int, Kategori> lKategori) async {
     List<Widget> listWidget = new List();
     if (lKategori.isNotEmpty) {
-      lKategori.forEach((k,v){
+      lKategori.forEach((k, v) {
         listWidget.add(OutlineButton(
           onPressed: () {
             Navigator.pop(context, v);
@@ -303,20 +303,33 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
         stream: _blocEntryKeuangan.entryKeuanganStream,
         builder: (context, snapshot) {
           if (snapshot == null) {
-            return LoadingView();
+            return Scaffold(
+                appBar: AppBar(
+                  title: Text('tunggu sebentar...'),
+                ),
+                body: LoadingView());
           } else if (snapshot.data == null) {
-            return LoadingView();
+            return Scaffold(
+                appBar: AppBar(
+                  title: Text('tunggu sebentar...'),
+                ),
+                body: LoadingView());
           } else {
             /// set state to [_cacheStateEntry]
             _cacheStateEntry = snapshot.data.stateEntryKeuangan;
 
             ///menunggu proses save ke database selesai. menanggulangi user klik UI saat proses save
             if (snapshot.data.stateEntryKeuangan ==
-                    EnumEntryKeuangan.simpandanlagi) {
-              return LoadingView();
+                EnumEntryKeuangan.simpandanlagi) {
+              return Scaffold(
+                  appBar: AppBar(
+                    title: Text('tunggu sebentar...'),
+                  ),
+                  body: LoadingView());
             }
 
-            if(snapshot.data.stateEntryKeuangan == EnumEntryKeuangan.finishLagi){
+            if (snapshot.data.stateEntryKeuangan ==
+                EnumEntryKeuangan.finishLagi) {
               _controllerTextItem.text = snapshot.data.itemName.nama;
               _txtNoteController.text = snapshot.data.keuangan.catatan;
             }
@@ -372,14 +385,15 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
                 Transform(
                   transform: Matrix4.translationValues(
                       0, _sizeWidget.height - (127 + _insetsMedia.bottom), 0),
-                  child: widget.isEditMode?_widgetButtonUpdate(_sizeWidget.width):_widgetButtonSave(_sizeWidget.width),
+                  child: widget.isEditMode
+                      ? _widgetButtonUpdate(_sizeWidget.width)
+                      : _widgetButtonSave(_sizeWidget.width),
                 ),
                 p != null
                     ? _widgetPadPositionAutoComplete1(p, _sizeWidget)
                     : new Container(),
                 p != null
-                    ? _widgetPositionAutoComplete1(
-                        snapshot.data.mapItemName, p)
+                    ? _widgetPositionAutoComplete1(snapshot.data.mapItemName, p)
                     : new Container(),
               ]),
             );
@@ -471,8 +485,8 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
     );
   }
 
-  Widget _widgetKategori1(Kategori kategori, Map<int,Kategori> lKategori) {
-    String text = kategori == null?'':kategori.nama;
+  Widget _widgetKategori1(Kategori kategori, Map<int, Kategori> lKategori) {
+    String text = kategori == null ? '' : kategori.nama;
     return Row(
       children: <Widget>[
         Icon(
@@ -597,8 +611,7 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
     );
   }
 
-  Widget _widgetButtonUpdate(double width){
-
+  Widget _widgetButtonUpdate(double width) {
     return Container(
       width: double.infinity,
       height: 50,
@@ -607,14 +620,11 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
           padding: const EdgeInsets.all(8.0),
           textColor: Colors.white,
           color: Colors.blue,
-          onPressed: () {
-
-          },
+          onPressed: () {},
           child: new Text("Update"),
         ),
       ),
     );
-
   }
 
   Widget _widgetPadPositionAutoComplete1(
@@ -635,10 +645,10 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
   }
 
   Widget _widgetPositionAutoComplete1(
-      Map<int,ItemName> lItemName, PropertyAutoComplete p) {
+      Map<int, ItemName> lItemName, PropertyAutoComplete p) {
     List<Widget> listW = new List();
     if (lItemName != null) {
-      lItemName.forEach((k,v){
+      lItemName.forEach((k, v) {
         listW.add(Row(
           children: <Widget>[
             Expanded(

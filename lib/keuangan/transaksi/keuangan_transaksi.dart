@@ -115,7 +115,7 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
       _kategoriMap = new Map();
       _kategoriMap.addAll(kMap);
       daoItemName.getAllItemNameMap().then((Map<int, ItemName> inMap) {
-        _itemNameMap = new Map();
+        _itemNameMap.clear();
         _itemNameMap.addAll(inMap);
         _populateKeuangan();
       });

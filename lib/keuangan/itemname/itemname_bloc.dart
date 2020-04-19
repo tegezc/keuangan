@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:keuangan/model/enum_db.dart';
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
@@ -11,12 +12,12 @@ class BlocHomepageItemName {
 
   BlocHomepageItemName() {
 
-    this.populateAllKategoriFromDb(EnumStatePopulateItemName.firsttime);
+    this.populateSemuaItemNameFromDb(EnumStatePopulateItemName.firsttime);
   }
 
-  void populateAllKategoriFromDb(EnumStatePopulateItemName enumState) {
+  void populateSemuaItemNameFromDb(EnumStatePopulateItemName enumState) {
     DaoItemName daoItemName = new DaoItemName();
-    daoItemName.getAllItemName().then((v) {
+    daoItemName.getAllItemNameVisible().then((v) {
       List<ItemName> litemname = new List();
       if (v != null) {
         litemname.addAll(v);
@@ -28,20 +29,14 @@ class BlocHomepageItemName {
     });
   }
 
+  /// itemname yang didelete user sebenarnya tidak di delete dari database.
+  /// hanya isDeleted di set 1. (jika di delete maka referensi transaksi akan hilang)
   deleteActioni(ItemName itemName,EnumStatePopulateItemName enumState){
     DaoItemName daoItemName = new DaoItemName();
-    daoItemName.deleteItemName(itemName).then((v){
-      if(v == 1){
-        daoItemName.getAllItemName().then((v) {
-          List<ItemName> litemname = new List();
-          if (v != null) {
-            litemname.addAll(v);
-          }
-
-          ItemUIHomepageItemName itemUIHomepageKategori =
-          new ItemUIHomepageItemName(enumState, litemname);
-          _itemUi.sink.add(itemUIHomepageKategori);
-        });
+    itemName.setIsDeleted(1);
+    daoItemName.update(itemName).then((v){
+      if(v == EnumResultDb.success){
+       this.populateSemuaItemNameFromDb(enumState);
       }
     });
   }
