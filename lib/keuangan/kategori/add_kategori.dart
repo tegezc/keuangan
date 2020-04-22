@@ -53,6 +53,7 @@ class _AddCategoryState extends State<AddCategory> {
   void dispose() {
     _txtController.dispose();
     _txtCatatanController.dispose();
+    _blocAddKategori.dispose();
     super.dispose();
   }
 
@@ -94,7 +95,7 @@ class _AddCategoryState extends State<AddCategory> {
   @override
   Widget build(BuildContext context) {
     if (_counterBuild == 0) {
-      _blocAddKategori.loadFirstTime(widget.stateAddCategory, widget.kategori);
+      _blocAddKategori.loadFirstTime(widget.stateAddCategory, widget.kategori,widget.idparent);
       _counterBuild++;
     }
 

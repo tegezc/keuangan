@@ -9,7 +9,9 @@ import 'homepage_kategori_bloc.dart';
 
 class HomePageKategori extends StatefulWidget {
   final Widget drawer;
+
   HomePageKategori({this.drawer});
+
   @override
   _HomePageKategoriState createState() => _HomePageKategoriState();
 }
@@ -18,11 +20,19 @@ class _HomePageKategoriState extends State<HomePageKategori> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   BlocHomepageKategori _blocHomepageKategori;
   EnumStatePopulateKategori _enumState;
+  int _counterBuild = 0;
 
   @override
   initState() {
     _blocHomepageKategori = new BlocHomepageKategori();
     super.initState();
+  }
+
+
+  @override
+  void dispose() {
+    _blocHomepageKategori.dispose();
+    super.dispose();
   }
 
   Widget _cellKategori(Kategori kategori) {
@@ -107,6 +117,10 @@ class _HomePageKategoriState extends State<HomePageKategori> {
 
   @override
   Widget build(BuildContext context) {
+    if(_counterBuild == 0){
+      _blocHomepageKategori.populateAllKategoriFromDb(EnumStatePopulateKategori.firsttime);
+      _counterBuild++;
+    }
     return StreamBuilder<ItemUIHomepageKategori>(
         stream: _blocHomepageKategori.listKategoriStream,
         builder: (context, snapshot) {
@@ -165,41 +179,40 @@ class _HomePageKategoriState extends State<HomePageKategori> {
         });
   }
 
-
-  _showDialogPilihan(Kategori kategori){
+  _showDialogPilihan(Kategori kategori) {
     List<Widget> lw = new List();
-    if(kategori.idParent == 0){
+    if (kategori.idParent == 0) {
       lw.add(new OutlineButton(
-        onPressed: (){
+        onPressed: () {
           _addSubKategori(kategori.id);
         },
         child: Text('tambah subkategori'),
       ));
 
       lw.add(new OutlineButton(
-        onPressed: (){
+        onPressed: () {
           _edit(kategori);
         },
         child: Text('edit'),
       ));
 
       lw.add(new OutlineButton(
-        onPressed: (){
+        onPressed: () {
           Navigator.of(context).pop();
           _showDialogConfirmDelete(kategori);
         },
         child: Text('delete'),
       ));
-    }else{
+    } else {
       lw.add(new OutlineButton(
-        onPressed: (){
+        onPressed: () {
           _edit(kategori);
         },
         child: Text('edit subkategori'),
       ));
 
       lw.add(new OutlineButton(
-        onPressed: (){
+        onPressed: () {
           Navigator.of(context).pop();
           _showDialogConfirmDelete(kategori);
         },
@@ -209,39 +222,36 @@ class _HomePageKategoriState extends State<HomePageKategori> {
     showDialog<String>(
         context: context,
         builder: (BuildContext context) => SimpleDialog(
-          title: Text('Pilihan'),
-          children: lw,
-        ));
+              title: Text('Pilihan'),
+              children: lw,
+            ));
   }
 
-  _showDialogConfirmDelete(Kategori kategori){
+  _showDialogConfirmDelete(Kategori kategori) {
     showDialog<String>(
         context: context,
         builder: (BuildContext context) => SimpleDialog(
-          title: Text('Apakah anda yakin akan menghapus record ini?'),
-          children: <Widget>[
-            new OutlineButton(
-              onPressed: (){
-                _deleteConfirmed(kategori);
-              },
-              child: Text('ya'),
-            ),
-            new OutlineButton(
-              onPressed: (){
-                Navigator.of(context).pop();
-              },
-              child: Text('tidak'),
-            ),
-          ],
-        ));
+              title: Text('Apakah anda yakin akan menghapus record ini?'),
+              children: <Widget>[
+                new OutlineButton(
+                  onPressed: () {
+                    _deleteConfirmed(kategori);
+                  },
+                  child: Text('ya'),
+                ),
+                new OutlineButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('tidak'),
+                ),
+              ],
+            ));
   }
 
-  _deleteConfirmed(Kategori kategori){
+  _deleteConfirmed(Kategori kategori) {}
 
-
-  }
-
-  _edit(Kategori kategori)async{
+  _edit(Kategori kategori) async {
     int res = await openPage(context, AddCategory.edit(kategori));
     Navigator.of(context).pop();
 
@@ -249,20 +259,19 @@ class _HomePageKategoriState extends State<HomePageKategori> {
     if (res == null) {
       _enumState = null;
     } else {
-      _blocHomepageKategori.populateAllKategoriFromDb(
-          EnumStatePopulateKategori.editsuccess);
+      _blocHomepageKategori
+          .populateAllKategoriFromDb(EnumStatePopulateKategori.editsuccess);
 
       String messageSnackBar = 'Kategori berhasil di update';
       _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: SizedBox(
-            height: 30.0, child: Center(child: Text(messageSnackBar))),
+        content:
+            SizedBox(height: 30.0, child: Center(child: Text(messageSnackBar))),
         duration: Duration(milliseconds: 1000),
       ));
     }
-
   }
 
-  _addSubKategori(int idparent)async{
+  _addSubKategori(int idparent) async {
     int res = await openPage(context, AddCategory.addSubkategori(idparent));
     Navigator.of(context).pop();
 
@@ -270,16 +279,15 @@ class _HomePageKategoriState extends State<HomePageKategori> {
     if (res == null) {
       _enumState = null;
     } else {
-      _blocHomepageKategori.populateAllKategoriFromDb(
-          EnumStatePopulateKategori.editsuccess);
+      _blocHomepageKategori
+          .populateAllKategoriFromDb(EnumStatePopulateKategori.editsuccess);
 
       String messageSnackBar = 'Kategori berhasil di update';
       _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: SizedBox(
-            height: 30.0, child: Center(child: Text(messageSnackBar))),
+        content:
+            SizedBox(height: 30.0, child: Center(child: Text(messageSnackBar))),
         duration: Duration(milliseconds: 1000),
       ));
     }
-
   }
 }

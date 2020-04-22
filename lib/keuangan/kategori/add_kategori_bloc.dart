@@ -41,17 +41,14 @@ class BlocAddKategori {
     } else {
       _cacheUIKategori.setListKategori(_cacheListPemasukan);
     }
-    _cacheUIKategori.currentKategori.setIdParent( _cacheUIKategori.listKategori[0].id);
-    print('=====================');
-    _cacheUIKategori.listKategori.forEach((k){
-      print('id: ${k.id}');
-    });
+    _cacheUIKategori.currentKategori
+        .setIdParent(_cacheUIKategori.listKategori[0].id);
 
     this._sinkUIKategori(_cacheUIKategori);
   }
 
-  void loadFirstTime(
-      StateAddCategory stateAddCategory, Kategori kategori) async {
+  void loadFirstTime(StateAddCategory stateAddCategory, Kategori kategori,
+      int idparent) async {
     DaoKategori daoKategori = new DaoKategori();
     _cacheListPengeluaran = await daoKategori
         .getMainKategoriByJenisTrxTanpaAbadi(EnumJenisTransaksi.pengeluaran);
@@ -69,7 +66,7 @@ class BlocAddKategori {
         break;
       case StateAddCategory.baruSubkategori:
         {
-          this._stateBaruSubKategori();
+          _cacheUIKategori = this._stateBaruSubKategori(idparent);
           _cacheUIKategori.titleBar = 'Tambah Kategori';
         }
 
@@ -99,19 +96,30 @@ class BlocAddKategori {
 
   void _stateEditSubKategori(Kategori kategori) {}
 
-  void _stateBaruSubKategori() {}
+  ItemUiAddKategori _stateBaruSubKategori(int idparent) {
+    Kategori kategoriParent = _cacheMapKategoriAll[idparent];
+    Kategori newKategori =
+        new Kategori('', idparent, kategoriParent.type, '', '');
+    List<Kategori> list = newKategori.type == EnumJenisTransaksi.pemasukan
+        ? _cacheListPemasukan
+        : _cacheListPengeluaran;
+
+    ItemUiAddKategori itemUiAddKategori =
+        new ItemUiAddKategori(newKategori, list, true, true);
+    print('idparent: $idparent');
+
+
+    itemUiAddKategori.listKategori.forEach((k) {
+      print('id: ${k.id}');
+    });
+    return itemUiAddKategori;
+  }
 
   ItemUiAddKategori _stateBaru() {
-    ItemUiAddKategori itemUiAddKategori = new ItemUiAddKategori();
-
     Kategori newKategori =
         new Kategori('', 0, EnumJenisTransaksi.pengeluaran, '', '');
-    itemUiAddKategori.currentKategori = newKategori;
-
-    itemUiAddKategori.setListKategori(_cacheListPengeluaran);
-
-    itemUiAddKategori.enableComboBox = true;
-    itemUiAddKategori.enableComboBoxJenisTransaksi = true;
+    ItemUiAddKategori itemUiAddKategori =
+        new ItemUiAddKategori(newKategori, _cacheListPengeluaran, true, true);
 
     return itemUiAddKategori;
   }
@@ -164,6 +172,11 @@ class ItemUiAddKategori {
   /// jadi karena jenis transaksi mengikuti parent, maka proses baru atau edit
   /// sub kategori harus di disable
   bool enableComboBoxJenisTransaksi;
+
+  ItemUiAddKategori(this.currentKategori, this._listKategori,
+      this.enableComboBoxJenisTransaksi, this.enableComboBox) {
+    this.setListKategori(_listKategori);
+  }
 
   List<Kategori> get listKategori => this._listKategori;
 

@@ -26,15 +26,15 @@ class Persiapan {
     daoKategori.saveKategori(new Kategori('Gift', 0,EnumJenisTransaksi.pengeluaran,'',colors[5]));
     daoKategori.saveKategori(new Kategori('k10dddddddd', 0,EnumJenisTransaksi.pengeluaran,'',colors[6]));
 
-    daoKategori.saveKategori(new Kategori('k11dddddddd', 1,EnumJenisTransaksi.pengeluaran,'',colors[0]));
-    daoKategori.saveKategori(new Kategori('k12ddddddddd', 1,EnumJenisTransaksi.pengeluaran,'',colors[1]));
+    daoKategori.saveKategori(new Kategori('k11dddddddd', 3,EnumJenisTransaksi.pengeluaran,'',colors[0]));
+    daoKategori.saveKategori(new Kategori('k12ddddddddd', 3,EnumJenisTransaksi.pengeluaran,'',colors[1]));
 
-    daoKategori.saveKategori(new Kategori('Entertainment', 2,EnumJenisTransaksi.pengeluaran,'',colors[0]));
-    daoKategori.saveKategori(new Kategori('Food', 2,EnumJenisTransaksi.pengeluaran,'',colors[1]));
-    daoKategori.saveKategori(new Kategori('k6pajanng', 2,EnumJenisTransaksi.pemasukan,'',colors[2]));
-    daoKategori.saveKategori(new Kategori('k7aaaaaaaaa', 2,EnumJenisTransaksi.pemasukan,'',colors[3]));
-    daoKategori.saveKategori(new Kategori('k8aaaaaaa', 2,EnumJenisTransaksi.pemasukan,'',colors[4]));
-    daoKategori.saveKategori(new Kategori('k9sssssss', 2,EnumJenisTransaksi.pengeluaran,'',colors[5]));
+    daoKategori.saveKategori(new Kategori('Entertainment', 5,EnumJenisTransaksi.pengeluaran,'',colors[0]));
+    daoKategori.saveKategori(new Kategori('Food', 5,EnumJenisTransaksi.pengeluaran,'',colors[1]));
+    daoKategori.saveKategori(new Kategori('k6pajanng', 5,EnumJenisTransaksi.pemasukan,'',colors[2]));
+    daoKategori.saveKategori(new Kategori('k7aaaaaaaaa', 3,EnumJenisTransaksi.pemasukan,'',colors[3]));
+    daoKategori.saveKategori(new Kategori('k8aaaaaaa', 3,EnumJenisTransaksi.pemasukan,'',colors[4]));
+    daoKategori.saveKategori(new Kategori('k9sssssss', 3,EnumJenisTransaksi.pengeluaran,'',colors[5]));
 
     daoKategori.saveKategori(new Kategori('Insurance',5,EnumJenisTransaksi.pengeluaran,'',colors[0]));
 

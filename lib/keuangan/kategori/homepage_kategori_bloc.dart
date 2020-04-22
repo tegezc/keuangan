@@ -12,13 +12,11 @@ class BlocHomepageKategori {
 
   BlocHomepageKategori() {
     _cacheListKategori = new List();
-
-    this.populateAllKategoriFromDb(EnumStatePopulateKategori.firsttime);
   }
 
   void populateAllKategoriFromDb(EnumStatePopulateKategori enumState) {
     DaoKategori daoKategori = new DaoKategori();
-    daoKategori.getAllKategori().then((v) {
+    daoKategori.getAllKategoriNonAbadi().then((v) {
       if (v != null) {
         _cacheListKategori.clear();
         _cacheListKategori.addAll(_processKategori(v));
