@@ -6,7 +6,6 @@ import 'package:rxdart/subjects.dart';
 
 class BlocHpKeuangan {
   UIHPKeuangan _uihpKeuanganItem;
-  int counterJangkrik = 0;
   final BehaviorSubject<UIHPKeuangan> _uiHPKeuangan = BehaviorSubject();
 
   BlocHpKeuangan() {
@@ -24,7 +23,6 @@ class BlocHpKeuangan {
   }
 
   fullReload() async {
-    print('jancuk: ${counterJangkrik++}');
     _setupBalance().then((item) {
       this._sinkUIHPKeuangan(item);
     });

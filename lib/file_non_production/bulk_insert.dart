@@ -13,11 +13,16 @@ class Persiapan {
   insertKategoriDummy() {
     var colors = ColorManagement.colors;
     DaoKategori daoKategori = DaoKategori();
-    daoKategori.saveKategori(new Kategori('Other', 0,EnumJenisTransaksi.pemasukan,'mencoba catatan',colors[0]));
+    Kategori kOtherPemasukan = new Kategori('Other', 0,EnumJenisTransaksi.pemasukan,'mencoba catatan',colors[0]);
+    kOtherPemasukan.isAbadi = 1;
+    Kategori kOtherPengeluaran = new Kategori('Other', 0,EnumJenisTransaksi.pengeluaran,'mencoba catatan',colors[0]);
+    kOtherPengeluaran.isAbadi = 1;
+    daoKategori.saveKategori(kOtherPemasukan);
+    daoKategori.saveKategori(kOtherPengeluaran);
     daoKategori.saveKategori(new Kategori('Donation', 0,EnumJenisTransaksi.pengeluaran,'',colors[1]));
-    daoKategori.saveKategori(new Kategori('k13ffffff', 0,EnumJenisTransaksi.pengeluaran,'',colors[2]));
+    daoKategori.saveKategori(new Kategori('Gaji', 0,EnumJenisTransaksi.pemasukan,'',colors[2]));
     daoKategori.saveKategori(new Kategori('k14cccccccc', 0,EnumJenisTransaksi.pengeluaran,'',colors[3]));
-    daoKategori.saveKategori(new Kategori('k15rrrrrrr', 0,EnumJenisTransaksi.pengeluaran,'',colors[4]));
+    daoKategori.saveKategori(new Kategori('Google Play', 0,EnumJenisTransaksi.pemasukan,'',colors[4]));
     daoKategori.saveKategori(new Kategori('Gift', 0,EnumJenisTransaksi.pengeluaran,'',colors[5]));
     daoKategori.saveKategori(new Kategori('k10dddddddd', 0,EnumJenisTransaksi.pengeluaran,'',colors[6]));
 
@@ -50,8 +55,10 @@ class Persiapan {
     daoItemName.saveItemName(new ItemName('Internet XL', 2,0));
     daoItemName.saveItemName(new ItemName('Shop', 3,0));
     daoItemName.saveItemName(new ItemName('Transport Operasional', 3,0));
-    daoItemName.saveItemName(new ItemName('Kosan', 4,0));
-    daoItemName.saveItemName(new ItemName('Jajan', 4,0));
+    daoItemName.saveItemName(new ItemName('Kosan', 5,0));
+    daoItemName.saveItemName(new ItemName('Jajan', 5,0));
+    daoItemName.saveItemName(new ItemName('Kalender', 6,0));
+    daoItemName.saveItemName(new ItemName('Freelance', 4,0));
 //    daoItemName.saveItemName(new ItemName('Keperluan bulanan', 3));
 //    daoItemName.saveItemName(new ItemName('keperluan Motor', 3));
 //    daoItemName.saveItemName(new ItemName('Mobil', 4));
@@ -85,8 +92,8 @@ class Persiapan {
     daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-7', 4, 500, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch));
     daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-6', 5, 1000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch));
     daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-5', 6, 23000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-4', 7, 13000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-4', 7, 15000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-4', 9, 200000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-08-4', 10,1200000 , 'ct',DateTime(2019,8,4).millisecondsSinceEpoch));
 //    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-28', 1, 5, '', 1));
 //    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-29', 10, 5, '', 1));
 //    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-29', 11, 5, '', 0));

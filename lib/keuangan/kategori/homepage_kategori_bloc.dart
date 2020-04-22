@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/database/keuangan/dao_kategori.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
@@ -27,6 +28,15 @@ class BlocHomepageKategori {
           new ItemUIHomepageKategori(enumState, _cacheListKategori);
       _itemUi.sink.add(itemUIHomepageKategori);
     });
+  }
+
+  void deleteKategori(Kategori kategori)async{
+    DaoKategori daoKategori = new DaoKategori();
+    DaoItemName daoItemName = new DaoItemName();
+    daoItemName.getItemNameByIdKategori(kategori.id).then((litem){
+
+    });
+
   }
 
   List<Kategori> _processKategori(List<Kategori> lk) {

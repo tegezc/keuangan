@@ -31,10 +31,14 @@ class DaoKategori {
     return rdb;
   }
 
-  Future<Kategori> getDefaultKategori() async {
+  Future<Kategori> getDefaultKategori(EnumJenisTransaksi enumJenisTransaksi) async {
     var dbClient = await DatabaseHelper().db;
+    int i = 1;
+    if(enumJenisTransaksi == EnumJenisTransaksi.pengeluaran){
+      i = 0;
+    }
     List<Map> list =
-    await dbClient.rawQuery('SELECT * FROM ${tb.name} WHERE ${tb.fId}=1');
+    await dbClient.rawQuery('SELECT * FROM ${tb.name} WHERE ${tb.fIsAbadi}=1 AND ${tb.fType}=$i');
     Kategori kategori;
     if (list.length > 0) {
       EnumJenisTransaksi type = EnumJenisTransaksi.values[list[0][tb.fType]];
@@ -48,6 +52,24 @@ class DaoKategori {
   Future<List<Kategori>> getAllKategori() async {
     var dbClient = await DatabaseHelper().db;
     List<Map> list = await dbClient.rawQuery('SELECT * FROM ${tb.name}');
+
+    List<Kategori> kategories = new List();
+    for (int i = 0; i < list.length; i++) {
+      EnumJenisTransaksi type = EnumJenisTransaksi.values[list[i][tb.fType]];
+      var kategori = new Kategori(list[i][tb.fNama], list[i][tb.fIdParent],
+          type, list[i][tb.fCatatan],list[i][tb.fColor]);
+      kategori.setId(list[i][tb.fId]);
+
+      kategories.add(kategori);
+    }
+
+    return kategories;
+  }
+
+  Future<List<Kategori>> getMainKategoriByJenisTrxTanpaAbadi(EnumJenisTransaksi enumJenisTransaksi) async {
+    var dbClient = await DatabaseHelper().db;
+    List<Map> list = await dbClient
+        .rawQuery('SELECT * FROM ${tb.name} WHERE ${tb.fIdParent}=0 AND ${tb.fType}=${enumJenisTransaksi.index} AND ${tb.fIsAbadi}=0');
 
     List<Kategori> kategories = new List();
     for (int i = 0; i < list.length; i++) {
@@ -158,6 +180,7 @@ class DaoKategori {
     int res = await dbClient.rawDelete('DELETE FROM ${tb.name}');
     return res;
   }
+
   /// pada case: kategori di edit, dimana hasil editannya ternyata duplikat.
   Future<EnumResultDb> update(Kategori kategori) async {
     Kategori k = await this.getKategoriByNameAndCategori(

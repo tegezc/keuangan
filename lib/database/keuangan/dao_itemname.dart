@@ -14,6 +14,7 @@ class DaoItemName {
 
     return res;
   }
+
   Future<List<ItemName>> getAllItemName() async {
     var dbClient = await DatabaseHelper().db;
     List<Map> list = await dbClient
@@ -28,6 +29,7 @@ class DaoItemName {
     }
     return itemNames;
   }
+
   Future<List<ItemName>> getAllItemNameVisible() async {
     var dbClient = await DatabaseHelper().db;
     List<Map> list = await dbClient
@@ -42,10 +44,10 @@ class DaoItemName {
     }
     return itemNames;
   }
+
   Future<Map<int, ItemName>> getAllItemNameMap() async {
     var dbClient = await DatabaseHelper().db;
-    List<Map> list = await dbClient
-        .rawQuery('SELECT * FROM ${tb.name}');
+    List<Map> list = await dbClient.rawQuery('SELECT * FROM ${tb.name}');
 
     Map<int, ItemName> itemNameMap = new Map();
     for (int i = 0; i < list.length; i++) {
@@ -87,7 +89,6 @@ class DaoItemName {
     return itemName;
   }
 
-
   /// baik visible atau tidak akan di dapatkan
   Future<ItemName> getItemNameByNamaNIdKategori(
       String nama, int idKategori) async {
@@ -104,6 +105,28 @@ class DaoItemName {
       itemName.setId(list[0][tb.fId]);
     }
     return itemName;
+  }
+
+  /// baik visible atau tidak akan di dapatkan
+  Future<List<ItemName>> getItemNameByIdKategori(int idKategori) async {
+    var dbClient = await DatabaseHelper().db;
+    String query =
+        'SELECT * FROM ${tb.name} WHERE ${tb.fIdKategori}=$idKategori';
+    List<Map> list = await dbClient.rawQuery(query);
+
+    List<ItemName> litem = new List();
+    if (litem != null) {
+      for (int i = 0; i < list.length; i++) {
+        ItemName itemName;
+
+        itemName = new ItemName(
+            list[i][tb.fNama], list[i][tb.fIdKategori], list[i][tb.fDeleted]);
+        itemName.setId(list[i][tb.fId]);
+        litem.add(itemName);
+      }
+    }
+
+    return litem;
   }
 
   Future<ItemName> getItemNameByNamaNIdKategoriVisible(
@@ -150,6 +173,14 @@ class DaoItemName {
   }
 
   Future<EnumResultDb> update(ItemName itemName) async {
+    var dbClient = await DatabaseHelper().db;
+
+    int res = await dbClient.update(tb.name, itemName.toMap(),
+        where: "${tb.fId} = ?", whereArgs: <int>[itemName.id]);
+    return res > 0 ? EnumResultDb.success : EnumResultDb.failed;
+  }
+
+  Future<EnumResultDb> updateKeOtherKategori(ItemName itemName) async {
     var dbClient = await DatabaseHelper().db;
 
     int res = await dbClient.update(tb.name, itemName.toMap(),

@@ -46,6 +46,7 @@ class DatabaseHelper {
             "${tbKategori.fIdParent} INTEGER ,"
             "${tbKategori.fType} INTEGER,"
             "${tbKategori.fCatatan} TEXT,"
+            "${tbKategori.fIsAbadi} INTEGER,"
             "${tbKategori.fColor} TEXT)");
     await db.execute(
         "CREATE TABLE ${tbItemName.name}(${tbItemName.fId} INTEGER PRIMARY KEY, "

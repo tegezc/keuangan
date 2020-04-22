@@ -5,8 +5,9 @@ class TbKategori {
   final fId = 'id';
   final fNama = 'nama';
   final fIdParent = 'id_parent';
-  final fType = 'type'; // sama dengan type di keuangan
+  final fType = 'type'; // EnumJenisTransaksi
   final fCatatan = 'catatan';
+  final fIsAbadi = 'isabadi';
   final fColor = 'color';
 }
 

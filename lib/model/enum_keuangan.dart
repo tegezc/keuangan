@@ -1,4 +1,4 @@
-enum StateAddCategory { edit, baru, baruSubkategori }
+enum StateAddCategory { editSubkategori, baru,edit, baruSubkategori }
 enum EnumStatePopulateKategori {
   firsttime,
   savesuccess,

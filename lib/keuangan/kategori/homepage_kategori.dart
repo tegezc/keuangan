@@ -107,7 +107,6 @@ class _HomePageKategoriState extends State<HomePageKategori> {
 
   @override
   Widget build(BuildContext context) {
-   // WidgetsBinding.instance.addPostFrameCallback((_) => _afterBuild(context));
     return StreamBuilder<ItemUIHomepageKategori>(
         stream: _blocHomepageKategori.listKategoriStream,
         builder: (context, snapshot) {
@@ -119,8 +118,6 @@ class _HomePageKategoriState extends State<HomePageKategori> {
             } else {
               _enumState = null;
             }
-
-            //////////////
 
             return Scaffold(
               key: _scaffoldKey,
@@ -135,21 +132,21 @@ class _HomePageKategoriState extends State<HomePageKategori> {
               floatingActionButton: new FloatingActionButton(
                 onPressed: () async {
                   int res = await openPage(context, AddCategory.baru());
-                  Navigator.of(context).pop();
 
-                  //prevent snacbar showing
-                  if (res == null) {
-                    _enumState = null;
-                  } else {
-                    _blocHomepageKategori.populateAllKategoriFromDb(
-                        EnumStatePopulateKategori.savesuccess);
-                    String messageSnackBar = 'Kategori berhasil di simpan.';
-                    _scaffoldKey.currentState.showSnackBar(SnackBar(
-                      content: SizedBox(
-                          height: 30.0, child: Center(child: Text(messageSnackBar))),
-                      duration: Duration(milliseconds: 1000),
-                    ));
-                  }
+//
+//                  //prevent snacbar showing
+//                  if (res == null) {
+//                    _enumState = null;
+//                  } else {
+//                    _blocHomepageKategori.populateAllKategoriFromDb(
+//                        EnumStatePopulateKategori.savesuccess);
+//                    String messageSnackBar = 'Kategori berhasil di simpan.';
+//                    _scaffoldKey.currentState.showSnackBar(SnackBar(
+//                      content: SizedBox(
+//                          height: 30.0, child: Center(child: Text(messageSnackBar))),
+//                      duration: Duration(milliseconds: 1000),
+//                    ));
+//                  }
                 },
                 tooltip: 'add kategori',
                 child: new Icon(Icons.add),
@@ -174,7 +171,7 @@ class _HomePageKategoriState extends State<HomePageKategori> {
     if(kategori.idParent == 0){
       lw.add(new OutlineButton(
         onPressed: (){
-          _addSubKategori(kategori);
+          _addSubKategori(kategori.id);
         },
         child: Text('tambah subkategori'),
       ));
@@ -265,8 +262,8 @@ class _HomePageKategoriState extends State<HomePageKategori> {
 
   }
 
-  _addSubKategori(Kategori kategori)async{
-    int res = await openPage(context, AddCategory.addSubkategori(kategori));
+  _addSubKategori(int idparent)async{
+    int res = await openPage(context, AddCategory.addSubkategori(idparent));
     Navigator.of(context).pop();
 
     //prevent snacbar showing

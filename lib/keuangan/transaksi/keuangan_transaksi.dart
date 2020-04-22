@@ -112,7 +112,7 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
     DaoKategori daoKategori = new DaoKategori();
     DaoItemName daoItemName = new DaoItemName();
     daoKategori.getAllKategoriMap().then((Map<int, Kategori> kMap) {
-      _kategoriMap = new Map();
+      _kategoriMap.clear();
       _kategoriMap.addAll(kMap);
       daoItemName.getAllItemNameMap().then((Map<int, ItemName> inMap) {
         _itemNameMap.clear();

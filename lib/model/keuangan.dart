@@ -10,13 +10,18 @@ class Kategori {
   EnumJenisTransaksi _type;
   String _catatan;
   List<Kategori> listKategori;
+  int isAbadi;
   String _color;
 
   Kategori(this._nama, this._idParent, this._type, this._catatan, this._color)
       : assert(_nama != null &&
             _idParent != null &&
             _type != null &&
-            _catatan != null);
+            _catatan != null) {
+    if (isAbadi == null) {
+      isAbadi = 0;
+    }
+  }
 
   String get nama => this._nama;
 
@@ -34,6 +39,7 @@ class Kategori {
     map[tb.fIdParent] = _idParent;
     map[tb.fType] = _type.index;
     map[tb.fCatatan] = _catatan;
+    map[tb.fIsAbadi] = isAbadi;
     map[tb.fColor] = _color;
 
     return map;
@@ -47,9 +53,21 @@ class Kategori {
     this._nama = nama;
   }
 
+  void setIdParent(int idp){
+    this._idParent = idp;
+  }
+
+  void setType(EnumJenisTransaksi jTrx){
+    this._type = jTrx;
+  }
+
+  void setColor(String hex){
+    this._color = hex;
+  }
+
   @override
   String toString() {
-    return '|ID: $id |nama: $_nama |Catatan: $catatan |ID Parent: $_idParent |Type: $_type |color: $_color';
+    return '|ID: $id |nama: $_nama |Catatan: $catatan |ID Parent: $_idParent |Type: $_type | abadi: $isAbadi |color: $_color';
   }
 }
 
