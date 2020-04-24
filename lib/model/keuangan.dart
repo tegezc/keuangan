@@ -9,7 +9,7 @@ class Kategori {
   int _idParent;
   EnumJenisTransaksi _type;
   String _catatan;
-  List<Kategori> listKategori;
+  List<Kategori> listKategori; // list subkategori
   int isAbadi;
   String _color;
 

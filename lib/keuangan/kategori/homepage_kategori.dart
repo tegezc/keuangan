@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:keuangan/keuangan/kategori/subkategori/add_subkategori.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/loading_view.dart';
@@ -147,20 +148,20 @@ class _HomePageKategoriState extends State<HomePageKategori> {
                 onPressed: () async {
                   int res = await openPage(context, AddCategory.baru());
 
-//
-//                  //prevent snacbar showing
-//                  if (res == null) {
-//                    _enumState = null;
-//                  } else {
-//                    _blocHomepageKategori.populateAllKategoriFromDb(
-//                        EnumStatePopulateKategori.savesuccess);
-//                    String messageSnackBar = 'Kategori berhasil di simpan.';
-//                    _scaffoldKey.currentState.showSnackBar(SnackBar(
-//                      content: SizedBox(
-//                          height: 30.0, child: Center(child: Text(messageSnackBar))),
-//                      duration: Duration(milliseconds: 1000),
-//                    ));
-//                  }
+
+                  //prevent snacbar showing
+                  if (res == null) {
+                    _enumState = null;
+                  } else {
+                    _blocHomepageKategori.populateAllKategoriFromDb(
+                        EnumStatePopulateKategori.savesuccess);
+                    String messageSnackBar = 'Kategori berhasil di simpan.';
+                    _scaffoldKey.currentState.showSnackBar(SnackBar(
+                      content: SizedBox(
+                          height: 30.0, child: Center(child: Text(messageSnackBar))),
+                      duration: Duration(milliseconds: 1000),
+                    ));
+                  }
                 },
                 tooltip: 'add kategori',
                 child: new Icon(Icons.add),
@@ -206,7 +207,7 @@ class _HomePageKategoriState extends State<HomePageKategori> {
     } else {
       lw.add(new OutlineButton(
         onPressed: () {
-          _edit(kategori);
+          _editSubKategori(kategori);
         },
         child: Text('edit subkategori'),
       ));
@@ -272,7 +273,7 @@ class _HomePageKategoriState extends State<HomePageKategori> {
   }
 
   _addSubKategori(int idparent) async {
-    int res = await openPage(context, AddCategory.addSubkategori(idparent));
+    int res = await openPage(context, AddSubCategory.baru(idparent));
     Navigator.of(context).pop();
 
     //prevent snacbar showing
@@ -286,6 +287,26 @@ class _HomePageKategoriState extends State<HomePageKategori> {
       _scaffoldKey.currentState.showSnackBar(SnackBar(
         content:
             SizedBox(height: 30.0, child: Center(child: Text(messageSnackBar))),
+        duration: Duration(milliseconds: 1000),
+      ));
+    }
+  }
+
+  _editSubKategori(Kategori kategori)async{
+    int res = await openPage(context, AddSubCategory.edit(kategori));
+    Navigator.of(context).pop();
+
+    //prevent snacbar showing
+    if (res == null) {
+      _enumState = null;
+    } else {
+      _blocHomepageKategori
+          .populateAllKategoriFromDb(EnumStatePopulateKategori.editsuccess);
+
+      String messageSnackBar = 'Kategori berhasil di update';
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+        content:
+        SizedBox(height: 30.0, child: Center(child: Text(messageSnackBar))),
         duration: Duration(milliseconds: 1000),
       ));
     }
