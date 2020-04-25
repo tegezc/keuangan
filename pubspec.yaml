@@ -13,6 +13,7 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
+  fluttertoast: ^4.0.1
   flutter_native_splash: ^0.1.9
   share: ^0.6.3+6
   #firebase_admob: ^0.9.3+1
