@@ -1,4 +1,4 @@
-import 'package:keuangan/model/enum_db.dart';
+import 'package:keuangan/database/db_utility.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/global_string_database.dart';
 

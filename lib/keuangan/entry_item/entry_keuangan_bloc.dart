@@ -141,7 +141,7 @@ class BlocEntryKeuangan {
     });
   }
 
-  Future<EnumFinalResult> simpan1(String nama, String catatan) async {
+  Future<EnumFinalResult> simpan(String nama, String catatan) async {
     _cacheEntry.itemName.setNama(nama);
     _cacheEntry.keuangan.setCatatan(catatan);
 

@@ -60,9 +60,8 @@ class _AddCategoryState extends State<AddCategory> {
   _saveKategori(ItemUiAddKategori itemUi) async {
     String nama = _txtController.text;
     String catatan = _txtCatatanController.text;
-    Kategori kategori = Kategori(nama, itemUi.currentKategori.idParent,
-        itemUi.currentKategori.type, catatan, '');
-    _blocAddKategori.submitKategori(kategori, widget.stateAddCategory);
+    _blocAddKategori.submitKategori(nama,catatan);
+
   }
 
   List<DropdownMenuItem<int>> _getDropDownTransaksi() {
@@ -79,6 +78,12 @@ class _AddCategoryState extends State<AddCategory> {
     ));
 
     return items;
+  }
+
+  _eksekusiAfterBuild(BuildContext context, ItemUiAddKategori data)async{
+    if(data.enumStateFromBloc == EnumStateFromBloc.finish){
+      Navigator.of(context).pop(1);
+    }
   }
 
   @override
@@ -101,6 +106,8 @@ class _AddCategoryState extends State<AddCategory> {
                 )),
                 body: LoadingView());
           } else {
+            WidgetsBinding.instance.addPostFrameCallback(
+                    (_) => _eksekusiAfterBuild(context, snapshot.data));
             _txtController.text = snapshot.data.currentKategori.nama;
             _txtCatatanController.text = snapshot.data.currentKategori.catatan;
             return Scaffold(

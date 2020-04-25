@@ -413,3 +413,8 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
     }
   }
 }
+enum StateTransaksi {
+  byDefault,
+  byKategori,
+  byItemName,
+}

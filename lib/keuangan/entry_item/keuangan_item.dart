@@ -134,7 +134,7 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
           _controllerTextItem.text, _txtNoteController.text);
       _blocEntryKeuangan.sinkState(stateSimpanLagi);
     } else {
-      EnumFinalResult enumFinalResult = await _blocEntryKeuangan.simpan1(
+      EnumFinalResult enumFinalResult = await _blocEntryKeuangan.simpan(
           _controllerTextItem.text, _txtNoteController.text);
       Navigator.pop(context, enumFinalResult);
     }

@@ -1,15 +1,4 @@
 enum StateAddCategory { editSubkategori, baru,edit, baruSubkategori }
-enum EnumStatePopulateKategori {
-  firsttime,
-  savesuccess,
-  editsuccess,
-}
-
-enum StateTransaksi {
-  byDefault,
-  byKategori,
-  byItemName,
-}
 
 enum Operator {
   addition,
@@ -25,8 +14,6 @@ enum EnumStatePopulateItemName {
   editsuccess,
   deleteSuccess,
 }
-
-enum StateItemNameEntry { edit, baru }
 
 enum EnumEntryKeuangan {
   jenisKeuangan,
@@ -50,4 +37,10 @@ enum EnumFinalResult{
 enum EnumJenisTransaksi{
   pengeluaran,
   pemasukan
+}
+
+enum EnumStateFromBloc{
+  progress,
+  finish,
+  error
 }

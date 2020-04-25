@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:keuangan/model/enum_db.dart';
+import 'package:keuangan/database/db_utility.dart';
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';

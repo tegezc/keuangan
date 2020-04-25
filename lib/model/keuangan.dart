@@ -53,15 +53,19 @@ class Kategori {
     this._nama = nama;
   }
 
-  void setIdParent(int idp){
+  void setIdParent(int idp) {
     this._idParent = idp;
   }
 
-  void setType(EnumJenisTransaksi jTrx){
+  void setType(EnumJenisTransaksi jTrx) {
     this._type = jTrx;
   }
 
-  void setColor(String hex){
+  void setCatatan(String ctt) {
+    this._catatan = ctt;
+  }
+
+  void setColor(String hex) {
     this._color = hex;
   }
 

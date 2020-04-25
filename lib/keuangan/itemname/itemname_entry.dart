@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:keuangan/database/db_utility.dart';
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/database/keuangan/dao_kategori.dart';
-import 'package:keuangan/model/enum_db.dart';
-import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/loading_view.dart';
 
@@ -75,7 +74,7 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
   /// jika tidak maka insert baru
   /// 2. kondisi edit: maka cek data isDeleted 0 apakah duplikasi, jika tidak,
   /// maka insert baru itemname dan yang ori di edit dengan isDeleted menjadi 1.
-  _saveKategori() {
+  _saveItemName() {
     bool isShowSnackbar = false;
     String messageSnackBar = '';
     String nama = _txtController.text;
@@ -188,7 +187,7 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
               color: Colors.green[900],
               icon: Icon(Icons.done),
               onPressed: () {
-                _saveKategori();
+                _saveItemName();
               },
             ),
             // overflow menu
@@ -230,3 +229,5 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
     });
   }
 }
+
+enum StateItemNameEntry { edit, baru }

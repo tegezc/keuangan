@@ -1,4 +1,3 @@
-import 'package:keuangan/model/enum_db.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/global_string_database.dart';
@@ -199,22 +198,36 @@ class DaoKategori {
   }
 
   /// pada case: kategori di edit, dimana hasil editannya ternyata duplikat.
-  Future<EnumResultDb> update(Kategori kategori) async {
+  Future<ResultDb> update(Kategori kategori) async {
+
+    ResultDb resultDb = new ResultDb(null);
     Kategori k = await this.getKategoriByNameAndCategori(
         kategori.nama, kategori.idParent, kategori.type);
     var dbClient = await DatabaseHelper().db;
     if (k == null) {
       int res = await dbClient.update(tb.name, kategori.toMap(),
           where: "${tb.fId} = ?", whereArgs: <int>[kategori.id]);
-      return res > 0 ? EnumResultDb.success : EnumResultDb.failed;
+      if(res>0){
+        resultDb.value = res;
+        resultDb.enumResultDb = EnumResultDb.success;
+      }else{
+        resultDb.enumResultDb = EnumResultDb.failed;
+      }
+
     } else {
       if (k.id == kategori.id) {
         int res = await dbClient.update(tb.name, kategori.toMap(),
             where: "${tb.fId} = ?", whereArgs: <int>[kategori.id]);
-        return res > 0 ? EnumResultDb.success : EnumResultDb.failed;
+        if(res>0){
+          resultDb.value = res;
+          resultDb.enumResultDb = EnumResultDb.success;
+        }else{
+          resultDb.enumResultDb = EnumResultDb.failed;
+        }
       } else {
-        return EnumResultDb.duplicate;
+        resultDb.enumResultDb = EnumResultDb.duplicate;
       }
     }
+    return resultDb;
   }
 }
