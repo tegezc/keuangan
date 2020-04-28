@@ -21,9 +21,14 @@ class _HomePageKategoriState extends State<HomePageKategori> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   BlocHomepageKategori _blocHomepageKategori;
   EnumStatePopulateKategori _enumState;
+
+  /// COUNTER UI
   int _counterBuild = 0;
   int _counterSaveSuccess = 0;
   int _counterEditSuccess = 0;
+  int _counterSaveSubKategoriSuccess = 0;
+  int _counterEditSubKategoriSuccess = 0;
+
 
   @override
   initState() {
@@ -130,6 +135,16 @@ class _HomePageKategoriState extends State<HomePageKategori> {
         _counterEditSuccess == 0) {
       _counterEditSuccess ++;
       String messageToast = 'Kategori berhasil di ubah.';
+      this._showToast(messageToast);
+    }else if (data.enumState == EnumStatePopulateKategori.editSubkategorisuccess &&
+        _counterEditSubKategoriSuccess == 0){
+      _counterEditSubKategoriSuccess++;
+      String messageToast = 'Subkategori berhasil di ubah.';
+      this._showToast(messageToast);
+    }else if (data.enumState == EnumStatePopulateKategori.saveSubkategorisuccess &&
+        _counterSaveSubKategoriSuccess == 0){
+      _counterSaveSubKategoriSuccess++;
+      String messageToast = 'Subkategori berhasil di simpan.';
       this._showToast(messageToast);
     }
   }
@@ -298,15 +313,10 @@ class _HomePageKategoriState extends State<HomePageKategori> {
     if (res == null) {
       _enumState = null;
     } else {
+      _counterSaveSubKategoriSuccess = 0;
       _blocHomepageKategori
-          .populateAllKategoriFromDb(EnumStatePopulateKategori.editsuccess);
+          .populateAllKategoriFromDb(EnumStatePopulateKategori.saveSubkategorisuccess);
 
-      String messageSnackBar = 'Kategori berhasil di update';
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content:
-            SizedBox(height: 30.0, child: Center(child: Text(messageSnackBar))),
-        duration: Duration(milliseconds: 1000),
-      ));
     }
   }
 
@@ -318,15 +328,9 @@ class _HomePageKategoriState extends State<HomePageKategori> {
     if (res == null) {
       _enumState = null;
     } else {
+      _counterEditSubKategoriSuccess = 0;
       _blocHomepageKategori
-          .populateAllKategoriFromDb(EnumStatePopulateKategori.editsuccess);
-
-      String messageSnackBar = 'Kategori berhasil di update';
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content:
-            SizedBox(height: 30.0, child: Center(child: Text(messageSnackBar))),
-        duration: Duration(milliseconds: 1000),
-      ));
+          .populateAllKategoriFromDb(EnumStatePopulateKategori.editSubkategorisuccess);
     }
   }
 }

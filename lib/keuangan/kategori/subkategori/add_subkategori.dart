@@ -50,9 +50,14 @@ class _AddSubCategoryState extends State<AddSubCategory> {
   _saveKategori(Kategori k) async {
     String nama = _txtController.text;
     String catatan = _txtCatatanController.text;
-    Kategori kategori = Kategori(nama, k.idParent,
-        k.type, catatan, '');
-    _blocAddKategori.submitKategori(kategori, widget.stateAddCategory);
+    _blocAddKategori.submitKategori(nama,catatan);
+  }
+
+
+  _eksekusiAfterBuild(BuildContext context, ItemUiAddSubKategori data)async{
+    if(data.enumStateFromBloc == EnumStateFromBloc.finish){
+      Navigator.of(context).pop(1);
+    }
   }
 
   @override
@@ -73,6 +78,8 @@ class _AddSubCategoryState extends State<AddSubCategory> {
                     )),
                 body: LoadingView());
           } else {
+            WidgetsBinding.instance.addPostFrameCallback(
+                    (_) => _eksekusiAfterBuild(context, snapshot.data));
             String header = snapshot.data.currentKategori.type==EnumJenisTransaksi.pemasukan?"Pemasukan":'Pengeluaran';
 
             _txtCatatanController.text = snapshot.data.currentKategori.catatan;

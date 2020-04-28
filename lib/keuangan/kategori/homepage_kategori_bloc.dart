@@ -104,4 +104,6 @@ enum EnumStatePopulateKategori {
   firsttime,
   savesuccess,
   editsuccess,
+  saveSubkategorisuccess,
+  editSubkategorisuccess,
 }

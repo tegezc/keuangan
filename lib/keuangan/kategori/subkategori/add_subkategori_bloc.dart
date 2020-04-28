@@ -1,3 +1,4 @@
+import 'package:keuangan/database/db_utility.dart';
 import 'package:keuangan/database/keuangan/dao_kategori.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
@@ -7,12 +8,15 @@ import 'package:rxdart/subjects.dart';
 class BlocAddSubKategori {
   ItemUiAddSubKategori _cacheUIKategori;
 
+  StateAddCategory _cacheStateCategiri;
+
   final BehaviorSubject<ItemUiAddSubKategori> _itemUi = BehaviorSubject();
 
   Stream<ItemUiAddSubKategori> get uiItemAddKategori => _itemUi.stream;
 
   void loadFirstTime(StateAddCategory stateAddCategory, Kategori kategori,
       int idparent) async {
+    _cacheStateCategiri = stateAddCategory;
     switch (stateAddCategory) {
       case StateAddCategory.baruSubkategori:
         {
@@ -42,7 +46,7 @@ class BlocAddSubKategori {
     DaoKategori daoKategori = new DaoKategori();
     Kategori parentKategori = await daoKategori.getKategoriById(kategori.idParent);
 
-    ItemUiAddSubKategori itemUiAddKategori = new ItemUiAddSubKategori(kategori,parentKategori);
+    ItemUiAddSubKategori itemUiAddKategori = new ItemUiAddSubKategori(kategori,parentKategori,EnumStateFromBloc.progress);
     return itemUiAddKategori;
   }
 
@@ -53,7 +57,7 @@ class BlocAddSubKategori {
         new Kategori('', idparent, kategoriParent.type, '', '');
 
     ItemUiAddSubKategori itemUiAddKategori =
-        new ItemUiAddSubKategori(newKategori,kategoriParent);
+        new ItemUiAddSubKategori(newKategori,kategoriParent,EnumStateFromBloc.progress);
 //    print('idparent: $idparent');
 //
 //
@@ -64,26 +68,42 @@ class BlocAddSubKategori {
   }
 
   void submitKategori(
-      Kategori kategori, StateAddCategory stateAddCategory) async {
+      String nama, String catatan) async {
     ColorManagement colorManagement = new ColorManagement();
-    String hexColor = await colorManagement.hexColor(kategori.idParent);
-    kategori.setColor(hexColor);
+    String hexColor = await colorManagement.hexColor(_cacheUIKategori.currentKategori.idParent);
+    _cacheUIKategori.currentKategori.setColor(hexColor);
+    _cacheUIKategori.currentKategori.setNama(nama);
+    _cacheUIKategori.currentKategori.setCatatan(catatan);
 
-    if (stateAddCategory == StateAddCategory.baruSubkategori ||
-        stateAddCategory == StateAddCategory.baru) {
-      this._saveKategori().then((value) {});
-    } else if (stateAddCategory == StateAddCategory.edit ||
-        stateAddCategory == StateAddCategory.editSubkategori) {
-      this._updateKategori(kategori).then((value) {});
+
+    if (_cacheStateCategiri == StateAddCategory.baruSubkategori) {
+      this._saveKategori( _cacheUIKategori.currentKategori).then((resultDb) {
+        if(resultDb.enumResultDb == EnumResultDb.success){
+          _cacheUIKategori.currentKategori.setId(resultDb.value);
+          _cacheUIKategori.enumStateFromBloc = EnumStateFromBloc.finish;
+          this._sinkUIKategori(_cacheUIKategori);
+        }
+      });
+    } else if (_cacheStateCategiri == StateAddCategory.editSubkategori) {
+      this._updateKategori(_cacheUIKategori.currentKategori).then((resultDb) {
+        if(resultDb.enumResultDb == EnumResultDb.success){
+          _cacheUIKategori.enumStateFromBloc = EnumStateFromBloc.finish;
+          this._sinkUIKategori(_cacheUIKategori);
+        }
+      });
     }
   }
 
-  Future<bool> _saveKategori() async {
-    return true;
+  Future<ResultDb> _saveKategori(Kategori kategori) async {
+    DaoKategori daoKategori = new DaoKategori();
+    ResultDb rdb = await daoKategori.saveKategori(kategori);
+    return rdb;
   }
 
-  Future<bool> _updateKategori(Kategori kategori) async {
-    return false;
+  Future<ResultDb> _updateKategori(Kategori kategori) async {
+    DaoKategori daoKategori = new DaoKategori();
+    ResultDb rdb  = await daoKategori.update(kategori);
+    return rdb;
   }
 
   void _sinkUIKategori(ItemUiAddSubKategori itemUiAddKategori) {
@@ -98,10 +118,12 @@ class BlocAddSubKategori {
 class ItemUiAddSubKategori {
   String titleBar;
 
+  EnumStateFromBloc enumStateFromBloc;
+
   /// kategori yang sedang di kerjakan
   Kategori currentKategori;
 
   Kategori kategoriParent;
 
-  ItemUiAddSubKategori(this.currentKategori,this.kategoriParent);
+  ItemUiAddSubKategori(this.currentKategori,this.kategoriParent,this.enumStateFromBloc);
 }
