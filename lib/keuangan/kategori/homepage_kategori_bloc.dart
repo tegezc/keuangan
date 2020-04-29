@@ -41,9 +41,30 @@ class BlocHomepageKategori {
     });
   }
 
+  /// Delete kategori memiliki 2 kondisi:
+  /// 1. Kategori level 1
+  /// 2. Kategori level 2
+  ///
+  /// MENGHAPUS LEVEL 1: seluruh sub kategori otomatis akan menjadi level 1
+  /// sedangkan itemName(all baik isdeleted 0 dan 1) yang berafiliasi dengan kategori
+  /// tersebut akan di arahkan kategori 'Other'.
+  ///
+  /// MENGHAPUS LEVEL 2: itemName(all baik isdeleted 0 dan 1) yang berafiliasi dengan kategori
+  /// tersebut akan di arahkan kategori 'Other'.
+  ///
   void deleteKategori(Kategori kategori)async{
+
     DaoKategori daoKategori = new DaoKategori();
     DaoItemName daoItemName = new DaoItemName();
+
+    /// cek level
+    ///  [kategori.idParent == 0] adalah level 1
+    if(kategori.idParent == 0){
+
+    }else{
+
+    }
+
     daoItemName.getItemNameByIdKategori(kategori.id).then((litem){
 
     });
