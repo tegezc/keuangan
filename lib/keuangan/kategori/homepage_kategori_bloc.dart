@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:html';
 
+import 'package:keuangan/database/db_utility.dart';
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/database/keuangan/dao_kategori.dart';
+import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -36,7 +39,7 @@ class BlocHomepageKategori {
       }
 
       ItemUIHomepageKategori itemUIHomepageKategori =
-      new ItemUIHomepageKategori(enumState, _cacheListKategori);
+          new ItemUIHomepageKategori(enumState, _cacheListKategori);
       _itemUi.sink.add(itemUIHomepageKategori);
     });
   }
@@ -52,23 +55,59 @@ class BlocHomepageKategori {
   /// MENGHAPUS LEVEL 2: itemName(all baik isdeleted 0 dan 1) yang berafiliasi dengan kategori
   /// tersebut akan di arahkan kategori 'Other'.
   ///
-  void deleteKategori(Kategori kategori)async{
-
+  void deleteKategori(Kategori kategori) async {
     DaoKategori daoKategori = new DaoKategori();
     DaoItemName daoItemName = new DaoItemName();
 
-    /// cek level
-    ///  [kategori.idParent == 0] adalah level 1
-    if(kategori.idParent == 0){
-
-    }else{
-
-    }
-
-    daoItemName.getItemNameByIdKategori(kategori.id).then((litem){
-
+    /// update itemname yang berafiliasi dengan kategori , diarahkan ke Other
+    daoItemName.getItemNameByIdKategori(kategori.id).then((litem) {
+      if (litem.isNotEmpty) {
+        daoKategori.getDefaultKategori(kategori.type).then((k) {
+          for (int i = 0; i < litem.length; i++) {
+            ItemName itemName = litem[i];
+            itemName.setKategori(k);
+            daoItemName.update(itemName);
+          }
+        });
+      }
     });
 
+    /// cek level
+    ///  [kategori.idParent == 0] adalah level 1, jika punya subkategori, maka
+    ///  subkategori akan menjadi level 1
+    if (kategori.idParent == 0) {
+      daoKategori.getSubkategori(kategori.idParent).then((lktg) {
+        if (lktg.isNotEmpty) {
+          for (int i = 0; i < lktg.length; i++) {
+            Kategori ktg = lktg[i];
+
+            /// set subkategori ke level 1
+            ktg.setIdParent(0);
+
+            daoKategori.update(ktg);
+          }
+        }
+      });
+    }
+  }
+
+  Future<bool> _updateItemNameKeOther(Kategori kategori) async {
+    DaoKategori daoKategori = new DaoKategori();
+    DaoItemName daoItemName = new DaoItemName();
+
+    bool success = true;
+    /// update itemname yang berafiliasi dengan kategori , diarahkan ke Other
+    List<ItemName> litemName =
+        await daoItemName.getItemNameByIdKategori(kategori.id);
+    if (litemName.isNotEmpty) {
+      Kategori k = await daoKategori.getDefaultKategori(kategori.type);
+      for (int i = 0; i < litemName.length; i++) {
+        ItemName itemName = litemName[i];
+        itemName.setKategori(k);
+        EnumResultDb erdb = await daoItemName.update(itemName);
+        if(erdb == EnumResultDb.failed){}
+      }
+    }
   }
 
   List<Kategori> _processKategori(List<Kategori> lk) {
@@ -109,10 +148,7 @@ class BlocHomepageKategori {
   void dispose() {
     _itemUi.close();
   }
-
 }
-
-
 
 class ItemUIHomepageKategori {
   EnumStatePopulateKategori enumState;
