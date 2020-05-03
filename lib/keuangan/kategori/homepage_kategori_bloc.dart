@@ -39,12 +39,21 @@ class BlocHomepageKategori {
   /// MENGHAPUS LEVEL 2: itemName(all baik isdeleted 0 dan 1) yang berafiliasi dengan kategori
   /// tersebut akan di arahkan kategori 'Other'.
   ///
+  ///
+  /// [PERBAIKAN] NEXT VERSION SELURUH TRX INI HARUS DLM SATU BATCH SUPAYA JIKA SATU GAGAL
+  /// BISA DILAKUKAN ROLLBACK
   void deleteKategori(Kategori kategori) async {
+    DaoKategori daoKategori = new DaoKategori();
     this._updateItemNameKeOther(kategori).then((isSuccess) {
       if (isSuccess) {
         this._updateSubkategorikeLevel1(kategori).then((scc){
           if(scc){
-            this.populateAllKategoriFromDb(EnumStatePopulateKategori.deleteSuccess);
+            daoKategori.deleteKategori(kategori).then((res){
+              if(res > 0){
+                this.populateAllKategoriFromDb(EnumStatePopulateKategori.deleteSuccess);
+              }
+            });
+
           }else{
             //TODO gagal update kategori
           }
@@ -98,7 +107,7 @@ class BlocHomepageKategori {
     DaoKategori daoKategori = new DaoKategori();
     bool isSuccess = true;
     if (kategori.idParent == 0) {
-      List<Kategori> lktg = await daoKategori.getSubkategori(kategori.idParent);
+      List<Kategori> lktg = await daoKategori.getSubkategori(kategori.id);
       if (lktg.isNotEmpty) {
         for (int i = 0; i < lktg.length; i++) {
           /// set subkategori ke level 1

@@ -1,4 +1,5 @@
 import 'package:keuangan/database/db_utility.dart';
+import 'package:keuangan/database/keuangan/dao_kategori.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/global_string_database.dart';
 
@@ -40,6 +41,24 @@ class DaoItemName {
       var itemName = new ItemName(
           list[i][tb.fNama], list[i][tb.fIdKategori], list[i][tb.fDeleted]);
       itemName.setId(list[i][tb.fId]);
+      itemNames.add(itemName);
+    }
+    return itemNames;
+  }
+
+  Future<List<ItemName>> getAllItemNameVisibleLazy() async {
+    DaoKategori daoKategori = new DaoKategori();
+    var dbClient = await DatabaseHelper().db;
+    List<Map> list = await dbClient
+        .rawQuery('SELECT * FROM ${tb.name} WHERE ${tb.fDeleted}=0');
+
+    List<ItemName> itemNames = new List();
+    for (int i = 0; i < list.length; i++) {
+      var itemName = new ItemName(
+          list[i][tb.fNama], list[i][tb.fIdKategori], list[i][tb.fDeleted]);
+      itemName.setId(list[i][tb.fId]);
+      Kategori kategori = await daoKategori.getKategoriById(itemName.idKategori);
+      itemName.setKategori(kategori);
       itemNames.add(itemName);
     }
     return itemNames;

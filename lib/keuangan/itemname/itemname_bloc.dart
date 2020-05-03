@@ -10,14 +10,9 @@ class BlocHomepageItemName {
 
   final BehaviorSubject<ItemUIHomepageItemName> _itemUi = BehaviorSubject();
 
-  BlocHomepageItemName() {
-
-    this.populateSemuaItemNameFromDb(EnumStatePopulateItemName.firsttime);
-  }
-
   void populateSemuaItemNameFromDb(EnumStatePopulateItemName enumState) {
     DaoItemName daoItemName = new DaoItemName();
-    daoItemName.getAllItemNameVisible().then((v) {
+    daoItemName.getAllItemNameVisibleLazy().then((v) {
       List<ItemName> litemname = new List();
       if (v != null) {
         litemname.addAll(v);
@@ -30,7 +25,9 @@ class BlocHomepageItemName {
   }
 
   /// itemname yang didelete user sebenarnya tidak di delete dari database.
-  /// hanya isDeleted di set 1. (jika di delete maka referensi transaksi akan hilang)
+  /// hanya isDeleted di set 1. untuk menjaga referensi transaksi ke itemname
+  /// tidak terganggu. di perkirakan jumlah itemname ini tidak akan banyak. jadi
+  /// layak dengan cara seperti ini.
   deleteActioni(ItemName itemName,EnumStatePopulateItemName enumState){
     DaoItemName daoItemName = new DaoItemName();
     itemName.setIsDeleted(1);

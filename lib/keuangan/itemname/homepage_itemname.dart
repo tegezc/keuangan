@@ -18,6 +18,7 @@ class _HomePageItemNameState extends State<HomePageItemName> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   BlocHomepageItemName _blocHomepageItemName;
   EnumStatePopulateItemName _enumState;
+  int _counterBuild = 0;
 
   @override
   initState() {
@@ -38,6 +39,8 @@ class _HomePageItemNameState extends State<HomePageItemName> {
                 '${itemName.nama}',
                 style: TextStyle(fontSize: 15),
               ),
+              Spacer(),
+              Text('${itemName.kategori.nama}',style: TextStyle(fontSize: 15,color: Colors.lightGreen)),
             ],
           ),
           onPressed: () async {
@@ -53,6 +56,9 @@ class _HomePageItemNameState extends State<HomePageItemName> {
 
   List<Widget> _listWidgetItemName(List<ItemName> lin) {
     List<Widget> lW = new List();
+    if(lin.isEmpty){
+      lW.add(Center(child: Text('Belum ada data',style: TextStyle(fontSize: 15))));
+    }
     for (int i = 0; i < lin.length; i++) {
       lW.add(_itemNameCell(lin[i]));
     }
@@ -70,7 +76,10 @@ class _HomePageItemNameState extends State<HomePageItemName> {
 
   @override
   Widget build(BuildContext context) {
-    // WidgetsBinding.instance.addPostFrameCallback((_) => _afterBuild(context));
+    if(_counterBuild == 0){
+      _counterBuild++;
+      _blocHomepageItemName.populateSemuaItemNameFromDb(EnumStatePopulateItemName.firsttime);
+    }
     return StreamBuilder<ItemUIHomepageItemName>(
         stream: _blocHomepageItemName.listItemNameStream,
         builder: (context, snapshot) {

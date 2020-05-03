@@ -291,10 +291,15 @@ class _HomePageKategoriState extends State<HomePageKategori> {
 
   _deleteConfirmed(Kategori kategori) {
     _blocHomepageKategori.deleteKategori(kategori);
+
+    /// dismiss showDialog
+    Navigator.of(context).pop();
   }
 
   _edit(Kategori kategori) async {
     int res = await openPage(context, AddCategory.edit(kategori));
+
+    /// dismiss showDialog
     Navigator.of(context).pop();
 
     //prevent snacbar showing
@@ -311,7 +316,7 @@ class _HomePageKategoriState extends State<HomePageKategori> {
     int res = await openPage(context, AddSubCategory.baru(idparent));
     Navigator.of(context).pop();
 
-    //prevent snacbar showing
+    ///prevent snacbar showing
     if (res == null) {
       _enumState = null;
     } else {
