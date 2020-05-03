@@ -238,13 +238,20 @@ class DaoKategori {
   ///  hanya idparent saja.
   Future<ResultDb> updateBatchNoDuplicate(List<Kategori> lkategori) async {
     ResultDb resultDb = new ResultDb(null);
-    var dbClient = await DatabaseHelper().db;
-    var batch = dbClient.batch();
-    for (int i = 0; i < lkategori.length; i++) {
-      Kategori kategori = lkategori[i];
-      batch.update(tb.name, kategori.toMap(), where: "${tb.fId} = ?", whereArgs: <int>[kategori.id]);
+    try {
+      var dbClient = await DatabaseHelper().db;
+      var batch = dbClient.batch();
+      for (int i = 0; i < lkategori.length; i++) {
+        Kategori kategori = lkategori[i];
+        batch.update(tb.name, kategori.toMap(), where: "${tb.fId} = ?",
+            whereArgs: <int>[kategori.id]);
+      }
+      await batch.commit(noResult: true);
+      resultDb.enumResultDb = EnumResultDb.success;
+      return resultDb;
+    }catch(e){
+      resultDb.enumResultDb = EnumResultDb.failed;
+      return resultDb;
     }
-    await batch.commit(noResult: true);
-    return resultDb;
   }
 }

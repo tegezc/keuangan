@@ -146,11 +146,11 @@ class DaoItemName {
     return itemName;
   }
 
-  Future<bool> isDuplicate(int id, String nama, int idKategori) async {
-    String lowerName = nama.toLowerCase().trim();
+  Future<bool> isDuplicate(ItemName itemName) async {
+    String lowerName = itemName.nama.toLowerCase().trim();
     var dbClient = await DatabaseHelper().db;
     String query =
-        'SELECT * FROM ${tb.name} WHERE ${tb.fIdKategori}=$idKategori AND ${tb.fId}!=$id AND ${tb.fDeleted}=0 AND ${tb.fNama} = \'$lowerName\' COLLATE NOCASE';
+        'SELECT * FROM ${tb.name} WHERE ${tb.fIdKategori}=${itemName.idKategori} AND ${tb.fId}!=${itemName.id} AND ${tb.fDeleted}=0 AND ${tb.fNama} = \'$lowerName\' COLLATE NOCASE';
     List<Map> list = await dbClient.rawQuery(query);
 
     if (list.length > 0) {
@@ -178,6 +178,26 @@ class DaoItemName {
     int res = await dbClient.update(tb.name, itemName.toMap(),
         where: "${tb.fId} = ?", whereArgs: <int>[itemName.id]);
     return res > 0 ? EnumResultDb.success : EnumResultDb.failed;
+  }
+
+  Future<ResultDb> updateBatch(List<ItemName> litemName) async {
+
+    ResultDb resultDb = new ResultDb(null);
+    try {
+      var dbClient = await DatabaseHelper().db;
+      var batch = dbClient.batch();
+      for (int i = 0; i < litemName.length; i++) {
+        ItemName itemName = litemName[i];
+        batch.update(tb.name, itemName.toMap(), where: "${tb.fId} = ?",
+            whereArgs: <int>[itemName.id]);
+      }
+      await batch.commit(noResult: true);
+      resultDb.enumResultDb = EnumResultDb.success;
+      return resultDb;
+    }catch(e){
+      resultDb.enumResultDb = EnumResultDb.failed;
+      return resultDb;
+    }
   }
 
   Future<EnumResultDb> updateKeOtherKategori(ItemName itemName) async {

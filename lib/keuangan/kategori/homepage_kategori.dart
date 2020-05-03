@@ -198,7 +198,7 @@ class _HomePageKategoriState extends State<HomePageKategori> {
                     _enumState = null;
                   } else {
                     _counterSaveSuccess = 0;
-                    _blocHomepageKategori.populateAllKategoriSaveEditSuccess(
+                    _blocHomepageKategori.populateAllKategoriFromDb(
                         EnumStatePopulateKategori.savesuccess);
                   }
                 },
@@ -289,7 +289,9 @@ class _HomePageKategoriState extends State<HomePageKategori> {
             ));
   }
 
-  _deleteConfirmed(Kategori kategori) {}
+  _deleteConfirmed(Kategori kategori) {
+    _blocHomepageKategori.deleteKategori(kategori);
+  }
 
   _edit(Kategori kategori) async {
     int res = await openPage(context, AddCategory.edit(kategori));
@@ -301,7 +303,7 @@ class _HomePageKategoriState extends State<HomePageKategori> {
     } else {
       _counterEditSuccess = 0;
       _blocHomepageKategori
-          .populateAllKategoriSaveEditSuccess(EnumStatePopulateKategori.editsuccess);
+          .populateAllKategoriFromDb(EnumStatePopulateKategori.editsuccess);
     }
   }
 

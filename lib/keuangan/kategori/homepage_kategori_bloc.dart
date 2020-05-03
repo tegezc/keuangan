@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:html';
 
 import 'package:keuangan/database/db_utility.dart';
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/database/keuangan/dao_kategori.dart';
-import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -30,20 +28,6 @@ class BlocHomepageKategori {
     });
   }
 
-  void populateAllKategoriSaveEditSuccess(EnumStatePopulateKategori enumState) {
-    DaoKategori daoKategori = new DaoKategori();
-    daoKategori.getAllKategoriNonAbadi().then((v) {
-      if (v != null) {
-        _cacheListKategori.clear();
-        _cacheListKategori.addAll(_processKategori(v));
-      }
-
-      ItemUIHomepageKategori itemUIHomepageKategori =
-          new ItemUIHomepageKategori(enumState, _cacheListKategori);
-      _itemUi.sink.add(itemUIHomepageKategori);
-    });
-  }
-
   /// Delete kategori memiliki 2 kondisi:
   /// 1. Kategori level 1
   /// 2. Kategori level 2
@@ -56,58 +40,85 @@ class BlocHomepageKategori {
   /// tersebut akan di arahkan kategori 'Other'.
   ///
   void deleteKategori(Kategori kategori) async {
-    DaoKategori daoKategori = new DaoKategori();
-    DaoItemName daoItemName = new DaoItemName();
-
-    /// update itemname yang berafiliasi dengan kategori , diarahkan ke Other
-    daoItemName.getItemNameByIdKategori(kategori.id).then((litem) {
-      if (litem.isNotEmpty) {
-        daoKategori.getDefaultKategori(kategori.type).then((k) {
-          for (int i = 0; i < litem.length; i++) {
-            ItemName itemName = litem[i];
-            itemName.setKategori(k);
-            daoItemName.update(itemName);
+    this._updateItemNameKeOther(kategori).then((isSuccess) {
+      if (isSuccess) {
+        this._updateSubkategorikeLevel1(kategori).then((scc){
+          if(scc){
+            this.populateAllKategoriFromDb(EnumStatePopulateKategori.deleteSuccess);
+          }else{
+            //TODO gagal update kategori
           }
         });
+      } else {
+        // TODO gagal update itemname
       }
     });
-
-    /// cek level
-    ///  [kategori.idParent == 0] adalah level 1, jika punya subkategori, maka
-    ///  subkategori akan menjadi level 1
-    if (kategori.idParent == 0) {
-      daoKategori.getSubkategori(kategori.idParent).then((lktg) {
-        if (lktg.isNotEmpty) {
-          for (int i = 0; i < lktg.length; i++) {
-            Kategori ktg = lktg[i];
-
-            /// set subkategori ke level 1
-            ktg.setIdParent(0);
-
-            daoKategori.update(ktg);
-          }
-        }
-      });
-    }
   }
 
+  /// update itemname yang berafiliasi dengan kategori , diarahkan ke Other
+  /// jika duplikasi, maka ubah isdeleted menjadi 1
   Future<bool> _updateItemNameKeOther(Kategori kategori) async {
     DaoKategori daoKategori = new DaoKategori();
     DaoItemName daoItemName = new DaoItemName();
 
-    bool success = true;
-    /// update itemname yang berafiliasi dengan kategori , diarahkan ke Other
+    bool isSuccess = true;
     List<ItemName> litemName =
         await daoItemName.getItemNameByIdKategori(kategori.id);
     if (litemName.isNotEmpty) {
       Kategori k = await daoKategori.getDefaultKategori(kategori.type);
       for (int i = 0; i < litemName.length; i++) {
         ItemName itemName = litemName[i];
-        itemName.setKategori(k);
-        EnumResultDb erdb = await daoItemName.update(itemName);
-        if(erdb == EnumResultDb.failed){}
+        litemName[i].setKategori(k);
+        bool isduplicate = await daoItemName.isDuplicate(itemName);
+        if (isduplicate) {
+          litemName[i].setIsDeleted(1);
+        }
+      }
+      if (litemName.length > 1) {
+        ResultDb resultDb = await daoItemName.updateBatch(litemName);
+        if (resultDb.enumResultDb == EnumResultDb.failed) {
+          isSuccess = false;
+        }
+      } else {
+        EnumResultDb enumResultDb = await daoItemName.update(litemName[0]);
+        if (enumResultDb == EnumResultDb.success) {
+          isSuccess = true;
+        } else {
+          isSuccess = false;
+        }
       }
     }
+    return isSuccess;
+  }
+
+  /// cek level
+  ///  [kategori.idParent == 0] adalah level 1, jika punya subkategori, maka
+  ///  subkategori akan menjadi level 1
+  Future<bool> _updateSubkategorikeLevel1(Kategori kategori) async {
+    DaoKategori daoKategori = new DaoKategori();
+    bool isSuccess = true;
+    if (kategori.idParent == 0) {
+      List<Kategori> lktg = await daoKategori.getSubkategori(kategori.idParent);
+      if (lktg.isNotEmpty) {
+        for (int i = 0; i < lktg.length; i++) {
+          /// set subkategori ke level 1
+          lktg[i].setIdParent(0);
+        }
+        if(lktg.length> 1){
+          ResultDb resultDb = await daoKategori.updateBatchNoDuplicate(lktg);
+          if(resultDb.enumResultDb == EnumResultDb.failed){
+            isSuccess = false;
+          }
+        }else{
+          ResultDb resultDb = await daoKategori.update(lktg[0]);
+          if(resultDb.enumResultDb == EnumResultDb.failed){
+            isSuccess = false;
+          }
+        }
+
+      }
+    }
+    return isSuccess;
   }
 
   List<Kategori> _processKategori(List<Kategori> lk) {
@@ -163,4 +174,5 @@ enum EnumStatePopulateKategori {
   editsuccess,
   saveSubkategorisuccess,
   editSubkategorisuccess,
+  deleteSuccess,
 }
