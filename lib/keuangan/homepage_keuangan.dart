@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:keuangan/keuangan/bloc_hpkeuangan.dart';
 import 'package:keuangan/keuangan/entry_item/keuangan_item.dart';
+import 'package:keuangan/keuangan/itemname/itemname_entry.dart';
 import 'package:keuangan/keuangan/transaksi/model_keuangan_ui.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
@@ -196,16 +197,17 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
     lw.add(Center(
       child: Text('Transaksi terakhir'),
     ));
-    lw.add(SizedBox(height: 3,));
+    lw.add(SizedBox(
+      height: 3,
+    ));
     if (data.listKeuangan != null) {
       data.listKeuangan.forEach((k) {
-       print('idkeuangan: ${k.id}');
-          lw.add(FlatButton(
-              onPressed: () {
-                _showDialogPilihan(k);
-              },
-              child: CellKeuanganStateLess(k)));
-       
+        print('idkeuangan: ${k.id}');
+        lw.add(FlatButton(
+            onPressed: () {
+              _showDialogPilihan(k);
+            },
+            child: CellKeuanganStateLess(k)));
       });
     }
     return lw;
@@ -238,6 +240,24 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
                     children: listWidget(sizeWidget, snapshot.data),
                   ),
                 ),
+              ),
+              floatingActionButton: new FloatingActionButton(
+                onPressed: () async {
+                  EnumFinalResult res = await openPage(
+                      context,
+                      KeuanganItemView(
+                        dateTime: DateTime.now(),
+                        isEditMode: false,
+                        keuangan: null,
+                      ));
+                  if (res == EnumFinalResult.success) {
+                    _blocHpKeuangan.fullReload();
+                  } else {
+                    /// TODO gagal
+                  }
+                },
+                tooltip: 'add Item',
+                child: new Icon(Icons.add),
               ),
             );
           } else {

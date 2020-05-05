@@ -620,7 +620,9 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
           padding: const EdgeInsets.all(8.0),
           textColor: Colors.white,
           color: Colors.blue,
-          onPressed: () {},
+          onPressed: () {
+            print('button update diklik');
+          },
           child: new Text("Update"),
         ),
       ),

@@ -151,7 +151,7 @@ class DaoKeuangan {
     return res;
   }
 
-  Future<bool> update(Keuangan keuangan) async {
+  Future<bool> update1(Keuangan keuangan) async {
     var dbClient = await DatabaseHelper().db;
     int res = await dbClient.update(tb.name, keuangan.toMap(),
         where: "${tb.fId} = ?", whereArgs: <int>[keuangan.id]);
