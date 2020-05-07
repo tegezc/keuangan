@@ -66,10 +66,14 @@ class DaoKategori {
     return kategories;
   }
 
-  Future<List<Kategori>> getAllKategoriNonAbadi() async {
+  Future<List<Kategori>> getAllKategoriNonAbadi(EnumJenisTransaksi enumJenisTransaksi) async {
+    int i = 1;
+    if (enumJenisTransaksi == EnumJenisTransaksi.pengeluaran) {
+      i = 0;
+    }
     var dbClient = await DatabaseHelper().db;
     List<Map> list = await dbClient
-        .rawQuery('SELECT * FROM ${tb.name} WHERE ${tb.fIsAbadi}=0');
+        .rawQuery('SELECT * FROM ${tb.name} WHERE ${tb.fIsAbadi}=0 AND ${tb.fType}=$i ORDER BY ${tb.fNama}');
 
     List<Kategori> kategories = new List();
     for (int i = 0; i < list.length; i++) {

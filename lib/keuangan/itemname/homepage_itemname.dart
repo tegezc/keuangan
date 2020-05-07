@@ -27,7 +27,7 @@ class _HomePageItemNameState extends State<HomePageItemName> {
     super.initState();
   }
 
-  Widget _itemNameCell(ItemName itemName) {
+  Widget _itemNameCellPengeluaran(ItemName itemName) {
    // print(itemName);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,7 +40,7 @@ class _HomePageItemNameState extends State<HomePageItemName> {
                 style: TextStyle(fontSize: 15),
               ),
               Spacer(),
-              Text('${itemName.kategori.nama}',style: TextStyle(fontSize: 15,color: Colors.lightGreen)),
+              Text('${itemName.kategori.nama}',style: TextStyle(fontSize: 15,color: Colors.red)),
             ],
           ),
           onPressed: () async {
@@ -54,14 +54,47 @@ class _HomePageItemNameState extends State<HomePageItemName> {
     );
   }
 
-  List<Widget> _listWidgetItemName(List<ItemName> lin) {
+  Widget _itemNameCellPemasukan(ItemName itemName) {
+    // print(itemName);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        FlatButton(
+          child: Row(
+            children: <Widget>[
+              Text(
+                '${itemName.nama}',
+                style: TextStyle(fontSize: 15),
+              ),
+              Spacer(),
+              Text('${itemName.kategori.nama}',style: TextStyle(fontSize: 15,color: Colors.green)),
+            ],
+          ),
+          onPressed: () async {
+            _showDialogPilihan(itemName);
+          },
+        ),
+        Divider(
+          height: 1.0,
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _listWidgetItemName(List<ItemName> lpengeluaaran, List<ItemName> lPemasukan) {
     List<Widget> lW = new List();
-    if(lin.isEmpty){
+    if(lpengeluaaran.isEmpty && lPemasukan.isEmpty){
       lW.add(Center(child: Text('Belum ada data',style: TextStyle(fontSize: 15))));
+    }else{
+      for (int i = 0; i < lpengeluaaran.length; i++) {
+        lW.add(_itemNameCellPengeluaran(lpengeluaaran[i]));
+      }
+
+      for (int i = 0; i < lPemasukan.length; i++) {
+        lW.add(_itemNameCellPemasukan(lPemasukan[i]));
+      }
     }
-    for (int i = 0; i < lin.length; i++) {
-      lW.add(_itemNameCell(lin[i]));
-    }
+
     return lW;
   }
 
@@ -102,7 +135,7 @@ class _HomePageItemNameState extends State<HomePageItemName> {
               ),
               body: ListView(
                 scrollDirection: Axis.vertical,
-                children: _listWidgetItemName(snapshot.data.listItemName),
+                children: _listWidgetItemName(snapshot.data.listPengeluaran,snapshot.data.listPemasukan),
               ),
               floatingActionButton: new FloatingActionButton(
                 onPressed: () async {

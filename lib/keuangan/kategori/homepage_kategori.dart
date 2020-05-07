@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:keuangan/keuangan/kategori/subkategori/add_subkategori.dart';
+import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/loading_view.dart';
 
@@ -40,6 +41,28 @@ class _HomePageKategoriState extends State<HomePageKategori> {
   void dispose() {
     _blocHomepageKategori.dispose();
     super.dispose();
+  }
+
+  Widget _cellBelumAdaData(){
+    return Container(
+      height: 40.0,
+      width: double.infinity,
+      child: Center(child: Text('Belum ada data',style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 11),),),
+    );
+  }
+  Widget _cellHeader(EnumJenisTransaksi enumJenisTransaksi){
+    Color bgColor = Colors.green;
+    String text = 'Pemasukan';
+    if(enumJenisTransaksi == EnumJenisTransaksi.pengeluaran){
+      bgColor = Colors.red;
+      text = 'Pengeluaran';
+    }
+    return Container(
+      color: bgColor,
+      height: 25.0,
+      width: double.infinity,
+      child: Center(child: Text(text,style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 13),),),
+    );
   }
 
   Widget _cellKategori(Kategori kategori) {
@@ -104,11 +127,26 @@ class _HomePageKategoriState extends State<HomePageKategori> {
     );
   }
 
-  List<Widget> _listKategori(List<Kategori> lKategori) {
+  List<Widget> _listKategori(List<Kategori> lkPengeluaran,List<Kategori> lkPemasukan) {
     List<Widget> lW = new List();
-    for (int i = 0; i < lKategori.length; i++) {
-      lW.add(_cellKategori(lKategori[i]));
+    if(lkPemasukan.isEmpty && lkPengeluaran.isEmpty){
+      lW.add(_cellBelumAdaData());
+    }else{
+      if(lkPengeluaran.isNotEmpty){
+        lW.add(_cellHeader(EnumJenisTransaksi.pengeluaran));
+        for (int i = 0; i < lkPengeluaran.length; i++) {
+          lW.add(_cellKategori(lkPengeluaran[i]));
+        }
+      }
+
+      if(lkPemasukan.isNotEmpty){
+        lW.add(_cellHeader(EnumJenisTransaksi.pemasukan));
+        for (int i = 0; i < lkPemasukan.length; i++) {
+          lW.add(_cellKategori(lkPemasukan[i]));
+        }
+      }
     }
+
     lW.add(SizedBox(
       height: 200,
     ));
@@ -167,7 +205,7 @@ class _HomePageKategoriState extends State<HomePageKategori> {
       _counterBuild++;
     }
     return StreamBuilder<ItemUIHomepageKategori>(
-        stream: _blocHomepageKategori.listKategoriStream,
+        stream: _blocHomepageKategori.itemUIHomepageKategori,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             ///prevent snacbar show twice
@@ -187,7 +225,7 @@ class _HomePageKategoriState extends State<HomePageKategori> {
               ),
               body: ListView(
                 scrollDirection: Axis.vertical,
-                children: _listKategori(snapshot.data.listKategori),
+                children: _listKategori(snapshot.data.listKategoriPengeluaran,snapshot.data.listKategoriPemasukan),
               ),
               floatingActionButton: new FloatingActionButton(
                 onPressed: () async {

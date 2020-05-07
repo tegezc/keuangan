@@ -13,13 +13,9 @@ class BlocHomepageItemName {
   void populateSemuaItemNameFromDb(EnumStatePopulateItemName enumState) {
     DaoItemName daoItemName = new DaoItemName();
     daoItemName.getAllItemNameVisibleLazy().then((v) {
-      List<ItemName> litemname = new List();
-      if (v != null) {
-        litemname.addAll(v);
-      }
 
       ItemUIHomepageItemName itemUIHomepageKategori =
-      new ItemUIHomepageItemName(enumState, litemname);
+      new ItemUIHomepageItemName(enumState, v.listPengeluaran,v.listPemasukan);
       _itemUi.sink.add(itemUIHomepageKategori);
     });
   }
@@ -49,7 +45,9 @@ class BlocHomepageItemName {
 
 class ItemUIHomepageItemName {
   EnumStatePopulateItemName enumState;
-  List<ItemName> listItemName;
+  List<ItemName> listPengeluaran;
+  List<ItemName> listPemasukan;
 
-  ItemUIHomepageItemName(this.enumState, this.listItemName);
+
+  ItemUIHomepageItemName(this.enumState, this.listPengeluaran,this.listPemasukan);
 }

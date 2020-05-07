@@ -1,5 +1,6 @@
 import 'package:keuangan/database/db_utility.dart';
 import 'package:keuangan/database/keuangan/dao_kategori.dart';
+import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/global_string_database.dart';
 
@@ -46,22 +47,29 @@ class DaoItemName {
     return itemNames;
   }
 
-  Future<List<ItemName>> getAllItemNameVisibleLazy() async {
+  Future<UiItemNamesLazy> getAllItemNameVisibleLazy() async {
     DaoKategori daoKategori = new DaoKategori();
     var dbClient = await DatabaseHelper().db;
     List<Map> list = await dbClient
-        .rawQuery('SELECT * FROM ${tb.name} WHERE ${tb.fDeleted}=0');
+        .rawQuery('SELECT * FROM ${tb.name} WHERE ${tb.fDeleted}=0 ORDER BY ${tb.fNama}');
 
-    List<ItemName> itemNames = new List();
+    List<ItemName> itemNamesPengeluaran = new List();
+    List<ItemName> itemNamesPemasukan = new List();
     for (int i = 0; i < list.length; i++) {
       var itemName = new ItemName(
           list[i][tb.fNama], list[i][tb.fIdKategori], list[i][tb.fDeleted]);
       itemName.setId(list[i][tb.fId]);
       Kategori kategori = await daoKategori.getKategoriById(itemName.idKategori);
       itemName.setKategori(kategori);
-      itemNames.add(itemName);
+      if(kategori.type == EnumJenisTransaksi.pemasukan){
+        itemNamesPemasukan.add(itemName);
+      }else{
+        itemNamesPengeluaran.add(itemName);
+      }
+
     }
-    return itemNames;
+    UiItemNamesLazy uiItemNamesLazy = new UiItemNamesLazy(itemNamesPengeluaran, itemNamesPemasukan);
+    return uiItemNamesLazy;
   }
 
   Future<Map<int, ItemName>> getAllItemNameMap() async {
@@ -226,4 +234,12 @@ class DaoItemName {
         where: "${tb.fId} = ?", whereArgs: <int>[itemName.id]);
     return res > 0 ? EnumResultDb.success : EnumResultDb.failed;
   }
+}
+
+
+class UiItemNamesLazy{
+  List<ItemName> listPengeluaran;
+  List<ItemName> listPemasukan;
+
+  UiItemNamesLazy(this.listPengeluaran,this.listPemasukan);
 }

@@ -3,29 +3,30 @@ import 'dart:async';
 import 'package:keuangan/database/db_utility.dart';
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/database/keuangan/dao_kategori.dart';
+import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:rxdart/subjects.dart';
 
 class BlocHomepageKategori {
-  List<Kategori> _cacheListKategori;
   final BehaviorSubject<ItemUIHomepageKategori> _itemUi = BehaviorSubject();
 
-  BlocHomepageKategori() {
-    _cacheListKategori = new List();
-  }
-
   void populateAllKategoriFromDb(EnumStatePopulateKategori enumState) {
-    DaoKategori daoKategori = new DaoKategori();
-    daoKategori.getAllKategoriNonAbadi().then((v) {
-      if (v != null) {
-        _cacheListKategori.clear();
-        _cacheListKategori.addAll(_processKategori(v));
-      }
-
-      ItemUIHomepageKategori itemUIHomepageKategori =
-          new ItemUIHomepageKategori(enumState, _cacheListKategori);
+    this._getData(enumState).then((itemUIHomepageKategori) {
       _itemUi.sink.add(itemUIHomepageKategori);
     });
+  }
+
+  Future<ItemUIHomepageKategori> _getData(
+      EnumStatePopulateKategori enumState) async {
+    DaoKategori daoKategori = new DaoKategori();
+    List<Kategori> lkPengeluaran = await daoKategori.getAllKategoriNonAbadi(EnumJenisTransaksi.pengeluaran);
+    List<Kategori> lkPemasukan = await daoKategori.getAllKategoriNonAbadi(EnumJenisTransaksi.pemasukan);
+    List<Kategori> lkPeng = this._processKategori(lkPengeluaran);
+    List<Kategori> lkPem = this._processKategori(lkPemasukan);
+
+    ItemUIHomepageKategori itemUIHomepageKategori =
+        new ItemUIHomepageKategori(enumState, lkPeng, lkPem);
+    return itemUIHomepageKategori;
   }
 
   /// Delete kategori memiliki 2 kondisi:
@@ -46,15 +47,15 @@ class BlocHomepageKategori {
     DaoKategori daoKategori = new DaoKategori();
     this._updateItemNameKeOther(kategori).then((isSuccess) {
       if (isSuccess) {
-        this._updateSubkategorikeLevel1(kategori).then((scc){
-          if(scc){
-            daoKategori.deleteKategori(kategori).then((res){
-              if(res > 0){
-                this.populateAllKategoriFromDb(EnumStatePopulateKategori.deleteSuccess);
+        this._updateSubkategorikeLevel1(kategori).then((scc) {
+          if (scc) {
+            daoKategori.deleteKategori(kategori).then((res) {
+              if (res > 0) {
+                this.populateAllKategoriFromDb(
+                    EnumStatePopulateKategori.deleteSuccess);
               }
             });
-
-          }else{
+          } else {
             //TODO gagal update kategori
           }
         });
@@ -113,18 +114,17 @@ class BlocHomepageKategori {
           /// set subkategori ke level 1
           lktg[i].setIdParent(0);
         }
-        if(lktg.length> 1){
+        if (lktg.length > 1) {
           ResultDb resultDb = await daoKategori.updateBatchNoDuplicate(lktg);
-          if(resultDb.enumResultDb == EnumResultDb.failed){
+          if (resultDb.enumResultDb == EnumResultDb.failed) {
             isSuccess = false;
           }
-        }else{
+        } else {
           ResultDb resultDb = await daoKategori.update(lktg[0]);
-          if(resultDb.enumResultDb == EnumResultDb.failed){
+          if (resultDb.enumResultDb == EnumResultDb.failed) {
             isSuccess = false;
           }
         }
-
       }
     }
     return isSuccess;
@@ -163,7 +163,7 @@ class BlocHomepageKategori {
     return returnList;
   }
 
-  Stream<ItemUIHomepageKategori> get listKategoriStream => _itemUi.stream;
+  Stream<ItemUIHomepageKategori> get itemUIHomepageKategori => _itemUi.stream;
 
   void dispose() {
     _itemUi.close();
@@ -172,9 +172,11 @@ class BlocHomepageKategori {
 
 class ItemUIHomepageKategori {
   EnumStatePopulateKategori enumState;
-  List<Kategori> listKategori;
+  List<Kategori> listKategoriPengeluaran;
+  List<Kategori> listKategoriPemasukan;
 
-  ItemUIHomepageKategori(this.enumState, this.listKategori);
+  ItemUIHomepageKategori(
+      this.enumState, this.listKategoriPengeluaran, this.listKategoriPemasukan);
 }
 
 enum EnumStatePopulateKategori {
