@@ -174,10 +174,10 @@ class _CalculatorViewState extends State<CalculatorView> {
   }
 
   _log(String ket) {
-    print('=========== $ket ==================');
-    print('Operator: $operator');
-    print('Num1 : $num1');
-    print('Num2 : $num2');
+//    print('=========== $ket ==================');
+//    print('Operator: $operator');
+//    print('Num1 : $num1');
+//    print('Num2 : $num2');
   }
 
   _clickNumber(int value) {

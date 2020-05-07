@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:keuangan/keuangan/bloc_hpkeuangan.dart';
 import 'package:keuangan/keuangan/entry_item/keuangan_item.dart';
-import 'package:keuangan/keuangan/itemname/itemname_entry.dart';
 import 'package:keuangan/keuangan/transaksi/model_keuangan_ui.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
@@ -23,7 +22,7 @@ class HomepageKeuangan extends StatefulWidget {
 class _HomepageKeuanganState extends State<HomepageKeuangan> {
   final TextStyle _textStyleSmall = new TextStyle(fontSize: 10);
 
-  int _counterBlock = 0;
+  int _counterBuild = 0;
   BlocHpKeuangan _blocHpKeuangan;
 
   @override
@@ -172,6 +171,7 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
           isEditMode: true,
           keuangan: entry.keuangan,
         ));
+    print('res : $res');
     Navigator.of(context).pop(res);
   }
 
@@ -201,14 +201,17 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
       height: 3,
     ));
     if (data.listKeuangan != null) {
-      data.listKeuangan.forEach((k) {
-        print('idkeuangan: ${k.id}');
+     List<Keuangan> lKeuangan = data.listKeuangan;
+      for(int i = 0; i< lKeuangan.length;i++){
+        Keuangan ke = lKeuangan[i];
+      Keuangan copyKeuangan = new Keuangan.fromUI(ke.tanggal, ke.idItemName, ke.jumlah, ke.catatan);
+      copyKeuangan.lazyItemName = ke.lazyItemName;
         lw.add(FlatButton(
             onPressed: () {
-              _showDialogPilihan(k);
+              _showDialogPilihan(copyKeuangan);
             },
-            child: CellKeuanganStateLess(k)));
-      });
+            child: CellKeuanganStateLess(copyKeuangan)));
+      }
     }
     return lw;
   }
@@ -217,9 +220,9 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
   Widget build(BuildContext context) {
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     Size sizeWidget = mediaQueryData.size;
-    if (_counterBlock == 0) {
+    if (_counterBuild == 0) {
       _blocHpKeuangan.fullReload();
-      _counterBlock++;
+      _counterBuild++;
     }
 
     return StreamBuilder<UIHPKeuangan>(

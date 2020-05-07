@@ -59,6 +59,7 @@ class BlocEntryKeuangan {
           break;
         case EnumEntryKeuangan.amount:
           {
+            print('masuk amount');
             StateAmount v = entryState;
             _cacheEntry.keuangan.setJumlah(v.amount.toDouble());
           }

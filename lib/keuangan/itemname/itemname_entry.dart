@@ -123,8 +123,6 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
         }
        ItemName oldItemName = widget.itemName;
         oldItemName.setIsDeleted(1);
-        print('new item: ${k.toString()}');
-        print('old item: ${oldItemName.toString()}');
         daoItemName
             .getItemNameByNamaNIdKategoriVisible(k.nama, k.idKategori)
             .then((itemName) {

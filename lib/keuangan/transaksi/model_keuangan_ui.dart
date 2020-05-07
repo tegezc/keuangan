@@ -137,14 +137,14 @@ class _CellKeuanganState extends State<CellKeuangan> {
   }
 
   _edit(Entry entry) async {
-    int res = await openPage(
+    await openPage(
         context,
         KeuanganItemView(
           dateTime: DateTime.now(),
           isEditMode: true,
           keuangan: entry.keuangan,
         ));
-    Navigator.of(context).pop(res);
+    Navigator.of(context).pop();
   }
 
   _deleteConfirmed(Entry entry) {
