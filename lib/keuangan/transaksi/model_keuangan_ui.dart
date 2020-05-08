@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:keuangan/database/keuangan/dao_keuangan.dart';
 import 'package:keuangan/keuangan/entry_item/keuangan_item.dart';
-import 'package:keuangan/main.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
+import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/global_string_database.dart';
 
 class Entry {

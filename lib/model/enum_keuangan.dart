@@ -8,13 +8,6 @@ enum Operator {
   kosong,
 }
 
-enum EnumStatePopulateItemName {
-  firsttime,
-  savesuccess,
-  editsuccess,
-  deleteSuccess,
-}
-
 enum EnumEntryKeuangan {
   jenisKeuangan,
   typeItem,

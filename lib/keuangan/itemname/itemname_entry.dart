@@ -3,9 +3,8 @@ import 'package:keuangan/database/db_utility.dart';
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/database/keuangan/dao_kategori.dart';
 import 'package:keuangan/model/keuangan.dart';
+import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/loading_view.dart';
-
-
 
 class ItemNameEntry extends StatefulWidget {
   final ItemName itemName;
@@ -22,15 +21,16 @@ class ItemNameEntry extends StatefulWidget {
 }
 
 class _ItemNameEntryState extends State<ItemNameEntry> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   List<Kategori> _listKategori;
   List<DropdownMenuItem<Kategori>> _dropDownKategory;
   Kategori _currentCatogery;
 
   TextEditingController _txtController;
+  CommonUi _commonUi;
 
   @override
   void initState() {
+    _commonUi = new CommonUi();
     print(widget.itemName.toString());
     _txtController = new TextEditingController();
     _populateKategori();
@@ -75,16 +75,16 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
   /// 2. kondisi edit: maka cek data isDeleted 0 apakah duplikasi, jika tidak,
   /// maka insert baru itemname dan yang ori di edit dengan isDeleted menjadi 1.
   _saveItemName() {
-    bool isShowSnackbar = false;
-    String messageSnackBar = '';
+    bool isShowToast = false;
+    String messageToast = '';
     String nama = _txtController.text;
     DaoItemName daoItemName = new DaoItemName();
     if (widget.stateItemName == StateItemNameEntry.baru) {
       ItemName iname;
       if (_currentCatogery.idParent == null) {
-        iname = new ItemName(nama, 0,0);
+        iname = new ItemName(nama, 0, 0);
       } else {
-        iname = new ItemName(nama, _currentCatogery.id,0);
+        iname = new ItemName(nama, _currentCatogery.id, 0);
       }
 
       daoItemName
@@ -95,33 +95,31 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
             if (value > 0) {
               Navigator.of(context).pop(1);
             } else {
-              isShowSnackbar = true;
-              messageSnackBar = 'Item gagal disimpan';
+              isShowToast = true;
+              messageToast = 'Item gagal disimpan';
             }
           });
         } else {
-          isShowSnackbar = true;
-          messageSnackBar = 'Item sudah ada';
+          isShowToast = true;
+          messageToast = 'Item sudah ada';
         }
-        if (isShowSnackbar) {
-          _scaffoldKey.currentState.showSnackBar(SnackBar(
-            content: Text(messageSnackBar),
-            duration: Duration(seconds: 3),
-          ));
+        if (isShowToast) {
+          _commonUi.showToast(messageToast);
         }
       });
     } else {
-      if(nama.trim() == widget.itemName.nama && widget.itemName.idKategori == _currentCatogery.id){
+      if (nama.trim() == widget.itemName.nama &&
+          widget.itemName.idKategori == _currentCatogery.id) {
         /// kondisi user klik edit, namun tidak melakukan perubahan apapun
         Navigator.of(context).pop(3);
-      }else{
+      } else {
         ItemName k;
         if (_currentCatogery.idParent == null) {
-          k = new ItemName(nama, 0,0);
+          k = new ItemName(nama, 0, 0);
         } else {
-          k = new ItemName(nama, _currentCatogery.id,0);
+          k = new ItemName(nama, _currentCatogery.id, 0);
         }
-       ItemName oldItemName = widget.itemName;
+        ItemName oldItemName = widget.itemName;
         oldItemName.setIsDeleted(1);
         daoItemName
             .getItemNameByNamaNIdKategoriVisible(k.nama, k.idKategori)
@@ -132,23 +130,19 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
               if (value == EnumResultDb.success) {
                 Navigator.of(context).pop(2);
               } else {
-                isShowSnackbar = true;
-                messageSnackBar = 'Item gagal disimpan';
+                isShowToast = true;
+                messageToast = 'Item gagal disimpan';
               }
             });
           } else {
-            isShowSnackbar = true;
-            messageSnackBar = 'Item sudah ada';
+            isShowToast = true;
+            messageToast = 'Item sudah ada';
           }
-          if (isShowSnackbar) {
-            _scaffoldKey.currentState.showSnackBar(SnackBar(
-              content: Text(messageSnackBar),
-              duration: Duration(seconds: 3),
-            ));
+          if (isShowToast) {
+            _commonUi.showToast(messageToast);
           }
         });
       }
-
     }
   }
 
@@ -176,7 +170,6 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
       return LoadingView();
     } else {
       return Scaffold(
-        key: _scaffoldKey,
         appBar: AppBar(
           title: Text(title),
           actions: <Widget>[

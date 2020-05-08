@@ -6,6 +6,7 @@ import 'package:keuangan/keuangan/kategori/homepage_kategori.dart';
 import 'package:keuangan/keuangan/transaksi/keuangan_transaksi.dart';
 import 'package:keuangan/keuangan/reporting_by_kategori/reporting_bykategori.dart';
 import 'package:flutter/material.dart';
+import 'package:keuangan/util/common_ui.dart';
 
 import 'keuangan/homepage_keuangan.dart';
 
@@ -198,23 +199,5 @@ class MyHomePageState extends State<MyHomePage> {
       },
       child: _getDrawerItemWidget(_selectedDrawerIndex),
     );
-  }
-}
-
-class SwipeBackObserver extends NavigatorObserver {
-  static Completer promise;
-
-  @override
-  void didStartUserGesture(Route route, Route previousRoute) {
-    // make a new promise
-    promise = Completer();
-    super.didStartUserGesture(route, previousRoute);
-  }
-
-  @override
-  void didStopUserGesture() {
-    super.didStopUserGesture();
-    // resolve the promise
-    promise.complete();
   }
 }

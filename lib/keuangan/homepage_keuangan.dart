@@ -5,10 +5,9 @@ import 'package:keuangan/keuangan/entry_item/keuangan_item.dart';
 import 'package:keuangan/keuangan/transaksi/model_keuangan_ui.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
+import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/loading_view.dart';
 import 'package:keuangan/util/process_string.dart';
-
-import '../main.dart';
 
 class HomepageKeuangan extends StatefulWidget {
   final Widget drawer;

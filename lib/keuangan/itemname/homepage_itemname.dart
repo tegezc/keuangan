@@ -1,34 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:keuangan/keuangan/itemname/itemname_bloc.dart';
 import 'package:keuangan/keuangan/itemname/itemname_entry.dart';
-import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
+import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/loading_view.dart';
-
-import '../../main.dart';
 
 class HomePageItemName extends StatefulWidget {
   final Widget drawer;
+
   HomePageItemName({this.drawer});
+
   @override
   _HomePageItemNameState createState() => _HomePageItemNameState();
 }
 
 class _HomePageItemNameState extends State<HomePageItemName> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   BlocHomepageItemName _blocHomepageItemName;
   EnumStatePopulateItemName _enumState;
   int _counterBuild = 0;
+  CommonUi _commonUi;
 
   @override
   initState() {
-
+    _commonUi = new CommonUi();
     _blocHomepageItemName = new BlocHomepageItemName();
     super.initState();
   }
 
   Widget _itemNameCellPengeluaran(ItemName itemName) {
-   // print(itemName);
+    // print(itemName);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -40,11 +40,12 @@ class _HomePageItemNameState extends State<HomePageItemName> {
                 style: TextStyle(fontSize: 15),
               ),
               Spacer(),
-              Text('${itemName.kategori.nama}',style: TextStyle(fontSize: 15,color: Colors.red)),
+              Text('${itemName.kategori.nama}',
+                  style: TextStyle(fontSize: 15, color: Colors.red)),
             ],
           ),
           onPressed: () async {
-              _showDialogPilihan(itemName);
+            _showDialogPilihan(itemName);
           },
         ),
         Divider(
@@ -67,7 +68,8 @@ class _HomePageItemNameState extends State<HomePageItemName> {
                 style: TextStyle(fontSize: 15),
               ),
               Spacer(),
-              Text('${itemName.kategori.nama}',style: TextStyle(fontSize: 15,color: Colors.green)),
+              Text('${itemName.kategori.nama}',
+                  style: TextStyle(fontSize: 15, color: Colors.green)),
             ],
           ),
           onPressed: () async {
@@ -81,11 +83,13 @@ class _HomePageItemNameState extends State<HomePageItemName> {
     );
   }
 
-  List<Widget> _listWidgetItemName(List<ItemName> lpengeluaaran, List<ItemName> lPemasukan) {
+  List<Widget> _listWidgetItemName(
+      List<ItemName> lpengeluaaran, List<ItemName> lPemasukan) {
     List<Widget> lW = new List();
-    if(lpengeluaaran.isEmpty && lPemasukan.isEmpty){
-      lW.add(Center(child: Text('Belum ada data',style: TextStyle(fontSize: 15))));
-    }else{
+    if (lpengeluaaran.isEmpty && lPemasukan.isEmpty) {
+      lW.add(Center(
+          child: Text('Belum ada data', style: TextStyle(fontSize: 15))));
+    } else {
       for (int i = 0; i < lpengeluaaran.length; i++) {
         lW.add(_itemNameCellPengeluaran(lpengeluaaran[i]));
       }
@@ -98,20 +102,12 @@ class _HomePageItemNameState extends State<HomePageItemName> {
     return lW;
   }
 
-  Future openPage(context, Widget builder) async {
-    // wait until animation finished
-    await SwipeBackObserver.promise?.future;
-
-    return await Navigator.of(context).push(
-      MaterialPageRoute(builder: (ctx) => builder),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    if(_counterBuild == 0){
+    if (_counterBuild == 0) {
       _counterBuild++;
-      _blocHomepageItemName.populateSemuaItemNameFromDb(EnumStatePopulateItemName.firsttime);
+      _blocHomepageItemName
+          .populateSemuaItemNameFromDb(EnumStatePopulateItemName.firsttime);
     }
     return StreamBuilder<ItemUIHomepageItemName>(
         stream: _blocHomepageItemName.listItemNameStream,
@@ -128,31 +124,29 @@ class _HomePageItemNameState extends State<HomePageItemName> {
             //////////////
 
             return Scaffold(
-              key: _scaffoldKey,
               drawer: widget.drawer,
               appBar: new AppBar(
                 title: new Text('Item Cepat'),
               ),
               body: ListView(
                 scrollDirection: Axis.vertical,
-                children: _listWidgetItemName(snapshot.data.listPengeluaran,snapshot.data.listPemasukan),
+                children: _listWidgetItemName(
+                    snapshot.data.listPengeluaran, snapshot.data.listPemasukan),
               ),
               floatingActionButton: new FloatingActionButton(
                 onPressed: () async {
-                  int res = await openPage(context, ItemNameEntry.baru());
+                  int res =
+                      await _commonUi.openPage(context, ItemNameEntry.baru());
 
                   //prevent snacbar showing
                   if (res == null) {
                     _enumState = null;
-                  } else {
+                  } else if (res == 1) {
+                    /// 1 konstanta penanda save success
                     _blocHomepageItemName.populateSemuaItemNameFromDb(
                         EnumStatePopulateItemName.savesuccess);
-                    String messageSnackBar = 'Item berhasil di simpan.';
-                    _scaffoldKey.currentState.showSnackBar(SnackBar(
-                      content: SizedBox(
-                          height: 30.0, child: Center(child: Text(messageSnackBar))),
-                      duration: Duration(milliseconds: 1000),
-                    ));
+                    String messageToast = 'Item berhasil di simpan.';
+                    _commonUi.showToast(messageToast);
                   }
                 },
                 tooltip: 'add Item',
@@ -172,76 +166,73 @@ class _HomePageItemNameState extends State<HomePageItemName> {
         });
   }
 
-  _showDialogPilihan(ItemName itemName){
+  _showDialogPilihan(ItemName itemName) {
     showDialog<String>(
         context: context,
         builder: (BuildContext context) => SimpleDialog(
-          title: Text('Pilihan'),
-          children: <Widget>[
-            new OutlineButton(
-              onPressed: (){
-                _edit(itemName);
-              },
-              child: Text('edit'),
-            ),
-            new OutlineButton(
-              onPressed: (){
-                Navigator.of(context).pop();
-                _showDialogConfirmDelete(itemName);
-              },
-              child: Text('delete'),
-            ),
-          ],
-        ));
+              title: Text('Pilihan'),
+              children: <Widget>[
+                new OutlineButton(
+                  onPressed: () {
+                    _edit(itemName);
+                  },
+                  child: Text('edit'),
+                ),
+                new OutlineButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _showDialogConfirmDelete(itemName);
+                  },
+                  child: Text('delete'),
+                ),
+              ],
+            ));
   }
 
-  _showDialogConfirmDelete(ItemName itemName){
+  _showDialogConfirmDelete(ItemName itemName) {
     showDialog<String>(
         context: context,
         builder: (BuildContext context) => SimpleDialog(
-          title: Text('Apakah anda yakin akan menghapus record ini?'),
-          children: <Widget>[
-            new OutlineButton(
-              onPressed: (){
-                _deleteConfirmed(itemName);
-              },
-              child: Text('ya'),
-            ),
-            new OutlineButton(
-              onPressed: (){
-                Navigator.of(context).pop();
-              },
-              child: Text('tidak'),
-            ),
-          ],
-        ));
+              title: Text('Apakah anda yakin akan menghapus record ini?'),
+              children: <Widget>[
+                new OutlineButton(
+                  onPressed: () {
+                    _deleteConfirmed(itemName);
+                  },
+                  child: Text('ya'),
+                ),
+                new OutlineButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('tidak'),
+                ),
+              ],
+            ));
   }
 
-  _deleteConfirmed(ItemName itemName){
-    if(itemName != null){
-      _blocHomepageItemName.deleteActioni(itemName,EnumStatePopulateItemName.deleteSuccess);
+  _deleteConfirmed(ItemName itemName) {
+    if (itemName != null) {
+      _blocHomepageItemName.deleteActioni(
+          itemName, EnumStatePopulateItemName.deleteSuccess);
       Navigator.of(context).pop();
     }
-
   }
 
-  _edit(ItemName itemname)async{
-    int res = await openPage(context, ItemNameEntry.edit(itemname));
+  _edit(ItemName itemname) async {
+    int res = await _commonUi.openPage(context, ItemNameEntry.edit(itemname));
     Navigator.of(context).pop();
 
     //prevent snacbar showing
     if (res == null) {
       _enumState = null;
-    } else if(res == 2){
-      _blocHomepageItemName.populateSemuaItemNameFromDb(
-          EnumStatePopulateItemName.editsuccess);
+    } else if (res == 2) {
+      /// 2 konstanta penanda proses update
+      _blocHomepageItemName
+          .populateSemuaItemNameFromDb(EnumStatePopulateItemName.editsuccess);
 
-      String messageSnackBar = 'Item berhasil di update';
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: SizedBox(
-            height: 30.0, child: Center(child: Text(messageSnackBar))),
-        duration: Duration(milliseconds: 1000),
-      ));
+      String messageToast = 'Item berhasil di update';
+      _commonUi.showToast(messageToast);
     }
   }
 }

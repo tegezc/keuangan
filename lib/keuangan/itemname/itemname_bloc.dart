@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:keuangan/database/db_utility.dart';
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
-import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -50,4 +49,11 @@ class ItemUIHomepageItemName {
 
 
   ItemUIHomepageItemName(this.enumState, this.listPengeluaran,this.listPemasukan);
+}
+
+enum EnumStatePopulateItemName {
+  firsttime,
+  savesuccess,
+  editsuccess,
+  deleteSuccess,
 }
