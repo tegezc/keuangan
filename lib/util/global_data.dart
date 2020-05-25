@@ -16,4 +16,20 @@ class GlobalData {
     'November',
     'Desember'
   ];
+
+  static final namaBulanPendek = const [
+    '',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'Mei',
+    'Jun',
+    'Jul',
+    'Ags',
+    'Sept',
+    'Okt',
+    'Nov',
+    'Des'
+  ];
 }

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:keuangan/keuangan/bloc_hpkeuangan.dart';
@@ -5,9 +7,11 @@ import 'package:keuangan/keuangan/entry_item/keuangan_item.dart';
 import 'package:keuangan/keuangan/transaksi/model_keuangan_ui.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
+import 'package:keuangan/util/colors_utility.dart';
 import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/loading_view.dart';
 import 'package:keuangan/util/process_string.dart';
+import 'package:keuangan/util/style.dart';
 
 class HomepageKeuangan extends StatefulWidget {
   final Widget drawer;
@@ -61,9 +65,9 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
     final txtPemasukan = formatCurrency.format(pmsk);
     final txtPengeluran = formatCurrency.format(pngl);
     final txtBalance = formatCurrency.format(blc);
-    Color color = Colors.green;
+    Color color = StyleUi.colorPemasukan;
     if (blc < 0) {
-      color = Colors.red;
+      color = StyleUi.colorPengeluaran;
     }
     return Column(
       mainAxisSize: MainAxisSize.max,
@@ -89,7 +93,7 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
               child: Column(
                 children: <Widget>[
                   _textSmall('Pengeluaran'),
-                  _textNormal('Rp $txtPengeluran', Colors.red),
+                  _textNormal('Rp $txtPengeluran', StyleUi.colorPengeluaran),
                 ],
               ),
             ),
@@ -103,7 +107,7 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
               child: Column(
                 children: <Widget>[
                   _textSmall('Pemasukan'),
-                  _textNormal('Rp $txtPemasukan', Colors.green),
+                  _textNormal('Rp $txtPemasukan', StyleUi.colorPemasukan),
                 ],
               ),
             ),
@@ -160,6 +164,28 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
                 ),
               ],
             ));
+  }
+
+  _showDialogConfirmDeleteBeautifull(Entry entry) {
+    showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => SimpleDialog(
+          title: Text('Apakah anda yakin akan menghapus record ini?'),
+          children: <Widget>[
+            new OutlineButton(
+              onPressed: () {
+                _deleteConfirmed(entry);
+              },
+              child: Text('ya'),
+            ),
+            new OutlineButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('tidak'),
+            ),
+          ],
+        ));
   }
 
   _edit(Entry entry) async {
@@ -275,23 +301,25 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
 
 class CellKeuanganStateLess extends StatelessWidget {
   final Keuangan keuangan;
+  ProcessString _processString = ProcessString();
 
   CellKeuanganStateLess(this.keuangan);
 
-  final _styleTextItem = TextStyle(fontWeight: FontWeight.normal, fontSize: 14);
 
-  final _styleTextKategori = TextStyle(fontSize: 10, color: Colors.blueAccent);
 
   @override
   Widget build(BuildContext context) {
     final formatCurrency = new NumberFormat("#,##0", "idr");
     int uang = keuangan.jumlah.toInt();
+    String tanggal = _processString.dateToStringDdMmmYyyyPendek(keuangan.tanggal);
+
     ItemName itemName = keuangan.lazyItemName;
+    String subTitle = '${itemName.kategori.nama} ($tanggal)';
     TextStyle textStyle;
     if (itemName.kategori.type == EnumJenisTransaksi.pemasukan) {
-      textStyle = TextStyle(color: Colors.green);
+      textStyle = StyleUi.textStylePemasukan;
     } else {
-      textStyle = TextStyle(color: Colors.red);
+      textStyle = StyleUi.textStylePengeluaran;
     }
     return Container(
       child: Column(
@@ -299,11 +327,12 @@ class CellKeuanganStateLess extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
+          Divider(),
           Row(
             children: <Widget>[
               Text(
                 itemName.nama,
-                style: _styleTextItem,
+                style: StyleUi.tRxstyleTextItem,
               ),
               Spacer(),
               Text(
@@ -316,11 +345,8 @@ class CellKeuanganStateLess extends StatelessWidget {
             height: 3,
           ),
           Text(
-            '${itemName.kategori.nama}-${keuangan.tanggal}',
-            style: _styleTextKategori,
-          ),
-          SizedBox(
-            height: 3,
+            subTitle,
+            style: StyleUi.tRxstyleTextKategori,
           ),
         ],
       ),

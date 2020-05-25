@@ -311,9 +311,6 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
   }
 
   Widget _bodyTransaksi(Size dimensi) {
-    _listEntry.forEach((e){
-      print('uang: ${e.keuangan.jumlah}');
-    });
     return Container(
       width: double.infinity,
       child: Column(

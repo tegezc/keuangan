@@ -99,6 +99,8 @@ class _HomePageItemNameState extends State<HomePageItemName> {
       }
     }
 
+    lW.add(SizedBox(height: 150.0,));
+
     return lW;
   }
 
@@ -146,7 +148,7 @@ class _HomePageItemNameState extends State<HomePageItemName> {
                     _blocHomepageItemName.populateSemuaItemNameFromDb(
                         EnumStatePopulateItemName.savesuccess);
                     String messageToast = 'Item berhasil di simpan.';
-                    _commonUi.showToast(messageToast);
+                    _commonUi.showToastBottom(messageToast);
                   }
                 },
                 tooltip: 'add Item',
@@ -213,7 +215,7 @@ class _HomePageItemNameState extends State<HomePageItemName> {
 
   _deleteConfirmed(ItemName itemName) {
     if (itemName != null) {
-      _blocHomepageItemName.deleteActioni(
+      _blocHomepageItemName.deleteAction(
           itemName, EnumStatePopulateItemName.deleteSuccess);
       Navigator.of(context).pop();
     }
@@ -232,7 +234,7 @@ class _HomePageItemNameState extends State<HomePageItemName> {
           .populateSemuaItemNameFromDb(EnumStatePopulateItemName.editsuccess);
 
       String messageToast = 'Item berhasil di update';
-      _commonUi.showToast(messageToast);
+      _commonUi.showToastBottom(messageToast);
     }
   }
 }

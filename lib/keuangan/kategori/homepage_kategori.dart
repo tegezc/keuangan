@@ -180,24 +180,24 @@ class _HomePageKategoriState extends State<HomePageKategori> {
         _counterSaveSuccess == 0) {
       _counterSaveSuccess++;
       String messageToast = 'Kategori berhasil di simpan.';
-      _commonUi.showToast(messageToast);
+      _commonUi.showToastBottom(messageToast);
     } else if (data.enumState == EnumStatePopulateKategori.editsuccess &&
         _counterEditSuccess == 0) {
       _counterEditSuccess++;
       String messageToast = 'Kategori berhasil di ubah.';
-      _commonUi.showToast(messageToast);
+      _commonUi.showToastBottom(messageToast);
     } else if (data.enumState ==
             EnumStatePopulateKategori.editSubkategorisuccess &&
         _counterEditSubKategoriSuccess == 0) {
       _counterEditSubKategoriSuccess++;
       String messageToast = 'Subkategori berhasil di ubah.';
-      _commonUi.showToast(messageToast);
+      _commonUi.showToastBottom(messageToast);
     } else if (data.enumState ==
             EnumStatePopulateKategori.saveSubkategorisuccess &&
         _counterSaveSubKategoriSuccess == 0) {
       _counterSaveSubKategoriSuccess++;
       String messageToast = 'Subkategori berhasil di simpan.';
-      _commonUi.showToast(messageToast);
+      _commonUi.showToastBottom(messageToast);
     }
   }
 

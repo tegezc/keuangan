@@ -104,7 +104,7 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
           messageToast = 'Item sudah ada';
         }
         if (isShowToast) {
-          _commonUi.showToast(messageToast);
+          _commonUi.showToastBottom(messageToast);
         }
       });
     } else {
@@ -139,7 +139,7 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
             messageToast = 'Item sudah ada';
           }
           if (isShowToast) {
-            _commonUi.showToast(messageToast);
+            _commonUi.showToastBottom(messageToast);
           }
         });
       }

@@ -23,7 +23,7 @@ class BlocHomepageItemName {
   /// hanya isDeleted di set 1. untuk menjaga referensi transaksi ke itemname
   /// tidak terganggu. di perkirakan jumlah itemname ini tidak akan banyak. jadi
   /// layak dengan cara seperti ini.
-  deleteActioni(ItemName itemName,EnumStatePopulateItemName enumState){
+  deleteAction(ItemName itemName,EnumStatePopulateItemName enumState){
     DaoItemName daoItemName = new DaoItemName();
     itemName.setIsDeleted(1);
     daoItemName.update(itemName).then((v){

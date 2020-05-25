@@ -30,6 +30,15 @@ class ProcessString {
   /*
   * ex: 23 Maret 2019
   * */
+  String dateToStringDdMmmYyyyPendek(DateTime dateTime) {
+    String tanggal =
+        '${dateTime.day < 10 ? '0' : ''}${dateTime.day} ${GlobalData.namaBulanPendek[dateTime.month]} ${dateTime.year}';
+    return tanggal;
+  }
+
+  /*
+  * ex: Maret 2019
+  * */
   String dateToStringMmmmYyyy(DateTime dateTime) {
     String tanggal =
         '${GlobalData.namaBulan[dateTime.month]} ${dateTime.year}';

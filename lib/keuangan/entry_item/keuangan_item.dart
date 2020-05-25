@@ -55,6 +55,19 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
   EnumEntryKeuangan _cacheStateEntry;
 
   @override
+  dispose() {
+    _controllerAutoComplete.dispose();
+    _controllerTextItem.dispose();
+    _txtNoteController.dispose();
+
+    _blocEntryKeuangan.dispose();
+    _focusNodeTextItem.dispose();
+    _focusNodeCatatan.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
   initState() {
     _blocEntryKeuangan = BlocEntryKeuangan();
     WidgetsBinding.instance.addObserver(this);
@@ -79,14 +92,6 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
     }
 
     super.initState();
-  }
-
-  @override
-  dispose() {
-    _focusNodeTextItem.dispose();
-    _focusNodeCatatan.dispose();
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
   }
 
   @override

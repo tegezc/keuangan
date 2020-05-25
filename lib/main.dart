@@ -22,9 +22,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Expense Management',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+       // primarySwatch: Colors.blue,
+       // brightness: Brightness.light,
+        primaryColor: Colors.white,
+        accentColor: Colors.cyan[600],
         fontFamily: 'Opensans',
+        textTheme: TextTheme(),
       ),
+      darkTheme: ThemeData(),
       home: MyHomePage(),
       navigatorObservers: <NavigatorObserver>[
         SwipeBackObserver(),
@@ -107,8 +112,6 @@ class MyHomePageState extends State<MyHomePage> {
   List<Widget> _createDrawerItem(int pos) {
     final textStyleNormal = new TextStyle(fontSize: 16, color: Colors.black);
     final textStyleSelected = new TextStyle(fontSize: 16, color: Colors.blue);
-    final textStyleLabel = new TextStyle(fontSize: 12);
-    final textStyleLabelVersi = new TextStyle(fontSize: 9);
     List<Widget> drawerOptions = [];
     drawerOptions.add(new SizedBox(
       height: 8.0,
@@ -178,14 +181,14 @@ class MyHomePageState extends State<MyHomePage> {
 
   Widget _createHeader() {
     return Container(
-        color: Colors.blueAccent,
+        color: Colors.white,
         height: 100,
         width: double.infinity,
         child: Padding(
           padding: const EdgeInsets.only(top: 60.0, left: 10.0),
           child: Text("Keuangan",
               style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 20.0,
                   fontWeight: FontWeight.w500)),
         ));
