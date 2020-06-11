@@ -7,6 +7,7 @@ import 'package:keuangan/keuangan/transaksi/keuangan_transaksi.dart';
 import 'package:keuangan/keuangan/reporting_by_kategori/reporting_bykategori.dart';
 import 'package:flutter/material.dart';
 import 'package:keuangan/util/common_ui.dart';
+import 'package:keuangan/util/style.dart';
 
 import 'keuangan/homepage_keuangan.dart';
 
@@ -21,14 +22,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Expense Management',
-      theme: ThemeData(
-       // primarySwatch: Colors.blue,
-       // brightness: Brightness.light,
-        primaryColor: Colors.white,
-        accentColor: Colors.cyan[600],
-        fontFamily: 'Opensans',
-        textTheme: TextTheme(),
-      ),
+//      theme: ThemeData(
+//       // primarySwatch: Colors.blue,
+//       // brightness: Brightness.light,
+//        primaryColor: Colors.white,
+//        accentColor: Colors.cyan[600],
+//        fontFamily: 'Opensans',
+//        textTheme: TextTheme(),
+//      ),
+      theme: AppTheme.darkTheme,
       darkTheme: ThemeData(),
       home: MyHomePage(),
       navigatorObservers: <NavigatorObserver>[
@@ -39,7 +41,6 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-
   @override
   State<StatefulWidget> createState() {
     return new MyHomePageState();
@@ -51,7 +52,6 @@ class MyHomePageState extends State<MyHomePage> {
 
   @override
   initState() {
-
     _testingonly();
 
     super.initState();
@@ -75,27 +75,27 @@ class MyHomePageState extends State<MyHomePage> {
     switch (pos) {
       case 0:
         {
-          return HomepageKeuangan(drawer:_createDrawer(pos));
+          return HomepageKeuangan(drawer: _createDrawer(pos));
         }
         break;
       case 1:
         {
-          return new TransactionKeuangan.byDefault(drawer:_createDrawer(pos));
+          return new TransactionKeuangan.byDefault(drawer: _createDrawer(pos));
         }
         break;
       case 2:
         {
-          return new ReportByCategories(drawer:_createDrawer(pos));
+          return new ReportByCategories(drawer: _createDrawer(pos));
         }
         break;
       case 3:
         {
-          return new HomePageKategori(drawer:_createDrawer(pos));
+          return new HomePageKategori(drawer: _createDrawer(pos));
         }
         break;
       case 4:
         {
-          return new HomePageItemName(drawer:_createDrawer(pos));
+          return new HomePageItemName(drawer: _createDrawer(pos));
         }
         break;
       default:
@@ -129,7 +129,7 @@ class MyHomePageState extends State<MyHomePage> {
           color: _selectedDrawerIndex == 1 ? Colors.blue : Colors.black),
       title: new Text("Transaksi",
           style:
-          _selectedDrawerIndex == 1 ? textStyleSelected : textStyleNormal),
+              _selectedDrawerIndex == 1 ? textStyleSelected : textStyleNormal),
       onTap: () => _onSelectItem(1),
     ));
     drawerOptions.add(new ListTile(
@@ -197,7 +197,7 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: (){
+      onWillPop: () {
         return new Future(() => true);
       },
       child: _getDrawerItemWidget(_selectedDrawerIndex),

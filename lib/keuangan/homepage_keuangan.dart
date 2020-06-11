@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:keuangan/keuangan/bloc_hpkeuangan.dart';
@@ -7,7 +5,6 @@ import 'package:keuangan/keuangan/entry_item/keuangan_item.dart';
 import 'package:keuangan/keuangan/transaksi/model_keuangan_ui.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
-import 'package:keuangan/util/colors_utility.dart';
 import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/loading_view.dart';
 import 'package:keuangan/util/process_string.dart';
@@ -23,8 +20,6 @@ class HomepageKeuangan extends StatefulWidget {
 }
 
 class _HomepageKeuanganState extends State<HomepageKeuangan> {
-  final TextStyle _textStyleSmall = new TextStyle(fontSize: 10);
-
   int _counterBuild = 0;
   BlocHpKeuangan _blocHpKeuangan;
 
@@ -35,28 +30,12 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
   }
 
   Widget _textSmall(String text) {
-    return Text(
-      text,
-      style: _textStyleSmall,
-    );
-  }
-
-  Widget _textNormal(String text, Color color) {
-    final TextStyle _textStyleM = new TextStyle(fontSize: 13, color: color);
     return Padding(
-      padding: const EdgeInsets.only(top: 3.0, bottom: 5.0),
+      padding: const EdgeInsets.only(top:5.0),
       child: Text(
         text,
-        style: _textStyleM,
+        style: Theme.of(context).textTheme.headline4,
       ),
-    );
-  }
-
-  Widget _textL(String text, Color color) {
-    final TextStyle _textStyleL = new TextStyle(fontSize: 20, color: color);
-    return Text(
-      text,
-      style: _textStyleL,
     );
   }
 
@@ -65,9 +44,10 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
     final txtPemasukan = formatCurrency.format(pmsk);
     final txtPengeluran = formatCurrency.format(pngl);
     final txtBalance = formatCurrency.format(blc);
-    Color color = StyleUi.colorPemasukan;
+    TextStyle styleBesar = StyleUi.textStyleBalanceBesarPositif;
+
     if (blc < 0) {
-      color = StyleUi.colorPengeluaran;
+      styleBesar = StyleUi.textStyleBalanceBesarNegatif;
     }
     return Column(
       mainAxisSize: MainAxisSize.max,
@@ -79,7 +59,7 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
             _textSmall('Balance'),
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
-              child: _textL('Rp $txtBalance', color),
+              child: Text('Rp $txtBalance',style: styleBesar,),
             ),
           ],
         ),
@@ -93,7 +73,7 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
               child: Column(
                 children: <Widget>[
                   _textSmall('Pengeluaran'),
-                  _textNormal('Rp $txtPengeluran', StyleUi.colorPengeluaran),
+                  Text('Rp $txtPengeluran', style:StyleUi.textStyleBalanceMediumPengeluaran),
                 ],
               ),
             ),
@@ -107,7 +87,7 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
               child: Column(
                 children: <Widget>[
                   _textSmall('Pemasukan'),
-                  _textNormal('Rp $txtPemasukan', StyleUi.colorPemasukan),
+                  Text('Rp $txtPemasukan',style: StyleUi.textStyleBalanceMediumPemasukan),
                 ],
               ),
             ),
@@ -220,7 +200,7 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
         sizeWidget, data.pemasukan, data.pengeluaran, data.balance));
     lw.add(Divider());
     lw.add(Center(
-      child: Text('Transaksi terakhir'),
+      child: Text('Transaksi terakhir',style: Theme.of(context).textTheme.headline2,),
     ));
     lw.add(SizedBox(
       height: 3,
@@ -332,7 +312,7 @@ class CellKeuanganStateLess extends StatelessWidget {
             children: <Widget>[
               Text(
                 itemName.nama,
-                style: StyleUi.tRxstyleTextItem,
+                style: Theme.of(context).textTheme.headline3,
               ),
               Spacer(),
               Text(
@@ -346,7 +326,7 @@ class CellKeuanganStateLess extends StatelessWidget {
           ),
           Text(
             subTitle,
-            style: StyleUi.tRxstyleTextKategori,
+            style: Theme.of(context).textTheme.subtitle2,
           ),
         ],
       ),
