@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
@@ -5,16 +6,18 @@ import 'package:keuangan/database/keuangan/dao_keuangan.dart';
 import 'package:keuangan/keuangan/entry_item/keuangan_item.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
+import 'package:keuangan/util/colors_utility.dart';
 import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/global_string_database.dart';
 
 class Entry {
-  Entry(this.title, this.kategori, this.tanggal, this.keuangan, this.flag,
+  Entry(this.title, this.kategori, this.tanggal,this.date, this.keuangan, this.flag,
       this.isLast);
 
   final String title;
   final Kategori kategori;
   final String tanggal; ///ex: 23 Maret 2019
+  final DateTime date;
   final Keuangan keuangan;
   final bool flag;
   final bool isLast;
@@ -170,29 +173,46 @@ class _CellKeuanganState extends State<CellKeuangan> {
 }
 
 class HeaderCellTanggalTransaksi extends StatelessWidget {
-  final String tanggal;
+  final DateTime date;
+  final String namaBulan;
+  final String namaHari;
 
-  HeaderCellTanggalTransaksi(this.tanggal);
+  HeaderCellTanggalTransaksi(this.date,this.namaHari,this.namaBulan);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 30,
+     // height: 80,
       width: double.infinity,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Divider(
-            height: 1.0,
-            color: Colors.blue,
-          ),
           Container(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 3, left: 8),
-              child: Text(
-                tanggal,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+            decoration: BoxDecoration(
+                color: HexColor('#5E5E5E'),
+                border: Border(
+                  top: BorderSide(color: HexColor('#808080'), width: 0.5),
+                )),
+            height: 40.0,
+            padding: EdgeInsets.symmetric(horizontal: 15.0),
+            alignment: Alignment.centerLeft,
+            child: Row(
+              children: <Widget>[
+                Text(
+                  date.day.toString(),
+                  style: TextStyle(fontWeight: FontWeight.bold,fontSize: 24,color: Colors.white),
+                ),
+                SizedBox(
+                  width: 8,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(namaHari,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12,color: Colors.white),),
+                    Text('$namaBulan ${date.year}',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12,color: Colors.white),),
+                  ],
+                ),
+              ],
             ),
           ),
         ],

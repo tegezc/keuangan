@@ -30,8 +30,8 @@ class MyApp extends StatelessWidget {
 //        fontFamily: 'Opensans',
 //        textTheme: TextTheme(),
 //      ),
-      theme: AppTheme.darkTheme,
-      darkTheme: ThemeData(),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.lightTheme,
       home: MyHomePage(),
       navigatorObservers: <NavigatorObserver>[
         SwipeBackObserver(),

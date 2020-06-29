@@ -8,8 +8,10 @@ import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/datepicker_singlescrollview.dart';
+import 'package:keuangan/util/global_data.dart';
 import 'package:keuangan/util/loading_view.dart';
 import 'package:keuangan/util/process_string.dart';
+import 'package:sticky_headers/sticky_headers/widget.dart';
 
 import '../entry_item/keuangan_item.dart';
 
@@ -46,7 +48,7 @@ class TransactionKeuangan extends StatefulWidget {
 
 class _TransactionKeuanganState extends State<TransactionKeuangan> {
   List<Keuangan> _listKeuangan;
-  List<Entry> _listEntry;
+  List<ForCellTransaksi> _listEntry;
 
   List<DropdownMenuItem<EntryCombobox>> _dropDownEntry;
   EntryCombobox _currentEntryCombo;
@@ -197,11 +199,13 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
 
     _listEntry = new List();
     list.forEach((value) {
-      String tanggal = _processString.dateToStringDdMmmmYyyy(value.key);
-      Entry entry = new Entry('', null, tanggal, null, false, false);
-      _listEntry.add(entry);
+      DateTime dt = value.key;
+      String tanggal = _processString.dateToStringDdMmmmYyyy(dt);
+      String namaHari = GlobalData.nhari[dt.weekday];
+      String namaBulan = GlobalData.namaBulan[dt.month];
       int lgth = value.listKeuangan.length;
 
+      List<Entry> le = new List();
       for (int i = 0; i < lgth; i++) {
         var k = value.listKeuangan[i];
         var itemName = _itemNameMap[k.idItemName];
@@ -209,9 +213,12 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
         var ktg = _kategoriMap[itemName.idKategori];
         bool isLast = (i + 1) == lgth ? true : false;
 
-        var e = Entry(itemName.nama, ktg, tanggal, k, true, isLast);
-        _listEntry.add(e);
+        var e = Entry(itemName.nama, ktg, tanggal, value.key, k, true, isLast);
+        le.add(e);
       }
+      ForCellTransaksi forCellTransaksi =
+          new ForCellTransaksi(dt, namaHari, namaBulan, le);
+      _listEntry.add(forCellTransaksi);
     });
   }
 
@@ -316,7 +323,7 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
       child: Column(
         children: <Widget>[
           Container(
-            height: 59,
+            // height: 59,
             width: double.infinity,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -324,34 +331,32 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.only(
-                      top: 10, left: 20, bottom: 0, right: 10),
+                      top: 0, left: 20, bottom: 0, right: 10),
                   child: _widgetComboBoxTanggal(),
                 ),
               ],
             ),
           ),
           Divider(
-            color: Colors.blueAccent,
-            thickness: 10,
+            color: Colors.grey,
+            thickness: 2,
           ),
           new Container(
             height: dimensi.height - 200,
             child: ListView.builder(
               itemBuilder: (BuildContext context, int index) {
                 if (index < _listEntry.length) {
-                  Entry e = _listEntry[index];
-                  if(e.flag){
-                    return CellKeuangan(
-                      entry: _listEntry[index],
-                      callbackDelete: _callbackActionDelete,
-                    );
-                  }else{
-                    return HeaderCellTanggalTransaksi(e.tanggal);
-                  }
-
+                  ForCellTransaksi e = _listEntry[index];
+                  return StickyHeader(
+                    header: HeaderCellTanggalTransaksi(
+                        e.date, e.namaHari, e.namaBulan),
+                    content: Column(
+                      children: this._listCellTransaksi(e.lEntry),
+                    ),
+                  );
                 } else {
                   return SizedBox(
-                    height: 70,
+                    height: 150,
                   );
                 }
               },
@@ -361,6 +366,18 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
         ],
       ),
     );
+  }
+
+  List<Widget> _listCellTransaksi(List<Entry> lEntry) {
+    List<Widget> lw = new List();
+    lEntry.forEach((element) {
+      lw.add(CellKeuangan(
+        entry: element,
+        callbackDelete: _callbackActionDelete,
+      ));
+    });
+
+    return lw;
   }
 
   Future openPage(context, Widget builder) async {
@@ -413,8 +430,18 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
     }
   }
 }
+
 enum StateTransaksi {
   byDefault,
   byKategori,
   byItemName,
+}
+
+class ForCellTransaksi {
+  DateTime date;
+  String namaBulan;
+  String namaHari;
+  List<Entry> lEntry;
+
+  ForCellTransaksi(this.date, this.namaHari, this.namaBulan, this.lEntry);
 }

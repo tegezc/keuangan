@@ -63,7 +63,6 @@ class ProcessString {
     return tanggal;
   }
 
-
   DateTime dateFromDbToDateTime(String tanggal) {
     var tmp = tanggal.split('-');
     if (tmp.length == 3) {

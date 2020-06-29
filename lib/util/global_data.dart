@@ -32,4 +32,15 @@ class GlobalData {
     'Nov',
     'Des'
   ];
+
+  static final nhari = [
+    '',
+    'Senin',
+    'Selasa',
+    'Rabu',
+    'Kamis',
+    'Jum\'at',
+    'Sabtu',
+    'Minggu'
+  ];
 }

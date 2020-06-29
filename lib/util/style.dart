@@ -47,7 +47,7 @@ class AppTheme {
 
   static final _smallTextDark = new TextStyle(fontSize: 10, color: Colors.white);
 
-  static final _caption = new TextStyle(fontSize: 14, color: Colors.black);
+  static final _caption = new TextStyle(fontSize: 16 ,color: Colors.black,fontWeight: FontWeight.bold);
   static final _captionDark = new TextStyle(fontSize: 14, color: Colors.white);
 
   static Color _iconColor = Colors.cyan[600];
@@ -57,7 +57,7 @@ class AppTheme {
   static const Color _lightSecondaryColor = Colors.green;
   static const Color _lightOnPrimaryColor = Colors.black;
 
-  static const Color _darkPrimaryColor = Colors.white24;
+  static const Color _darkPrimaryColor = Colors.white;
   static const Color _darkPrimaryVariantColor = Colors.black;
   static const Color _darkSecondaryColor = Colors.white;
   static const Color _darkOnPrimaryColor = Colors.white;

@@ -101,7 +101,7 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
     ProcessString processString = new ProcessString();
     ItemName inm = k.lazyItemName;
     String tanggal = processString.dateToStringDdMmmmYyyy(k.tanggal);
-    Entry entry = new Entry(inm.nama, inm.kategori, tanggal, k, true, true);
+    Entry entry = new Entry(inm.nama, inm.kategori, tanggal,k.tanggal, k, true, true);
     showDialog<String>(
         context: context,
         builder: (BuildContext context) => SimpleDialog(
@@ -199,8 +199,14 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
     lw.add(_widgetBalance(
         sizeWidget, data.pemasukan, data.pengeluaran, data.balance));
     lw.add(Divider());
-    lw.add(Center(
-      child: Text('Transaksi terakhir',style: Theme.of(context).textTheme.headline2,),
+    lw.add(Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        child: Padding(
+          padding: const EdgeInsets.only(left:12.0),
+          child: Text('Transaksi terakhir',style: Theme.of(context).textTheme.headline2,textAlign: TextAlign.left,),
+        ),
+      ),
     ));
     lw.add(SizedBox(
       height: 3,
@@ -211,6 +217,7 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
         Keuangan ke = lKeuangan[i];
       Keuangan copyKeuangan = new Keuangan.fromUI(ke.tanggal, ke.idItemName, ke.jumlah, ke.catatan);
       copyKeuangan.lazyItemName = ke.lazyItemName;
+
         lw.add(FlatButton(
             onPressed: () {
               _showDialogPilihan(copyKeuangan);
@@ -279,21 +286,25 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
   }
 }
 
-class CellKeuanganStateLess extends StatelessWidget {
+class CellKeuanganStateLess extends StatefulWidget {
   final Keuangan keuangan;
-  ProcessString _processString = ProcessString();
 
   CellKeuanganStateLess(this.keuangan);
 
+  @override
+  _CellKeuanganStateLessState createState() => _CellKeuanganStateLessState();
+}
 
+class _CellKeuanganStateLessState extends State<CellKeuanganStateLess> {
+  ProcessString _processString = ProcessString();
 
   @override
   Widget build(BuildContext context) {
     final formatCurrency = new NumberFormat("#,##0", "idr");
-    int uang = keuangan.jumlah.toInt();
-    String tanggal = _processString.dateToStringDdMmmYyyyPendek(keuangan.tanggal);
+    int uang = widget.keuangan.jumlah.toInt();
+    String tanggal = _processString.dateToStringDdMmmYyyyPendek(widget.keuangan.tanggal);
 
-    ItemName itemName = keuangan.lazyItemName;
+    ItemName itemName = widget.keuangan.lazyItemName;
     String subTitle = '${itemName.kategori.nama} ($tanggal)';
     TextStyle textStyle;
     if (itemName.kategori.type == EnumJenisTransaksi.pemasukan) {
