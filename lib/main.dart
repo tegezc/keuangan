@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:keuangan/file_non_production/bulk_insert.dart';
 import 'package:keuangan/keuangan/itemname/homepage_itemname.dart';
 import 'package:keuangan/keuangan/kategori/homepage_kategori.dart';
+import 'package:keuangan/keuangan/report/hp_report.dart';
+import 'package:keuangan/keuangan/report/reporting_by_kategori/reporting_bykategori.dart';
 import 'package:keuangan/keuangan/transaksi/keuangan_transaksi.dart';
-import 'package:keuangan/keuangan/reporting_by_kategori/reporting_bykategori.dart';
 import 'package:flutter/material.dart';
 import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/style.dart';
@@ -85,7 +86,8 @@ class MyHomePageState extends State<MyHomePage> {
         break;
       case 2:
         {
-          return new ReportByCategories(drawer: _createDrawer(pos));
+    //      return new ReportByCategories(drawer: _createDrawer(pos));
+          return HpReport(drawer: _createDrawer(pos));
         }
         break;
       case 3:

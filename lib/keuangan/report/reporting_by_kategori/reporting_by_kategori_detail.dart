@@ -2,24 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/database/keuangan/dao_kategori.dart';
 import 'package:keuangan/database/keuangan/dao_keuangan.dart';
-import 'package:keuangan/keuangan/transaksi/keuangan_transaksi.dart';
+import 'package:keuangan/keuangan/report/reporting_by_kategori/component_reporting.dart';
+import 'package:keuangan/keuangan/report/reporting_by_kategori/reporting_by_items.dart';
 import 'package:keuangan/keuangan/transaksi/model_keuangan_ui.dart';
-import 'package:keuangan/keuangan/reporting_by_kategori/reporting_by_items.dart';
-import 'package:keuangan/keuangan/reporting_by_kategori/reporting_by_kategori_detail.dart';
-import 'package:keuangan/keuangan/reporting_by_kategori/component_reporting.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/datepicker_singlescrollview.dart';
 import 'package:keuangan/util/loading_view.dart';
 import 'package:keuangan/util/process_string.dart';
 
-class ReportByCategories extends StatefulWidget {
-  final Widget drawer;
-  ReportByCategories({this.drawer});
+class ReportByCategoriesDetail extends StatefulWidget {
+  final Kategori katkegoridetail;
+  final int ecIndex;
+  final List<EntryCombobox> listCombobox;
+
+  ReportByCategoriesDetail(this.katkegoridetail, this.ecIndex,this.listCombobox);
+
   @override
-  _ReportByCategoriesState createState() => _ReportByCategoriesState();
+  _ReportByCategoriesDetailState createState() =>
+      _ReportByCategoriesDetailState();
 }
 
-class _ReportByCategoriesState extends State<ReportByCategories> {
+class _ReportByCategoriesDetailState extends State<ReportByCategoriesDetail> {
   List<Keuangan> _listKeuangan;
   List<ModelItemKategoriReport> _listEntrySort;
 
@@ -40,11 +43,13 @@ class _ReportByCategoriesState extends State<ReportByCategories> {
 
   @override
   void initState() {
+
     _valueTanggalFrom = new DateTime.now();
     _valueTanggalTo = new DateTime.now();
     _processString = new ProcessString();
 
     _populateKeuangan();
+
     super.initState();
   }
 
@@ -66,9 +71,8 @@ class _ReportByCategoriesState extends State<ReportByCategories> {
         daoItemName.getAllItemNameMap().then((Map<int, ItemName> inMap) {
           _itemNameMap = new Map();
           _itemNameMap.addAll(inMap);
-
-          _hitungTotalPerkategori();
-
+          // _hitungTotalPerkategori();
+          _filterDetailKategori();
           setState(() {});
         });
       });
@@ -82,56 +86,60 @@ class _ReportByCategoriesState extends State<ReportByCategories> {
         .then((List<Keuangan> list) {
       _listKeuangan.clear();
       _listKeuangan.addAll(list);
-      _hitungTotalPerkategori();
+      _filterDetailKategori();
       setState(() {});
     });
   }
 
-  _hitungTotalPerkategori() {
+  _filterDetailKategori() {
+    _hitungTotalSpecifickategori();
+  }
+
+  _hitungTotalSpecifickategori() {
     Map<int, List<Keuangan>> mapK = new Map();
     for (int i = 0; i < _listKeuangan.length; i++) {
       Keuangan keuangan = _listKeuangan[i];
       ItemName itemName = _itemNameMap[keuangan.idItemName];
       Kategori kategori = _kategoriMap[itemName.idKategori];
+      int idkategori = kategori.id;
       if (kategori.idParent > 0) {
-        kategori = _kategoriMap[kategori.idParent];
+        idkategori = kategori.idParent;
       }
+      if (idkategori == widget.katkegoridetail.id) {
 
-      if (mapK[kategori.id] == null) {
-        List<Keuangan> lk = new List();
-        lk.add(keuangan);
-        mapK[kategori.id] = lk;
-      } else {
-        List<Keuangan> lk = mapK[kategori.id];
-        lk.add(keuangan);
-        mapK[kategori.id] = lk;
+        if (mapK[kategori.id] == null) {
+          List<Keuangan> lk = new List();
+          lk.add(keuangan);
+          mapK[kategori.id] = lk;
+        } else {
+          List<Keuangan> lk = mapK[kategori.id];
+          lk.add(keuangan);
+          mapK[kategori.id] = lk;
+        }
       }
     }
 
-
+    _listEntrySort = new List();
     int total = 0;
     mapK.forEach((key, value) {
       value.forEach((k) {
         total = total + k.jumlah.toInt();
       });
     });
-    _listEntrySort = new List();
+
     mapK.forEach((key, value) {
       int jumlahUang = 0;
       value.forEach((k) {
         jumlahUang = jumlahUang + k.jumlah.toInt();
       });
 
-      double percentation = (jumlahUang / total) * 100;
+      double percentation = (jumlahUang / total)*100;
       Kategori kt = _kategoriMap[key];
-
-
       String text = '${kt.nama} (${percentation.toStringAsFixed(2)} %)';
       var entrySort = new ModelItemKategoriReport(
           values: kt, color: '#${kt.color}', jumlahUang: jumlahUang, text: text);
       _listEntrySort.add(entrySort);
     });
-
   }
 
   _getTotal(List<ModelItemKategoriReport> list) {
@@ -143,10 +151,12 @@ class _ReportByCategoriesState extends State<ReportByCategories> {
   }
 
   _initialCombobox() {
-    UtilUiRepByKategori utilUiRepByKategori = new UtilUiRepByKategori();
-    _listCombobox = utilUiRepByKategori.initialCombobox();
+//    UtilUiRepByKategori utilUiRepByKategori = new UtilUiRepByKategori();
+//    _listCombobox = utilUiRepByKategori.initialCombobox();
+  _listCombobox = new List();
+  _listCombobox.addAll(widget.listCombobox);
 
-    _currentIndexCombo = 2;
+    _currentIndexCombo = widget.ecIndex;
 
     _reloadComboBox();
   }
@@ -157,7 +167,7 @@ class _ReportByCategoriesState extends State<ReportByCategories> {
 
   List<DropdownMenuItem<int>> _getDropDownEntry() {
     List<DropdownMenuItem<int>> items = new List();
-    for (int i = 0; i < _listCombobox.length; i++) {
+    for (int i =0;i < _listCombobox.length;i++) {
       items.add(new DropdownMenuItem(
         value: i,
         child: new Text(_listCombobox[i].text),
@@ -171,7 +181,8 @@ class _ReportByCategoriesState extends State<ReportByCategories> {
     if (entryCombobox.startDate == null) {
       _selectDateFrom();
     } else {
-      _getDataKeuanganByPeriode(entryCombobox.startDate, entryCombobox.endDate);
+      _getDataKeuanganByPeriode(
+          entryCombobox.startDate, entryCombobox.endDate);
       setState(() {
         _currentIndexCombo = selectedECombo;
       });
@@ -202,6 +213,7 @@ class _ReportByCategoriesState extends State<ReportByCategories> {
         builder: (context, child) {
           return CustomeDatePicker(child);
         });
+
     if (picked != null) {
       _valueTanggalFrom = picked;
       _selectDateTo();
@@ -216,7 +228,8 @@ class _ReportByCategoriesState extends State<ReportByCategories> {
         lastDate: new DateTime(_endDate),
         builder: (context, child) {
           return CustomeDatePicker(child);
-        },);
+        });
+
     if (picked != null) {
       _valueTanggalTo = picked;
       String strStartDate =
@@ -235,79 +248,56 @@ class _ReportByCategoriesState extends State<ReportByCategories> {
     }
   }
 
-  Future<int> _asyncSimpleDialog(
-      ModelItemKategoriReport modelItemKategori) async {
+  Future<int> _asyncSimpleDialog(Kategori kategori, int ecIndex) async {
     return showDialog<int>(
         context: context,
         builder: (BuildContext context) => SimpleDialog(
-              title: Text('Pilihan:'),
-              children: <Widget>[
-                new OutlineButton(
-                  onPressed: () {
-                    _showBySubKategori(modelItemKategori.values);
-                  },
-                  child: Text('lap ke sub kategori'),
-                ),
-                new OutlineButton(
-                  onPressed: () {
-                    _showByItem(modelItemKategori.values);
-                  },
-                  child: Text('lap per item'),
-                ),
-                new OutlineButton(
-                  onPressed: () {
-                    _showTransaksi(modelItemKategori.values);
-                  },
-                  child: Text('tampilkan transaksi'),
-                ),
-                new OutlineButton(
-                  onPressed: _cancelDialog,
-                  child: Text('Cancel'),
-                ),
-              ],
-            ));
+          title: Text('Pilihan:'),
+          children: <Widget>[
+            new OutlineButton(
+              onPressed: () {
+                _showByItem(kategori, ecIndex);
+              },
+              child: Text('lap per item'),
+            ),
+            new OutlineButton(
+              onPressed: () {
+                _showTransaksi(kategori, ecIndex);
+              },
+              child: Text('tampilkan transaksi'),
+            ),
+            new OutlineButton(
+              onPressed: _cancelDialog,
+              child: Text('Cancel'),
+            ),
+          ],
+        ));
   }
 
-  _showBySubKategori(Kategori kategori) {
+  _showByItem(Kategori kategori, int ecIndex) {
     Navigator.pop(context);
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => ReportByCategoriesDetail(
-                kategori, _currentIndexCombo, _listCombobox)));
+            builder: (context) => ReportByItems(kategori, ecIndex,_listCombobox)));
   }
 
-  _showByItem(Kategori kategori) {
+  _showTransaksi(Kategori kategori, int ecIndex) {
     Navigator.pop(context);
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) =>
-                ReportByItems(kategori, _currentIndexCombo, _listCombobox)));
-  }
-
-  _showTransaksi(Kategori kategori) {
-    Navigator.pop(context);
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => TransactionKeuangan.byKategori(
-                  kategori: kategori,
-                  listCombobox: _listCombobox,
-                  posisiCombobox: _currentIndexCombo,
-                )));
+            builder: (context) => ReportByItems(kategori, ecIndex,_listCombobox)));
   }
 
   _cancelDialog() {
     Navigator.pop(context);
   }
 
-  funcBtnClick(ModelItemKategoriReport modelItemKategori) {
-    _asyncSimpleDialog(modelItemKategori);
+  funcBtnClick(Kategori kategori, int ecIndex) {
+    _asyncSimpleDialog(kategori, ecIndex);
   }
-
   Widget _bodyReporting(Size dimention) {
-
     ModelCategoryReport modelCategoryReport = new ModelCategoryReport(
       dimention: dimention,
       itemCategories: _listEntrySort,
@@ -335,18 +325,17 @@ class _ReportByCategoriesState extends State<ReportByCategories> {
     if (_listKeuangan == null) {
       return Scaffold(
         appBar: new AppBar(
-          title: new Text('Laporan'),
+          title: new Text('Sub Kategori'),
         ),
-        drawer: widget.drawer,
         body: LoadingView(),
       );
     } else {
       return Scaffold(
-        drawer: widget.drawer,
-          appBar: new AppBar(
-            title: new Text('Laporan'),
-          ),
-          body: _bodyReporting(mediaQueryData.size));
+        appBar: new AppBar(
+          title: new Text('Sub Kategori'),
+        ),
+        body: _bodyReporting(mediaQueryData.size),
+      );
     }
   }
 }
