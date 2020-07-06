@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:keuangan/keuangan/report/report_batang/report_batang.dart';
+import 'package:keuangan/keuangan/report/reporting_by_kategori/reporting_bykategori.dart';
 import 'package:keuangan/util/colors_utility.dart';
+import 'package:keuangan/util/common_ui.dart';
 
 class HpReport extends StatefulWidget {
   final Widget drawer;
@@ -31,7 +34,7 @@ class _HpReportState extends State<HpReport> {
         'Laporan Pemasukan per bulan pada tahun tertentu.',
         EnumJenisLaporan.pemasukan,
         EnumItemLaporan.pmByMonth,
-        null);
+        ReportBatang());
     _mReport[EnumItemLaporan.pmByYear] = new HpUiItemLaporan(
         'Laporan Per Tahun',
         'Laporan Pemasukan per tahun.',
@@ -45,7 +48,7 @@ class _HpReportState extends State<HpReport> {
         'Laporan Pengeluaran yang di kelompokkan berdasarkan kategori.',
         EnumJenisLaporan.pengeluaran,
         EnumItemLaporan.pgByCategory,
-        null);
+        new ReportByCategories());
     _mReport[EnumItemLaporan.pgByMonthly] = new HpUiItemLaporan(
         'Laporan Per Bulan',
         'Laporan Pengeluaran tiap bulan.',
@@ -88,7 +91,11 @@ class _HpReportState extends State<HpReport> {
             borderRadius: BorderRadius.circular(5.0),
             side: BorderSide(color: color)
         ),
-        onPressed: (){},
+        onPressed: ()async{
+           await openPage(
+              context,
+               hpUiItemLaporan.widgetLaporan);
+        },
         child: Container(
           width: double.infinity,
           child: Column(
@@ -179,6 +186,15 @@ class _HpReportState extends State<HpReport> {
           ),
         ),
       );
+  }
+
+  Future openPage(context, Widget builder) async {
+    // wait until animation finished
+    await SwipeBackObserver.promise?.future;
+
+    return await Navigator.of(context).push(
+      MaterialPageRoute(builder: (ctx) => builder),
+    );
   }
 }
 

@@ -7,6 +7,7 @@ import 'package:keuangan/keuangan/report/reporting_by_kategori/reporting_by_item
 import 'package:keuangan/keuangan/report/reporting_by_kategori/reporting_by_kategori_detail.dart';
 import 'package:keuangan/keuangan/transaksi/keuangan_transaksi.dart';
 import 'package:keuangan/keuangan/transaksi/model_keuangan_ui.dart';
+import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/datepicker_singlescrollview.dart';
 import 'package:keuangan/util/loading_view.dart';
@@ -14,6 +15,7 @@ import 'package:keuangan/util/process_string.dart';
 
 class ReportByCategories extends StatefulWidget {
   final Widget drawer;
+ // final EnumJenisTransaksi _enumJenisTransaksi;
   ReportByCategories({this.drawer});
   @override
   _ReportByCategoriesState createState() => _ReportByCategoriesState();

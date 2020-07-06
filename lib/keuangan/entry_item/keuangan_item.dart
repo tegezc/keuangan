@@ -349,9 +349,17 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
             }
 
             ///end setup auto complete
+
+            final List<Widget> _actionButtons = new List();
+            _actionButtons.add(IconButton(
+                icon: Icon(Icons.check),
+                onPressed: () {
+
+                }));
             return Scaffold(
               appBar: AppBar(
-                title: dropdownWidget1(snapshot.data.jenisKeuangan),
+                title: _headerAppBar(snapshot.data.jenisKeuangan),
+                actions: widget.isEditMode?_actionButtons:null,
               ),
               body: Stack(children: <Widget>[
                 Container(
@@ -387,12 +395,10 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
                     ),
                   ),
                 ),
-                Transform(
+                widget.isEditMode?Container():Transform(
                   transform: Matrix4.translationValues(
                       0, _sizeWidget.height - (127 + _insetsMedia.bottom), 0),
-                  child: widget.isEditMode
-                      ? _widgetButtonUpdate(_sizeWidget.width)
-                      : _widgetButtonSave(_sizeWidget.width),
+                  child:_widgetButtonSave(_sizeWidget.width),
                 ),
                 p != null
                     ? _widgetPadPositionAutoComplete1(p, _sizeWidget)
@@ -404,6 +410,18 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
             );
           }
         });
+  }
+
+  Widget _headerAppBar(EnumJenisTransaksi stateJenisKeuangan) {
+    if (widget.isEditMode) {
+      String titleAppBar = 'Pengeluaran';
+      if(stateJenisKeuangan == EnumJenisTransaksi.pemasukan){
+        titleAppBar = 'Pemasukan';
+      }
+      return Text(titleAppBar);
+    } else {
+      return dropdownWidget1(stateJenisKeuangan);
+    }
   }
 
   Widget dropdownWidget1(EnumJenisTransaksi stateJenisKeuangan) {
@@ -616,23 +634,23 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
     );
   }
 
-  Widget _widgetButtonUpdate(double width) {
-    return Container(
-      width: double.infinity,
-      height: 50,
-      child: Center(
-        child: new RaisedButton(
-          padding: const EdgeInsets.all(8.0),
-          textColor: Colors.white,
-          color: Colors.blue,
-          onPressed: () {
-            print('button update diklik');
-          },
-          child: new Text("Update"),
-        ),
-      ),
-    );
-  }
+//  Widget _widgetButtonUpdate(double width) {
+//    return Container(
+//      width: double.infinity,
+//      height: 50,
+//      child: Center(
+//        child: new RaisedButton(
+//          padding: const EdgeInsets.all(8.0),
+//          textColor: Colors.white,
+//          color: Colors.blue,
+//          onPressed: () {
+//            print('button update diklik');
+//          },
+//          child: new Text("Update"),
+//        ),
+//      ),
+//    );
+//  }
 
   Widget _widgetPadPositionAutoComplete1(
       PropertyAutoComplete p, Size sizeWidget) {
