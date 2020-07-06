@@ -10,6 +10,20 @@ class DaoKeuangan {
   TbKeuangan tb = new TbKeuangan();
 
   Future<int> saveKeuangan(Keuangan keuangan) async {
+    /// set jenis transaksi
+    DaoItemName daoItemName = new DaoItemName();
+    ItemName itemName = await daoItemName.getItemNameById(keuangan.idItemName);
+    DaoKategori daoKategori = new DaoKategori();
+    Kategori kategori = await daoKategori.getKategoriById(itemName.idKategori);
+    int jnsTransaksi = 1; // nilai lihat dimodel keuangan
+    if(kategori.type == EnumJenisTransaksi.pengeluaran){
+      jnsTransaksi = 0;
+    }
+
+    keuangan.setJenisTransaksi(jnsTransaksi);
+    /// set lastupdate
+    keuangan.setLastupdate(DateTime.now().millisecondsSinceEpoch);
+
     if (keuangan.isValid()) {
       var dbClient = await DatabaseHelper().db;
       int res = await dbClient.insert(tb.name, keuangan.toMap());
@@ -21,30 +35,30 @@ class DaoKeuangan {
     ///failed save record
   }
 
-  Future<List<Keuangan>> getAllKeuangan() async {
-    var dbClient = await DatabaseHelper().db;
-    List<Map> list = await dbClient.rawQuery('SELECT * FROM ${tb.name}');
-    List<Keuangan> keuangans = new List();
-    for (int i = 0; i < list.length; i++) {
-      var keuangan = new Keuangan.fromDB(
-          list[i][tb.fTgl],
-          list[i][tb.fIdItemName],
-          list[i][tb.fJumlah],
-          list[i][tb.fCatatan],
-          list[i][tb.fLastUpdate]);
-      keuangan.setId(list[i][tb.fId]);
-
-      keuangans.add(keuangan);
-    }
-    return keuangans;
-  }
+//  Future<List<Keuangan>> getAllKeuangan() async {
+//    var dbClient = await DatabaseHelper().db;
+//    List<Map> list = await dbClient.rawQuery('SELECT * FROM ${tb.name}');
+//    List<Keuangan> keuangans = new List();
+//    for (int i = 0; i < list.length; i++) {
+//      var keuangan = new Keuangan.fromDB(
+//          list[i][tb.fTgl],
+//          list[i][tb.fIdItemName],
+//          list[i][tb.fJumlah],
+//          list[i][tb.fCatatan],
+//          list[i][tb.fLastUpdate]);
+//      keuangan.setId(list[i][tb.fId]);
+//
+//      keuangans.add(keuangan);
+//    }
+//    return keuangans;
+//  }
 
   Future<List<Keuangan>> get5LastKeuanganLazy() async {
     DaoItemName daoItemName = new DaoItemName();
     DaoKategori daoKategori = new DaoKategori();
     var dbClient = await DatabaseHelper().db;
-    List<Map> list = await dbClient.rawQuery(
-        'SELECT * FROM ${tb.name} ORDER BY ${tb.fId} DESC limit 5');
+    List<Map> list = await dbClient
+        .rawQuery('SELECT * FROM ${tb.name} ORDER BY ${tb.fId} DESC limit 5');
     List<Keuangan> keuangans = new List();
     for (int i = 0; i < list.length; i++) {
       var keuangan = new Keuangan.fromDB(
@@ -52,7 +66,8 @@ class DaoKeuangan {
           list[i][tb.fIdItemName],
           list[i][tb.fJumlah],
           list[i][tb.fCatatan],
-          list[i][tb.fLastUpdate]);
+          list[i][tb.fLastUpdate],
+          list[i][tb.fJenisTransaksi]);
       keuangan.setId(list[i][tb.fId]);
 
       /// lazy di process
@@ -74,7 +89,7 @@ class DaoKeuangan {
     String strEndDate = processString.dateFormatForDB(endDate);
     var dbClient = await DatabaseHelper().db;
     List<Map> list = await dbClient.rawQuery(
-        'SELECT * FROM ${tb.name} WHERE ${tb.fTgl} BETWEEN \'$strStartDate\' AND \'$strEndDate\'  ORDER BY date(${tb.fTgl}) ASC');
+        'SELECT * FROM ${tb.name} WHERE ${tb.fTgl} BETWEEN \'$strStartDate\' AND \'$strEndDate\'  ORDER BY date(${tb.fTgl}) DESC');
     List<Keuangan> keuangans = new List();
     for (int i = 0; i < list.length; i++) {
       var keuangan = new Keuangan.fromDB(
@@ -82,7 +97,8 @@ class DaoKeuangan {
           list[i][tb.fIdItemName],
           list[i][tb.fJumlah],
           list[i][tb.fCatatan],
-          list[i][tb.fLastUpdate]);
+          list[i][tb.fLastUpdate],
+          list[i][tb.fJenisTransaksi]);
       keuangan.setId(list[i][tb.fId]);
 
       keuangans.add(keuangan);
@@ -103,7 +119,8 @@ class DaoKeuangan {
             list[0][tb.fIdItemName],
             list[0][tb.fJumlah],
             list[0][tb.fCatatan],
-            list[0][tb.fLastUpdate]);
+            list[0][tb.fLastUpdate],
+            list[0][tb.fJenisTransaksi]);
         keuangan.setId(list[0][tb.fId]);
       }
     }
@@ -113,13 +130,20 @@ class DaoKeuangan {
 
   Future<List<Keuangan>> getKeuanganByJenisTransaksi(
       EnumJenisTransaksi jt) async {
-    TbKategori tbKategori = new TbKategori();
-    TbItemName tbItemName = new TbItemName();
+
     var dbClient = await DatabaseHelper().db;
-    int type = jt.index;
-    String str = 'SELECT * FROM ${tb.name} k '
-        'JOIN ${tbItemName.name} itn ON k.${tb.fIdItemName}=itn.${tbItemName.fId} '
-        'JOIN ${tbKategori.name} kt ON itn.${tbItemName.fIdKategori}=kt.${tbKategori.fId} where kt.${tbKategori.fType}=$type';
+
+    int type = 0;// nilai check di model keuangan
+    if(jt == EnumJenisTransaksi.pemasukan){
+      type = 1;
+    }
+//    TbKategori tbKategori = new TbKategori();
+//    TbItemName tbItemName = new TbItemName();
+//    String str = 'SELECT * FROM ${tb.name} k '
+//        'JOIN ${tbItemName.name} itn ON k.${tb.fIdItemName}=itn.${tbItemName.fId} '
+//        'JOIN ${tbKategori.name} kt ON itn.${tbItemName.fIdKategori}=kt.${tbKategori.fId} where kt.${tbKategori.fType}=$type';
+
+        String str = 'SELECT * FROM ${tb.name} WHERE ${tb.fJenisTransaksi}=$type';
 
     List<Map> list = await dbClient.rawQuery(str);
 
@@ -130,7 +154,7 @@ class DaoKeuangan {
           list[i][tb.fIdItemName],
           list[i][tb.fJumlah],
           list[i][tb.fCatatan],
-          list[i][tb.fLastUpdate]);
+          list[i][tb.fLastUpdate],list[i][tb.fJenisTransaksi]);
       keuangan.setId(list[i][tb.fId]);
 
       keuangans.add(keuangan);

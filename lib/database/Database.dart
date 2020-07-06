@@ -59,7 +59,8 @@ class DatabaseHelper {
             "${tbKeuangan.fIdItemName} INTEGER,"
             "${tbKeuangan.fJumlah} REAL,"
             "${tbKeuangan.fCatatan} TEXT,"
-            "${tbKeuangan.fLastUpdate} INTEGER)");
+            "${tbKeuangan.fLastUpdate} INTEGER,"
+            "${tbKeuangan.fJenisTransaksi} INTEGER)");
 
     await db.execute(
         "CREATE TABLE ${tbSetup.name}(${tbSetup.fId} INTEGER PRIMARY KEY, "

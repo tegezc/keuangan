@@ -20,6 +20,7 @@ class TbKeuangan{
    final fJumlah = 'jumlah';
    final fCatatan = 'catatan';
    final fLastUpdate = 'last_update';
+   final fJenisTransaksi = 'jenis_transaksi';// 0 Pengeluaran, 1: Pemasukan
 }
 
 class TbItemName{

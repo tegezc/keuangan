@@ -18,7 +18,7 @@ class BlocEntryKeuangan {
 
   BlocEntryKeuangan() {
     _cacheEntry = new EntryKeuangan(
-      keuangan: new Keuangan.fromUI(DateTime.now(), 0, 0, '',0),
+      keuangan: new Keuangan.fromUI(DateTime.now(), 0, 0, ''),
       mapKategori: Map(),
       mapItemName: Map(),
       jenisKeuangan: EnumJenisTransaksi.pengeluaran,

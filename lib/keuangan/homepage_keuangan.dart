@@ -215,7 +215,7 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
      List<Keuangan> lKeuangan = data.listKeuangan;
       for(int i = 0; i< lKeuangan.length;i++){
         Keuangan ke = lKeuangan[i];
-      Keuangan copyKeuangan = new Keuangan.fromUI(ke.tanggal, ke.idItemName, ke.jumlah, ke.catatan,ke.jenisTransaksi);
+      Keuangan copyKeuangan = new Keuangan.fromUI(ke.tanggal, ke.idItemName, ke.jumlah, ke.catatan);
       copyKeuangan.lazyItemName = ke.lazyItemName;
 
         lw.add(FlatButton(

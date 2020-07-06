@@ -81,19 +81,19 @@ class Persiapan {
 
   bulkinsertKeuangan(){
     DaoKeuangan daoKeuangan = new DaoKeuangan();
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-11', 1, 50000, 'ct',DateTime(2019,8,1).millisecondsSinceEpoch));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-22', 2, 50000, 'ct',DateTime(2019,8,2).millisecondsSinceEpoch));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-23', 3, 13700, 'ct',DateTime(2019,8,3).millisecondsSinceEpoch));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-14', 4, 1700000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-15', 5, 532000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-26', 6, 32000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-17', 7, 10000, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-8', 8, 5000, 'ct',DateTime(2019,8,8).millisecondsSinceEpoch));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-7', 4, 500, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-25', 5, 1000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-5', 6, 23000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-4', 9, 200000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-28', 10,1200000 , 'ct',DateTime(2019,8,4).millisecondsSinceEpoch));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-11', 1, 50000, 'ct',DateTime(2019,8,1).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-22', 2, 50000, 'ct',DateTime(2019,8,2).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-23', 3, 13700, 'ct',DateTime(2019,8,3).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-14', 4, 1700000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-15', 5, 532000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-26', 6, 32000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-17', 6, 10000, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-8', 6, 5000, 'ct',DateTime(2019,8,8).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-7', 4, 500, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-25', 5, 1000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-5', 6, 23000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-4', 3, 200000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-28', 4,1200000 , 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
 //    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-28', 1, 5, '', 1));
 //    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-29', 10, 5, '', 1));
 //    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-29', 11, 5, '', 0));

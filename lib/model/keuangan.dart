@@ -134,6 +134,7 @@ class Keuangan {
   double _jumlah;
   String _catatan;
   int _lastupdate;
+  int _jenisTransaksi; // 0: pengeluaran, 1: pemasukan
 
   Keuangan();
 
@@ -147,13 +148,14 @@ class Keuangan {
   }
 
   Keuangan.fromDB(String tanggal, int idItemName, double jumlah, String catatan,
-      int newlastupdate) {
+      int newlastupdate, int newjenisTransaksi) {
     ProcessString processString = new ProcessString();
     this._tanggal = processString.dateFromDbToDateTime(tanggal);
     this._idItemName = idItemName;
     this._jumlah = jumlah;
     this._catatan = catatan;
     this._lastupdate = newlastupdate;
+    this._jenisTransaksi = newjenisTransaksi;
   }
 
   DateTime get tanggal => this._tanggal;
@@ -166,6 +168,8 @@ class Keuangan {
 
   int get lastupdate => this._lastupdate;
 
+  int get jenisTransaksi => this._jenisTransaksi;
+
   Map<String, dynamic> toMap() {
     ProcessString processString = new ProcessString();
     var map = new Map<String, dynamic>();
@@ -174,6 +178,7 @@ class Keuangan {
     map[tb.fJumlah] = _jumlah;
     map[tb.fCatatan] = _catatan;
     map[tb.fLastUpdate] = _lastupdate;
+    map[tb.fJenisTransaksi] = _jenisTransaksi;
 
     return map;
   }
@@ -202,8 +207,16 @@ class Keuangan {
     this._lastupdate = newvalue;
   }
 
+  void setJenisTransaksi(int newvalue) {
+    this._jenisTransaksi = newvalue;
+  }
+
   bool isValid() {
-    if (_idItemName > 0 && _tanggal != null) {
+    int _jenisTransaksi; // 0: pengeluaran, 1: pemasukan
+    if (_idItemName > 0 &&
+        _tanggal != null &&
+        (_jenisTransaksi == 0 || _jenisTransaksi == 1) &&
+        _lastupdate > 0) {
       return true;
     }
     return false;
