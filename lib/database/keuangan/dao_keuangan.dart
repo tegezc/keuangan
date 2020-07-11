@@ -16,11 +16,12 @@ class DaoKeuangan {
     DaoKategori daoKategori = new DaoKategori();
     Kategori kategori = await daoKategori.getKategoriById(itemName.idKategori);
     int jnsTransaksi = 1; // nilai lihat dimodel keuangan
-    if(kategori.type == EnumJenisTransaksi.pengeluaran){
+    if (kategori.type == EnumJenisTransaksi.pengeluaran) {
       jnsTransaksi = 0;
     }
 
     keuangan.setJenisTransaksi(jnsTransaksi);
+
     /// set lastupdate
     keuangan.setLastupdate(DateTime.now().millisecondsSinceEpoch);
 
@@ -106,6 +107,41 @@ class DaoKeuangan {
     return keuangans;
   }
 
+  Future<List<Keuangan>> getKeuanganByPeriodeAndJenisTransaksi(
+      EnumJenisTransaksi enumJenisTransaksi,
+      DateTime startDate,
+      DateTime endDate) async {
+    ProcessString processString = new ProcessString();
+    String strStartDate = processString.dateFormatForDB(startDate);
+    String strEndDate = processString.dateFormatForDB(endDate);
+
+    int jnsTransaksi = 1; // nilai lihat di model keuangan
+    if (enumJenisTransaksi == EnumJenisTransaksi.pengeluaran) {
+      jnsTransaksi = 0;
+    }
+
+    var dbClient = await DatabaseHelper().db;
+
+    String sql =
+        'SELECT * FROM ${tb.name} WHERE ${tb.fJenisTransaksi}=$jnsTransaksi AND ${tb.fTgl} BETWEEN \'$strStartDate\' AND \'$strEndDate\' ORDER BY date(${tb.fTgl}) DESC';
+
+    List<Map> list = await dbClient.rawQuery(sql);
+    List<Keuangan> keuangans = new List();
+    for (int i = 0; i < list.length; i++) {
+      var keuangan = new Keuangan.fromDB(
+          list[i][tb.fTgl],
+          list[i][tb.fIdItemName],
+          list[i][tb.fJumlah],
+          list[i][tb.fCatatan],
+          list[i][tb.fLastUpdate],
+          list[i][tb.fJenisTransaksi]);
+      keuangan.setId(list[i][tb.fId]);
+
+      keuangans.add(keuangan);
+    }
+    return keuangans;
+  }
+
   Future<Keuangan> getKeuanganById(int id) async {
     var dbClient = await DatabaseHelper().db;
     List<Map> list =
@@ -130,11 +166,10 @@ class DaoKeuangan {
 
   Future<List<Keuangan>> getKeuanganByJenisTransaksi(
       EnumJenisTransaksi jt) async {
-
     var dbClient = await DatabaseHelper().db;
 
-    int type = 0;// nilai check di model keuangan
-    if(jt == EnumJenisTransaksi.pemasukan){
+    int type = 0; // nilai check di model keuangan
+    if (jt == EnumJenisTransaksi.pemasukan) {
       type = 1;
     }
 //    TbKategori tbKategori = new TbKategori();
@@ -143,7 +178,7 @@ class DaoKeuangan {
 //        'JOIN ${tbItemName.name} itn ON k.${tb.fIdItemName}=itn.${tbItemName.fId} '
 //        'JOIN ${tbKategori.name} kt ON itn.${tbItemName.fIdKategori}=kt.${tbKategori.fId} where kt.${tbKategori.fType}=$type';
 
-        String str = 'SELECT * FROM ${tb.name} WHERE ${tb.fJenisTransaksi}=$type';
+    String str = 'SELECT * FROM ${tb.name} WHERE ${tb.fJenisTransaksi}=$type ORDER BY date(${tb.fTgl}) DESC';
 
     List<Map> list = await dbClient.rawQuery(str);
 
@@ -154,7 +189,8 @@ class DaoKeuangan {
           list[i][tb.fIdItemName],
           list[i][tb.fJumlah],
           list[i][tb.fCatatan],
-          list[i][tb.fLastUpdate],list[i][tb.fJenisTransaksi]);
+          list[i][tb.fLastUpdate],
+          list[i][tb.fJenisTransaksi]);
       keuangan.setId(list[i][tb.fId]);
 
       keuangans.add(keuangan);

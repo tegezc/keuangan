@@ -212,17 +212,24 @@ class Keuangan {
   }
 
   bool isValid() {
-    int _jenisTransaksi; // 0: pengeluaran, 1: pemasukan
     if (_idItemName > 0 &&
         _tanggal != null &&
         (_jenisTransaksi == 0 || _jenisTransaksi == 1) &&
         _lastupdate > 0) {
       return true;
+    }else{
+      print('gak valid');
     }
     return false;
   }
 
   String toString() {
-    return 'idkeuangan: $id| iditemname: $_idItemName| jumlah: $_jumlah| tanggal: $_tanggal| catatan: $_catatan';
+    return 'idkeuangan: $id| '
+        'iditemname: $_idItemName | '
+        'jumlah: $_jumlah | '
+        'tanggal: $_tanggal | '
+        'catatan: $_catatan |'
+        'lastupdate: $_lastupdate | '
+        'jnstransaksi: $_jenisTransaksi';
   }
 }

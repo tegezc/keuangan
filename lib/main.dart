@@ -68,7 +68,7 @@ class MyHomePageState extends State<MyHomePage> {
     persiapan.insertKategoriDummy();
 
     persiapan.deleteAllKeuangan();
-    persiapan.bulkinsertKeuangan();
+    persiapan.bulkinsertall();
     //end test only
   }
 

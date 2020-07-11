@@ -79,48 +79,199 @@ class Persiapan {
     daoItemName.deleteAllItemName();
   }
 
-  bulkinsertKeuangan(){
+  bulkinsertall(){
+    bulkinsertKeuangan(2015);
+    bulkinsertKeuangan(2016);
+    bulkinsertKeuangan(2017);
+    bulkinsertKeuangan(2018);
+    bulkinsertKeuangan(2019);
+    bulkinsertKeuangan(2020);
+    bulkinsertKeuangan(2021);
+    bulkinsertKeuangan(2022);
+  }
+
+  bulkinsertKeuangan(int year){
     DaoKeuangan daoKeuangan = new DaoKeuangan();
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-11', 1, 50000, 'ct',DateTime(2019,8,1).millisecondsSinceEpoch,1));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-22', 2, 50000, 'ct',DateTime(2019,8,2).millisecondsSinceEpoch,1));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-23', 3, 13700, 'ct',DateTime(2019,8,3).millisecondsSinceEpoch,0));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-14', 4, 1700000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-15', 5, 532000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-26', 6, 32000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-17', 6, 10000, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-8', 6, 5000, 'ct',DateTime(2019,8,8).millisecondsSinceEpoch,0));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-7', 4, 500, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-25', 5, 1000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-5', 6, 23000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-4', 3, 200000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
-    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2020-05-28', 4,1200000 , 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-28', 1, 5, '', 1));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-29', 10, 5, '', 1));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-29', 11, 5, '', 0));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-29', 12, 5, '', 1));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-30', 13, 5, '', 0));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-30', 14, 5, '', 1));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-30', 1, 5, '', 0));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-30', 2, 5, '', 1));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-01', 3, 5, '', 0));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-01', 4, 5, '', 1));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-01', 5, 5, '', 1));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-02-02', 14, 50000, '', 1));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-02-03', 16, 50000, '', 0));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-02-03', 16, 50000, '', 0));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-02-04', 16, 50000, '', 1));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-02-04', 16, 50000, '', 0));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-02-04', 8, 50000, '', 0));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-02-05', 9, 50000, '', 1));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-02-06', 2, 50000, '', 0));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-02', 2, 50001, '', 1));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-03', 4, 50002, '', 0));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-03', 14, 50003, '', 0));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-04', 14, 50004, '', 1));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-04', 14, 50005, '', 0));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-04', 14, 50006, '', 0));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-05', 14, 50007, '', 1));
-//    daoKeuangan.saveKeuangan(new Keuangan.fromDB('2019-04-06', 14, 50008, '', 0));
+    /// JANUARI
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-01-11', 1, 50000, 'ct',DateTime(2019,8,1).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-01-22', 2, 50000, 'ct',DateTime(2019,8,2).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-01-23', 3, 13700, 'ct',DateTime(2019,8,3).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-01-14', 4, 1700000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-01-15', 5, 532000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-01-26', 6, 32000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-01-17', 6, 10000, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-01-8', 6, 5000, 'ct',DateTime(2019,8,8).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-01-7', 4, 500, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-01-25', 5, 1000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-01-5', 6, 23000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-01-4', 3, 200000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-01-28', 9,1200000 , 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+
+    /// FEBRUARI
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-02-11', 1, 25000, 'ct',DateTime(2019,8,1).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-02-22', 2, 20000, 'ct',DateTime(2019,8,2).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-02-23', 3, 13700, 'ct',DateTime(2019,8,3).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-02-14', 4, 1700000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-02-15', 5, 532000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-02-26', 6, 32000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-02-17', 6, 10000, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-02-8', 6, 5000, 'ct',DateTime(2019,8,8).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-02-7', 4, 500, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-02-25', 5, 1000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-02-5', 6, 23000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-02-4', 3, 200000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-02-28', 10,1000000 , 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+
+    /// maret
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-03-11', 1, 50000, 'ct',DateTime(2019,8,1).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-03-22', 2, 50000, 'ct',DateTime(2019,8,2).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-03-23', 3, 13000, 'ct',DateTime(2019,8,3).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-03-14', 4, 1700000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-03-15', 5, 532000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-03-26', 6, 32000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-03-17', 6, 10000, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-03-8', 6, 5000, 'ct',DateTime(2019,8,8).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-03-7', 4, 5000, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-03-25', 5, 91000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-03-5', 6, 23000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-03-4', 9, 200000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-03-28', 10,900000 , 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+
+    /// APRIL
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-04-11', 1, 50000, 'ct',DateTime(2019,8,1).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-04-22', 2, 50000, 'ct',DateTime(2019,8,2).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-04-23', 3, 13700, 'ct',DateTime(2019,8,3).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-04-14', 4, 1700000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-04-15', 5, 53000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-04-26', 6, 32000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-04-17', 6, 10000, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-04-8', 6, 5000, 'ct',DateTime(2019,8,8).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-04-7', 4, 500, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-04-25', 5, 1000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-04-5', 6, 23000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-04-4', 3, 200000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-04-28', 10,1000000 , 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+
+    /// mei
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-05-11', 1, 50000, 'ct',DateTime(2019,8,1).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-05-22', 2, 50000, 'ct',DateTime(2019,8,2).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-05-23', 3, 13700, 'ct',DateTime(2019,8,3).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-05-14', 4, 1700000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-05-15', 5, 532000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-05-26', 6, 32000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-05-17', 6, 10000, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-05-8', 6, 5000, 'ct',DateTime(2019,8,8).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-05-7', 4, 500, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-05-25', 5, 1000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-05-5', 6, 23000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-05-4', 3, 200000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-05-28', 9,1200000 , 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+
+    /// JUNI
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-06-11', 1, 50000, 'ct',DateTime(2019,8,1).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-06-22', 2, 50000, 'ct',DateTime(2019,8,2).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-06-23', 3, 13700, 'ct',DateTime(2019,8,3).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-06-14', 4, 1700000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-06-15', 5, 532000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-06-26', 6, 32000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-06-17', 6, 10000, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-06-8', 6, 55000, 'ct',DateTime(2019,8,8).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-06-7', 4, 7500, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-06-25', 5, 1000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-06-5', 6, 23000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-06-4', 3, 200000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-06-28', 10,2000000 , 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+
+    /// JULI
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-07-11', 1, 10000, 'ct',DateTime(2019,8,1).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-07-22', 2, 40000, 'ct',DateTime(2019,8,2).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-07-23', 3, 13700, 'ct',DateTime(2019,8,3).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-07-14', 4, 1700000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-07-15', 5, 532000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-07-26', 6, 32000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-07-17', 6, 10000, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-07-8', 6, 5000, 'ct',DateTime(2019,8,8).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-07-7', 4, 2500, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-07-25', 5, 13000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-07-5', 6, 23000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-07-4', 3, 200000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-07-28', 9,1500000 , 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+
+    /// AGUSTUS
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-08-11', 1, 55000, 'ct',DateTime(2019,8,1).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-08-22', 2, 55000, 'ct',DateTime(2019,8,2).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-08-23', 3, 13000, 'ct',DateTime(2019,8,3).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-08-14', 4, 1700000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-08-15', 5, 532000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-08-26', 6, 32000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-08-17', 6, 10000, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-08-8', 6, 5000, 'ct',DateTime(2019,8,8).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-08-7', 4, 55500, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-08-25', 5, 111000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-08-5', 6, 23000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-08-4', 3, 200000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-08-28', 10,12000000 , 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+
+    /// SEPT
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-09-11', 1, 50000, 'ct',DateTime(2019,8,1).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-09-22', 2, 50000, 'ct',DateTime(2019,8,2).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-09-23', 3, 13700, 'ct',DateTime(2019,8,3).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-09-14', 4, 1700000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-09-15', 5, 532000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-09-26', 6, 32000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-09-17', 6, 10000, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-09-8', 6, 5000, 'ct',DateTime(2019,8,8).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-09-7', 4, 500, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-09-25', 5, 1000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-09-5', 6, 23000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-09-4', 3, 200000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-09-28', 10,13000000 , 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+
+    /// OKT
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-10-11', 1, 50000, 'ct',DateTime(2019,8,1).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-10-22', 2, 50000, 'ct',DateTime(2019,8,2).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-10-23', 3, 13700, 'ct',DateTime(2019,8,3).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-10-14', 4, 1700000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-10-15', 5, 532000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-10-26', 6, 32000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-10-17', 6, 160000, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-10-8', 6, 5000, 'ct',DateTime(2019,8,8).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-10-7', 4, 50000, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-10-25', 5, 001000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-10-5', 6, 23000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-10-4', 3, 200000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-10-28', 9,12000000 , 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+
+    /// NOV
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-11-11', 1, 550000, 'ct',DateTime(2019,8,1).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-11-22', 2, 550000, 'ct',DateTime(2019,8,2).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-11-23', 3, 130000, 'ct',DateTime(2019,8,3).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-11-14', 4, 1700000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-11-15', 5, 532000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-11-26', 6, 32000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-11-17', 6, 10000, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-11-8', 6, 5000, 'ct',DateTime(2019,8,8).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-11-7', 4, 500, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-11-25', 5, 1000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-11-5', 6, 23000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-11-4', 3, 200000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-11-28', 10,13000000 , 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+
+    /// DES
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-12-11', 1, 50000, 'ct',DateTime(2019,8,1).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-12-22', 2, 50000, 'ct',DateTime(2019,8,2).millisecondsSinceEpoch,1));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-12-23', 3, 13700, 'ct',DateTime(2019,8,3).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-12-14', 4, 1700000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-12-15', 5, 532000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-12-26', 6, 32000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-12-17', 6, 10000, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-12-8', 6, 5000, 'ct',DateTime(2019,8,8).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-12-7', 4, 55000, 'ct',DateTime(2019,8,7).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-12-25', 5, 190000, 'ct',DateTime(2019,8,6).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-12-5', 6, 23000, 'ct',DateTime(2019,8,5).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-12-4', 3, 200000, 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+    daoKeuangan.saveKeuangan(new Keuangan.fromDB('$year-12-28', 9,13000000 , 'ct',DateTime(2019,8,4).millisecondsSinceEpoch,0));
+
   }
 
   deleteAllKeuangan(){
