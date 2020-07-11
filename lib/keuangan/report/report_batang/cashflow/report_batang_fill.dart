@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
-class ReportBatang extends StatefulWidget {
+class CfReportBatang extends StatefulWidget {
   @override
-  _ReportBatangState createState() => _ReportBatangState();
+  _CfReportBatangState createState() => _CfReportBatangState();
 }
 
-class _ReportBatangState extends State<ReportBatang> {
+class _CfReportBatangState extends State<CfReportBatang> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,18 +17,18 @@ class _ReportBatangState extends State<ReportBatang> {
           width: double.infinity,
           child: SingleChildScrollView(
               child: Column(
-            children: <Widget>[
-              Container(
-                  width: double.infinity,
-                  height: 400,
-                  child: StackedFillColorBarChart.withSampleData()),
-              Container(
-                height: 300,
-                color: Colors.green,
-                child: Text('Ora po po'),
-              ),
-            ],
-          ))),
+                children: <Widget>[
+                  Container(
+                      width: double.infinity,
+                      height: 400,
+                      child: StackedFillColorBarChart.withSampleData()),
+                  Container(
+                    height: 300,
+                    color: Colors.green,
+                    child: Text('Ora po po'),
+                  ),
+                ],
+              ))),
     );
   }
 }
@@ -61,12 +61,12 @@ class StackedFillColorBarChart extends StatelessWidget {
       /// mengcostume text di axist horizontal dan vertical kunjungi stackoverflow
       /// https://stackoverflow.com/questions/54437448/charts-flutter-labels-text-on-x-axis-overlapping-each-other
       domainAxis: new charts.OrdinalAxisSpec(
-        renderSpec: new charts.SmallTickRendererSpec(
-          minimumPaddingBetweenLabelsPx: 0,
-          labelStyle: new charts.TextStyleSpec(
-            fontSize: 7
+          renderSpec: new charts.SmallTickRendererSpec(
+              minimumPaddingBetweenLabelsPx: 0,
+              labelStyle: new charts.TextStyleSpec(
+                  fontSize: 7
+              )
           )
-        )
       ),
     );
   }
@@ -119,7 +119,7 @@ class StackedFillColorBarChart extends StatelessWidget {
         data: desktopSalesData,
         colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
         fillColorFn: (_, __) =>
-            charts.MaterialPalette.blue.shadeDefault.lighter,
+        charts.MaterialPalette.blue.shadeDefault.lighter,
       ),
       // Solid red bars. Fill color will default to the series color if no
       // fillColorFn is configured.

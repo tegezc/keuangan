@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:keuangan/keuangan/report/report_batang/report_batang.dart';
+import 'package:keuangan/keuangan/report/report_batang/batang/report_batang.dart';
+import 'package:keuangan/keuangan/report/report_batang/cashflow/report_batang_fill.dart';
 import 'package:keuangan/keuangan/report/reporting_by_kategori/reporting_bykategori.dart';
+import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/util/colors_utility.dart';
 import 'package:keuangan/util/common_ui.dart';
 
@@ -28,19 +30,19 @@ class _HpReportState extends State<HpReport> {
         'Laporan Pemasukan yang di kelompokkan berdasarkan kategori.',
         EnumJenisLaporan.pemasukan,
         EnumItemLaporan.pmByCategory,
-        null);
+        new ReportByCategories(EnumJenisTransaksi.pemasukan));
     _mReport[EnumItemLaporan.pmByMonth] = new HpUiItemLaporan(
         'Laporan Per Bulan',
         'Laporan Pemasukan per bulan pada tahun tertentu.',
         EnumJenisLaporan.pemasukan,
         EnumItemLaporan.pmByMonth,
-        ReportBatang());
+        ReportBatang(EnumItemLaporan.pmByMonth));
     _mReport[EnumItemLaporan.pmByYear] = new HpUiItemLaporan(
         'Laporan Per Tahun',
-        'Laporan Pemasukan per tahun.',
+        'Laporan Pemasukan yang ditampilkan per tahun.',
         EnumJenisLaporan.pemasukan,
         EnumItemLaporan.pmByYear,
-        null);
+        ReportBatang(EnumItemLaporan.pmByYear));
 
     // ============ pengeluaran =================== //
     _mReport[EnumItemLaporan.pgByCategory] = new HpUiItemLaporan(
@@ -48,19 +50,19 @@ class _HpReportState extends State<HpReport> {
         'Laporan Pengeluaran yang di kelompokkan berdasarkan kategori.',
         EnumJenisLaporan.pengeluaran,
         EnumItemLaporan.pgByCategory,
-        new ReportByCategories());
+        new ReportByCategories(EnumJenisTransaksi.pengeluaran));
     _mReport[EnumItemLaporan.pgByMonthly] = new HpUiItemLaporan(
         'Laporan Per Bulan',
         'Laporan Pengeluaran tiap bulan.',
         EnumJenisLaporan.pengeluaran,
         EnumItemLaporan.pgByMonthly,
-        null);
+        ReportBatang(EnumItemLaporan.pgByMonthly));
     _mReport[EnumItemLaporan.pgByYearly] = new HpUiItemLaporan(
         'Laporan Per Tahun',
         'Laporan Pengeluaran per tahun.',
         EnumJenisLaporan.pengeluaran,
         EnumItemLaporan.pgByYearly,
-        null);
+        ReportBatang(EnumItemLaporan.pgByYearly));
 
     // ============ pengeluaran =================== //
     _mReport[EnumItemLaporan.cfMonthly] = new HpUiItemLaporan(
@@ -68,13 +70,13 @@ class _HpReportState extends State<HpReport> {
         'Membandingkan pemasukan dan pengeluaran tiap bulan.',
         EnumJenisLaporan.flowcash,
         EnumItemLaporan.cfMonthly,
-        null);
+        CfReportBatang());
     _mReport[EnumItemLaporan.cfYearly] = new HpUiItemLaporan(
         'Cash Flow Tahunan',
         'Membandingkan pemasukan dan pengeluaran per tahun.',
         EnumJenisLaporan.flowcash,
         EnumItemLaporan.cfYearly,
-        null);
+        CfReportBatang());
   }
 
   Widget _cellReport(HpUiItemLaporan hpUiItemLaporan) {

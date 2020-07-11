@@ -15,8 +15,8 @@ import 'package:keuangan/util/process_string.dart';
 
 class ReportByCategories extends StatefulWidget {
   final Widget drawer;
- // final EnumJenisTransaksi _enumJenisTransaksi;
-  ReportByCategories({this.drawer});
+  final EnumJenisTransaksi enumJenisTransaksi;
+  ReportByCategories(this.enumJenisTransaksi,{this.drawer}):assert(enumJenisTransaksi != null);
   @override
   _ReportByCategoriesState createState() => _ReportByCategoriesState();
 }
@@ -57,7 +57,7 @@ class _ReportByCategoriesState extends State<ReportByCategories> {
     DaoKategori daoKategori = new DaoKategori();
     DaoItemName daoItemName = new DaoItemName();
     daoKeuangan
-        .getKeuanganByPeriode(entryCombobox.startDate, entryCombobox.endDate)
+        .getKeuanganByPeriodeAndJenisTransaksi(widget.enumJenisTransaksi,entryCombobox.startDate, entryCombobox.endDate)
         .then((List<Keuangan> list) {
       _listKeuangan = new List();
       _listKeuangan.addAll(list);
@@ -80,7 +80,7 @@ class _ReportByCategoriesState extends State<ReportByCategories> {
   _getDataKeuanganByPeriode(DateTime startDate, DateTime endDate) {
     DaoKeuangan daoKeuangan = new DaoKeuangan();
     daoKeuangan
-        .getKeuanganByPeriode(startDate, endDate)
+        .getKeuanganByPeriodeAndJenisTransaksi(widget.enumJenisTransaksi,startDate, endDate)
         .then((List<Keuangan> list) {
       _listKeuangan.clear();
       _listKeuangan.addAll(list);
