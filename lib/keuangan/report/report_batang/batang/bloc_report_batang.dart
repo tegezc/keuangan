@@ -42,7 +42,7 @@ class BlocReportBatang {
         .getKeuanganByPeriodeAndJenisTransaksi(
         enumJenisTransaksi, startDate, endDate)
         .then((listKeuangan) {
-      ReportBatangUi reportBatangUi = this._extractToMonthlyReport(listKeuangan,enumItemLaporan);
+      ReportBatangUi reportBatangUi = this._extractToMonthlyReport(year,listKeuangan,enumItemLaporan);
       this._sinkUIKategori(reportBatangUi);
     });
   }
@@ -56,8 +56,7 @@ class BlocReportBatang {
   }
 
 
-  ReportBatangUi _extractToMonthlyReport(List<Keuangan> lk,EnumItemLaporan enumItemLaporan) {
-   // Map<int, double> tmpMk = new Map();
+  ReportBatangUi _extractToMonthlyReport(int year,List<Keuangan> lk,EnumItemLaporan enumItemLaporan) {
     SplayTreeMap<int,double> tmpMk =
     SplayTreeMap<int, double>();
 
@@ -84,6 +83,7 @@ class BlocReportBatang {
     reportBatangUi.enumItemLaporan = enumItemLaporan;
     reportBatangUi.listKeuangan = lk;
     reportBatangUi.listBatangItem = listBatangItem;
+    reportBatangUi.tahun = year;
     return reportBatangUi;
   }
 
@@ -126,6 +126,9 @@ class ReportBatangUi {
   List<Keuangan> listKeuangan;
   List<ReportBatangItem> listBatangItem;
   EnumItemLaporan enumItemLaporan;
+
+  /// null jika laporan tahunan, ada isi jika laporan bulanan
+  int tahun;
 }
 
 class ReportBatangItem {

@@ -48,7 +48,7 @@ class BlocCfReportBatang {
         lBatangItemPengeluaran,
         lkPemasukan,
         lkPengeluaran,
-        enumItemLaporan);
+        enumItemLaporan,year);
 
     this._sinkUIKategori(reportBatangCashFlowUi);
   }
@@ -72,7 +72,7 @@ class BlocCfReportBatang {
         lBatangItemPengeluaran,
         lkPemasukan,
         lkPengeluaran,
-        enumItemLaporan);
+        enumItemLaporan,null);
 
     this._sinkUIKategori(reportBatangCashFlowUi);
   }
@@ -142,10 +142,13 @@ class ReportBatangCashFlowUi {
   List<Keuangan> listKeuanganPengeluaran;
   EnumItemLaporan enumItemLaporan;
 
+  /// null jika laporan tahuna, ada isi jika bulanan
+  int year;
+
   ReportBatangCashFlowUi(
       this.listPemasukan,
       this.listPengeluaran,
       this.listKeuanganPemasukan,
       this.listKeuanganPengeluaran,
-      this.enumItemLaporan);
+      this.enumItemLaporan,this.year);
 }
