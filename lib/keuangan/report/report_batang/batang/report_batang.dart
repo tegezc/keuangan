@@ -16,6 +16,7 @@ class ReportBatang extends StatefulWidget {
 class _ReportBatangState extends State<ReportBatang> {
   BlocReportBatang _blocReportBatang;
   String _titleAppBar;
+  String _colorCharts;
 
   @override
   void initState() {
@@ -24,18 +25,28 @@ class _ReportBatangState extends State<ReportBatang> {
     super.initState();
   }
 
+  @override
+  void dispose(){
+    _blocReportBatang.dispose();
+    super.dispose();
+  }
+
   _setupInitial(){
     int year = DateTime.now().year;
     if(widget.enumItemLaporan == EnumItemLaporan.pmByMonth){
+      _colorCharts = '#78AB46';
       _titleAppBar = 'Laporan Pemasukan Bulanan';
       _blocReportBatang.prosesPemasukanByMonth(year);
     }else if (widget.enumItemLaporan == EnumItemLaporan.pmByYear){
+      _colorCharts = '#78AB46';
       _titleAppBar = 'Laporan Pemasukan Tahunan';
       _blocReportBatang.prosesPemasukanByYears();
     }else if (widget.enumItemLaporan == EnumItemLaporan.pgByMonthly){
+      _colorCharts = '#FF3333';
       _titleAppBar = 'Laporan Pengeluaran Bulanan';
       _blocReportBatang.prosesPengeluaranByMonth(year);
     }else if (widget.enumItemLaporan == EnumItemLaporan.pgByYearly){
+      _colorCharts = '#FF3333';
       _titleAppBar = 'Laporan Pengeluaran Tahunan';
       _blocReportBatang.prosesPengeluaranByYears();
     }
@@ -47,7 +58,7 @@ class _ReportBatangState extends State<ReportBatang> {
     return [
       new charts.Series<ReportBatangItem, String>(
         id: 'Sales',
-        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+        colorFn: (_, __) => charts.Color.fromHex(code: _colorCharts),
         domainFn: (ReportBatangItem sales, _) => sales.xvalue,
         measureFn: (ReportBatangItem sales, _) => sales.yvalue,
         data: listData,
@@ -69,22 +80,25 @@ class _ReportBatangState extends State<ReportBatang> {
           } else {
             return Scaffold(
               appBar: AppBar(
-                title: Text(_titleAppBar),
+                title: Text(_titleAppBar,style: TextStyle(fontSize: 14),),
               ),
               body: Container(
                   width: double.infinity,
                   child: SingleChildScrollView(
                       child: Column(
                     children: <Widget>[
-                      Container(
-                          width: double.infinity,
-                          height: 400,
-                          child: ChartBatangSimple(_dataForCharts(snapshot.data.listBatangItem))),
-                      Container(
-                        height: 300,
-                        color: Colors.green,
-                        child: Text('Ora po po'),
+                      Padding(
+                        padding: const EdgeInsets.only(left:5.0,right: 0.0),
+                        child: Container(
+                            width: double.infinity,
+                            height: 400,
+                            child: ChartBatangSimple(_dataForCharts(snapshot.data.listBatangItem))),
                       ),
+//                      Container(
+//                        height: 300,
+//                        color: Colors.green,
+//                        child: Text('Ora po po'),
+//                      ),
                     ],
                   ))),
             );
@@ -118,7 +132,7 @@ class ChartBatangSimple extends StatelessWidget {
               minimumPaddingBetweenLabelsPx: 0,
               labelStyle: new charts.TextStyleSpec(
                   fontSize: 9
-              )
+              ),
           )
       ),
     );

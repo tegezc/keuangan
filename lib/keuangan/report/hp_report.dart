@@ -70,13 +70,13 @@ class _HpReportState extends State<HpReport> {
         'Membandingkan pemasukan dan pengeluaran tiap bulan.',
         EnumJenisLaporan.flowcash,
         EnumItemLaporan.cfMonthly,
-        CfReportBatang());
+        CfReportBatang(EnumItemLaporan.cfMonthly));
     _mReport[EnumItemLaporan.cfYearly] = new HpUiItemLaporan(
         'Cash Flow Tahunan',
         'Membandingkan pemasukan dan pengeluaran per tahun.',
         EnumJenisLaporan.flowcash,
         EnumItemLaporan.cfYearly,
-        CfReportBatang());
+        CfReportBatang(EnumItemLaporan.cfYearly));
   }
 
   Widget _cellReport(HpUiItemLaporan hpUiItemLaporan) {

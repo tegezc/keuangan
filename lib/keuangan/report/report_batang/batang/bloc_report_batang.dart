@@ -1,9 +1,12 @@
+import 'dart:collection';
+
 import 'package:keuangan/database/keuangan/dao_keuangan.dart';
 import 'package:keuangan/keuangan/report/hp_report.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/global_data.dart';
 import 'package:rxdart/subjects.dart';
+
 
 class BlocReportBatang {
   final BehaviorSubject<ReportBatangUi> _uiReportBatang = BehaviorSubject();
@@ -54,7 +57,9 @@ class BlocReportBatang {
 
 
   ReportBatangUi _extractToMonthlyReport(List<Keuangan> lk,EnumItemLaporan enumItemLaporan) {
-    Map<int, double> tmpMk = new Map();
+   // Map<int, double> tmpMk = new Map();
+    SplayTreeMap<int,double> tmpMk =
+    SplayTreeMap<int, double>();
 
     /// di simpan di tmpmap<int,double> krn untuk akurasi, untuk menhandle suatu
     /// saat jikamenggunakan mata uang selain rupoiah, dimana angka dibelakang
@@ -83,7 +88,8 @@ class BlocReportBatang {
   }
 
   ReportBatangUi _extractToYearlyReport(List<Keuangan> lk,EnumItemLaporan enumItemLaporan) {
-    Map<int, double> tmpMk = new Map();
+    SplayTreeMap<int,double> tmpMk =
+    SplayTreeMap<int, double>();
 
     /// di simpan di tmpmap<int,double> krn untuk akurasi, untuk menhandle suatu
     /// saat jikamenggunakan mata uang selain rupoiah, dimana angka dibelakang
@@ -109,6 +115,10 @@ class BlocReportBatang {
     reportBatangUi.listKeuangan = lk;
     reportBatangUi.listBatangItem = listBatangItem;
     return reportBatangUi;
+  }
+
+  void dispose(){
+    _uiReportBatang.close();
   }
 }
 
