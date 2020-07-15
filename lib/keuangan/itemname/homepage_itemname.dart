@@ -99,7 +99,7 @@ class _HomePageItemNameState extends State<HomePageItemName> {
       }
     }
 
-    lW.add(SizedBox(height: 150.0,));
+    lW.add(SizedBox(height: 200.0,));
 
     return lW;
   }
@@ -111,6 +111,7 @@ class _HomePageItemNameState extends State<HomePageItemName> {
       _blocHomepageItemName
           .populateSemuaItemNameFromDb(EnumStatePopulateItemName.firsttime);
     }
+
     return StreamBuilder<ItemUIHomepageItemName>(
         stream: _blocHomepageItemName.listItemNameStream,
         builder: (context, snapshot) {
@@ -125,18 +126,10 @@ class _HomePageItemNameState extends State<HomePageItemName> {
 
             //////////////
 
-            return Scaffold(
-              drawer: widget.drawer,
-              appBar: new AppBar(
-                title: new Text('Item Cepat'),
-              ),
-              body: ListView(
-                scrollDirection: Axis.vertical,
-                children: _listWidgetItemName(
-                    snapshot.data.listPengeluaran, snapshot.data.listPemasukan),
-              ),
-              floatingActionButton: new FloatingActionButton(
-                onPressed: () async {
+            final List<Widget> _actionButtons = new List();
+            _actionButtons.add(IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () async{
                   int res =
                       await _commonUi.openPage(context, ItemNameEntry.baru());
 
@@ -150,10 +143,37 @@ class _HomePageItemNameState extends State<HomePageItemName> {
                     String messageToast = 'Item berhasil di simpan.';
                     _commonUi.showToastBottom(messageToast);
                   }
-                },
-                tooltip: 'add Item',
-                child: new Icon(Icons.add),
+                }));
+            return Scaffold(
+              drawer: widget.drawer,
+              appBar: new AppBar(
+                title: new Text('Item Cepat'),
+                actions: _actionButtons,
               ),
+              body: ListView(
+                scrollDirection: Axis.vertical,
+                children: _listWidgetItemName(
+                    snapshot.data.listPengeluaran, snapshot.data.listPemasukan),
+              ),
+//              floatingActionButton: new FloatingActionButton(
+//                onPressed: () async {
+//                  int res =
+//                      await _commonUi.openPage(context, ItemNameEntry.baru());
+//
+//                  //prevent snacbar showing
+//                  if (res == null) {
+//                    _enumState = null;
+//                  } else if (res == 1) {
+//                    /// 1 konstanta penanda save success
+//                    _blocHomepageItemName.populateSemuaItemNameFromDb(
+//                        EnumStatePopulateItemName.savesuccess);
+//                    String messageToast = 'Item berhasil di simpan.';
+//                    _commonUi.showToastBottom(messageToast);
+//                  }
+//                },
+//                tooltip: 'add Item',
+//                child: new Icon(Icons.add),
+//              ),
             );
           } else {
             _enumState = null;

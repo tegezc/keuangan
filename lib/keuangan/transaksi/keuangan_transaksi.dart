@@ -416,6 +416,7 @@ class _TransactionKeuanganState extends State<TransactionKeuangan> {
                   dateTime: DateTime.now(),
                   isEditMode: false,
                   keuangan: null,
+                  enumJenisTransaksi: EnumJenisTransaksi.pengeluaran,
                 ));
             if (res == EnumFinalResult.success) {
               _fullReload();

@@ -140,12 +140,19 @@ class _CellKeuanganState extends State<CellKeuangan> {
   }
 
   _edit(Entry entry) async {
+    EnumJenisTransaksi enumJenisTransaksi ;
+    if(entry.keuangan.jenisTransaksi == 0){
+      enumJenisTransaksi = EnumJenisTransaksi.pengeluaran;
+    }else{
+      enumJenisTransaksi = EnumJenisTransaksi.pemasukan;
+    }
     await openPage(
         context,
         KeuanganItemView(
           dateTime: DateTime.now(),
           isEditMode: true,
           keuangan: entry.keuangan,
+          enumJenisTransaksi: enumJenisTransaksi,
         ));
     Navigator.of(context).pop();
   }

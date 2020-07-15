@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:keuangan/util/colors_utility.dart';
 
 /// untuk style yang tak terpengaruh baik mode normal maupun mode dark
 class StyleUi {
@@ -51,11 +52,12 @@ class AppTheme {
   static final _captionDark = new TextStyle(fontSize: 14, color: Colors.white);
 
   static Color _iconColor = Colors.cyan[600];
+//  static Color _iconColor = HexColor('#00acee');
 
-  static const Color _lightPrimaryColor = Colors.white;
-  static const Color _lightPrimaryVariantColor = Color(0XFFE1E1E1);
-  static const Color _lightSecondaryColor = Colors.green;
-  static const Color _lightOnPrimaryColor = Colors.black;
+//  static const Color _lightPrimaryColor = Colors.white;
+//  static const Color _lightPrimaryVariantColor = Color(0XFFE1E1E1);
+//  static const Color _lightSecondaryColor = Colors.green;
+//  static const Color _lightOnPrimaryColor = Colors.black;
 
   static const Color _darkPrimaryColor = Colors.white;
   static const Color _darkPrimaryVariantColor = Colors.black;
@@ -63,23 +65,25 @@ class AppTheme {
   static const Color _darkOnPrimaryColor = Colors.white;
 
   static final ThemeData lightTheme = ThemeData(
+
     primaryColor: Colors.white,
     accentColor: Colors.cyan[600],
     fontFamily: 'Opensans',
-    scaffoldBackgroundColor: _lightPrimaryVariantColor,
-    appBarTheme: AppBarTheme(
-      color: _lightPrimaryVariantColor,
-      iconTheme: IconThemeData(color: _lightOnPrimaryColor),
-    ),
-    colorScheme: ColorScheme.light(
-      primary: _lightPrimaryColor,
-      primaryVariant: _lightPrimaryVariantColor,
-      secondary: _lightSecondaryColor,
-      onPrimary: _lightOnPrimaryColor,
-    ),
-    iconTheme: IconThemeData(
-      color: _iconColor,
-    ),
+ //   textTheme: TextTheme(),
+//    scaffoldBackgroundColor: _lightPrimaryVariantColor,
+//    appBarTheme: AppBarTheme(
+//      color: _lightPrimaryVariantColor,
+//      iconTheme: IconThemeData(color: _lightOnPrimaryColor),
+//    ),
+//    colorScheme: ColorScheme.light(
+//      primary: _lightPrimaryColor,
+//      primaryVariant: _lightPrimaryVariantColor,
+//      secondary: _lightSecondaryColor,
+//      onPrimary: _lightOnPrimaryColor,
+ //   ),
+//    iconTheme: IconThemeData(
+//      color: _iconColor,
+//    ),
     textTheme: _lightTextTheme,
   );
 

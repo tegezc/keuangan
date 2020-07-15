@@ -169,15 +169,27 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
   }
 
   _edit(Entry entry) async {
-    int res = await openPage(
+    EnumJenisTransaksi enumJenisTransaksi ;
+    if(entry.keuangan.jenisTransaksi == 0){
+      enumJenisTransaksi = EnumJenisTransaksi.pengeluaran;
+    }else{
+      enumJenisTransaksi = EnumJenisTransaksi.pemasukan;
+    }
+    EnumFinalResult res = await openPage(
         context,
         KeuanganItemView(
           dateTime: DateTime.now(),
           isEditMode: true,
           keuangan: entry.keuangan,
+          enumJenisTransaksi: enumJenisTransaksi,
         ));
+    if (res == EnumFinalResult.success) {
+      _blocHpKeuangan.fullReload();
+    } else {
+      /// TODO gagal
+    }
     print('res : $res');
-    Navigator.of(context).pop(res);
+    Navigator.of(context).pop();
   }
 
   _deleteConfirmed(Entry entry) {
@@ -215,14 +227,15 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
      List<Keuangan> lKeuangan = data.listKeuangan;
       for(int i = 0; i< lKeuangan.length;i++){
         Keuangan ke = lKeuangan[i];
-      Keuangan copyKeuangan = new Keuangan.fromUI(ke.tanggal, ke.idItemName, ke.jumlah, ke.catatan);
-      copyKeuangan.lazyItemName = ke.lazyItemName;
+
+//      Keuangan copyKeuangan = new Keuangan.fromUI(ke.tanggal, ke.idItemName, ke.jumlah, ke.catatan);
+//      copyKeuangan.lazyItemName = ke.lazyItemName;
 
         lw.add(FlatButton(
             onPressed: () {
-              _showDialogPilihan(copyKeuangan);
+              _showDialogPilihan(ke);
             },
-            child: CellKeuanganStateLess(copyKeuangan)));
+            child: CellKeuanganStateLess(ke)));
       }
     }
     return lw;
@@ -264,6 +277,7 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
                         dateTime: DateTime.now(),
                         isEditMode: false,
                         keuangan: null,
+                        enumJenisTransaksi: EnumJenisTransaksi.pengeluaran,
                       ));
                   if (res == EnumFinalResult.success) {
                     _blocHpKeuangan.fullReload();

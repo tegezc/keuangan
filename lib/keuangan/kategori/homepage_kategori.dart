@@ -221,18 +221,11 @@ class _HomePageKategoriState extends State<HomePageKategori> {
             }
             WidgetsBinding.instance.addPostFrameCallback(
                 (_) => _eksekusiAfterBuild(context, snapshot.data));
-            return Scaffold(
-              drawer: widget.drawer,
-              appBar: new AppBar(
-                title: new Text('Kategori'),
-              ),
-              body: ListView(
-                scrollDirection: Axis.vertical,
-                children: _listKategori(snapshot.data.listKategoriPengeluaran,
-                    snapshot.data.listKategoriPemasukan),
-              ),
-              floatingActionButton: new FloatingActionButton(
-                onPressed: () async {
+            final List<Widget> _actionButtons = new List();
+            _actionButtons.add(IconButton(
+                icon: Icon(Icons.add),
+               // color: Colors.blue,
+                onPressed: () async{
                   int res = await openPage(context, AddCategory.baru());
                   //prevent snacbar showing
                   if (res == null) {
@@ -242,10 +235,33 @@ class _HomePageKategoriState extends State<HomePageKategori> {
                     _blocHomepageKategori.populateAllKategoriFromDb(
                         EnumStatePopulateKategori.savesuccess);
                   }
-                },
-                tooltip: 'add kategori',
-                child: new Icon(Icons.add),
+                }));
+            return Scaffold(
+              drawer: widget.drawer,
+              appBar: new AppBar(
+                title: new Text('Kategori'),
+                actions: _actionButtons,
               ),
+              body: ListView(
+                scrollDirection: Axis.vertical,
+                children: _listKategori(snapshot.data.listKategoriPengeluaran,
+                    snapshot.data.listKategoriPemasukan),
+              ),
+//              floatingActionButton: new FloatingActionButton(
+//                onPressed: () async {
+//                  int res = await openPage(context, AddCategory.baru());
+//                  //prevent snacbar showing
+//                  if (res == null) {
+//                    _enumState = null;
+//                  } else {
+//                    _counterSaveSuccess = 0;
+//                    _blocHomepageKategori.populateAllKategoriFromDb(
+//                        EnumStatePopulateKategori.savesuccess);
+//                  }
+//                },
+//                tooltip: 'add kategori',
+//                child: new Icon(Icons.add),
+//              ),
             );
           } else {
             _enumState = null;

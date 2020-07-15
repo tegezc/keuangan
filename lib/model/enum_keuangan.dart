@@ -37,3 +37,8 @@ enum EnumStateFromBloc{
   finish,
   error
 }
+
+enum EnumPopupAction{
+  simpan,
+  update
+}

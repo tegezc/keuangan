@@ -88,6 +88,29 @@ class DaoKategori {
     return kategories;
   }
 
+  Future<List<Kategori>> getAllKategoriTermasukAbadi(EnumJenisTransaksi enumJenisTransaksi) async {
+    int i = 1;
+    if (enumJenisTransaksi == EnumJenisTransaksi.pengeluaran) {
+      i = 0;
+    }
+    var dbClient = await DatabaseHelper().db;
+    List<Map> list = await dbClient
+        .rawQuery('SELECT * FROM ${tb.name} WHERE ${tb.fType}=$i ORDER BY ${tb.fNama}');
+
+    List<Kategori> kategories = new List();
+    for (int i = 0; i < list.length; i++) {
+      EnumJenisTransaksi type = EnumJenisTransaksi.values[list[i][tb.fType]];
+      var kategori = new Kategori(list[i][tb.fNama], list[i][tb.fIdParent],
+          type, list[i][tb.fCatatan], list[i][tb.fColor]);
+      kategori.setId(list[i][tb.fId]);
+
+      kategories.add(kategori);
+    }
+
+    return kategories;
+  }
+
+
   Future<List<Kategori>> getMainKategoriByJenisTrxTanpaAbadi(
       EnumJenisTransaksi enumJenisTransaksi) async {
     var dbClient = await DatabaseHelper().db;

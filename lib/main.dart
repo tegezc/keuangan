@@ -4,7 +4,6 @@ import 'package:keuangan/file_non_production/bulk_insert.dart';
 import 'package:keuangan/keuangan/itemname/homepage_itemname.dart';
 import 'package:keuangan/keuangan/kategori/homepage_kategori.dart';
 import 'package:keuangan/keuangan/report/hp_report.dart';
-import 'package:keuangan/keuangan/report/reporting_by_kategori/reporting_bykategori.dart';
 import 'package:keuangan/keuangan/transaksi/keuangan_transaksi.dart';
 import 'package:flutter/material.dart';
 import 'package:keuangan/util/common_ui.dart';
@@ -32,7 +31,7 @@ class MyApp extends StatelessWidget {
 //        textTheme: TextTheme(),
 //      ),
       theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.lightTheme,
+//      darkTheme: AppTheme.lightTheme,
       home: MyHomePage(),
       navigatorObservers: <NavigatorObserver>[
         SwipeBackObserver(),

@@ -1,9 +1,9 @@
 class SetupApp{
 
-  bool setupKalender(){}
-  bool setupKategori(){}
-  bool checkIsNeedSetup(){
+//  bool setupKalender(){}
+//  bool setupKategori(){}
+//  bool checkIsNeedSetup(){
 
-  }
+ // }
 
 }

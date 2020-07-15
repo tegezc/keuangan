@@ -89,6 +89,7 @@ class _HpReportState extends State<HpReport> {
     return Padding(
       padding: const EdgeInsets.only(top:8.0,bottom: 0.0,right: 8,left: 8),
       child: RaisedButton(
+        color: Colors.white,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(5.0),
             side: BorderSide(color: color)
