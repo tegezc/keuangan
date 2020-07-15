@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:keuangan/keuangan/itemname/bloc_hpitemname.dart';
 import 'package:keuangan/keuangan/itemname/itemname_entry.dart';
 import 'package:keuangan/model/keuangan.dart';
@@ -19,9 +20,10 @@ class _HomePageItemNameState extends State<HomePageItemName> {
   EnumStatePopulateItemName _enumState;
   int _counterBuild = 0;
   CommonUi _commonUi;
-
+  FlutterToast _flutterToast;
   @override
   initState() {
+    _flutterToast = FlutterToast(context);
     _commonUi = new CommonUi();
     _blocHomepageItemName = new BlocHomepageItemName();
     super.initState();
@@ -141,7 +143,7 @@ class _HomePageItemNameState extends State<HomePageItemName> {
                     _blocHomepageItemName.populateSemuaItemNameFromDb(
                         EnumStatePopulateItemName.savesuccess);
                     String messageToast = 'Item berhasil di simpan.';
-                    _commonUi.showToastBottom(messageToast);
+                    this._showToast(messageToast);
                   }
                 }));
             return Scaffold(
@@ -254,7 +256,34 @@ class _HomePageItemNameState extends State<HomePageItemName> {
           .populateSemuaItemNameFromDb(EnumStatePopulateItemName.editsuccess);
 
       String messageToast = 'Item berhasil di update';
-      _commonUi.showToastBottom(messageToast);
+      this._showToast(messageToast);
     }
+  }
+
+  _showToast(String messageToast) {
+    Widget toast = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25.0),
+        color: Colors.greenAccent,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.check),
+          SizedBox(
+            width: 12.0,
+          ),
+          Text(messageToast),
+        ],
+      ),
+    );
+
+
+    _flutterToast.showToast(
+      child: toast,
+      gravity: ToastGravity.BOTTOM,
+      toastDuration: Duration(seconds: 2),
+    );
   }
 }

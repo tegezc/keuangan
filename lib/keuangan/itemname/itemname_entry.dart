@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:keuangan/database/db_utility.dart';
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/database/keuangan/dao_kategori.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
-import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/loading_view.dart';
 
 class ItemNameEntry extends StatefulWidget {
@@ -31,16 +31,15 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
   EnumJenisTransaksi _cacheJnsTransaksi;
 
   TextEditingController _txtController;
-  CommonUi _commonUi;
   final TextStyle _styleTextDesc = TextStyle(fontSize: 12,fontWeight: FontWeight.bold,color: Colors.blue);
   final _decorationNama = InputDecoration(
     // border: OutlineInputBorder(),
     hintText: 'nama item',
   );
-
+  FlutterToast _flutterToast;
   @override
   void initState() {
-    _commonUi = new CommonUi();
+    _flutterToast = FlutterToast(context);
     print(widget.itemName.toString());
     _txtController = new TextEditingController();
     _populateKategori();
@@ -118,7 +117,7 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
           messageToast = 'Item sudah ada';
         }
         if (isShowToast) {
-          _commonUi.showToastBottom(messageToast);
+          this._showToast(messageToast);
         }
       });
     } else {
@@ -153,7 +152,7 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
             messageToast = 'Item sudah ada';
           }
           if (isShowToast) {
-            _commonUi.showToastBottom(messageToast);
+            this._showToast(messageToast);
           }
         });
       }
@@ -274,6 +273,33 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
     setState(() {
 
     });
+  }
+
+  _showToast(String messageToast) {
+    Widget toast = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25.0),
+        color: Colors.greenAccent,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.check),
+          SizedBox(
+            width: 12.0,
+          ),
+          Text(messageToast),
+        ],
+      ),
+    );
+
+
+    _flutterToast.showToast(
+      child: toast,
+      gravity: ToastGravity.BOTTOM,
+      toastDuration: Duration(seconds: 2),
+    );
   }
 }
 

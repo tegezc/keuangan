@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:keuangan/keuangan/kategori/subkategori/add_subkategori.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
@@ -20,8 +21,7 @@ class HomePageKategori extends StatefulWidget {
 class _HomePageKategoriState extends State<HomePageKategori> {
   BlocHomepageKategori _blocHomepageKategori;
   EnumStatePopulateKategori _enumState;
-  CommonUi _commonUi;
-
+  FlutterToast _flutterToast;
   /// COUNTER UI
   int _counterBuild = 0;
   int _counterSaveSuccess = 0;
@@ -31,7 +31,7 @@ class _HomePageKategoriState extends State<HomePageKategori> {
 
   @override
   initState() {
-    _commonUi = new CommonUi();
+    _flutterToast = FlutterToast(context);
     _blocHomepageKategori = new BlocHomepageKategori();
     super.initState();
   }
@@ -180,24 +180,24 @@ class _HomePageKategoriState extends State<HomePageKategori> {
         _counterSaveSuccess == 0) {
       _counterSaveSuccess++;
       String messageToast = 'Kategori berhasil di simpan.';
-      _commonUi.showToastBottom(messageToast);
+      this._showToast(messageToast);
     } else if (data.enumState == EnumStatePopulateKategori.editsuccess &&
         _counterEditSuccess == 0) {
       _counterEditSuccess++;
       String messageToast = 'Kategori berhasil di ubah.';
-      _commonUi.showToastBottom(messageToast);
+      this._showToast(messageToast);
     } else if (data.enumState ==
             EnumStatePopulateKategori.editSubkategorisuccess &&
         _counterEditSubKategoriSuccess == 0) {
       _counterEditSubKategoriSuccess++;
       String messageToast = 'Subkategori berhasil di ubah.';
-      _commonUi.showToastBottom(messageToast);
+      this._showToast(messageToast);
     } else if (data.enumState ==
             EnumStatePopulateKategori.saveSubkategorisuccess &&
         _counterSaveSubKategoriSuccess == 0) {
       _counterSaveSubKategoriSuccess++;
       String messageToast = 'Subkategori berhasil di simpan.';
-      _commonUi.showToastBottom(messageToast);
+      this._showToast(messageToast);
     }
   }
 
@@ -395,5 +395,32 @@ class _HomePageKategoriState extends State<HomePageKategori> {
       _blocHomepageKategori.populateAllKategoriFromDb(
           EnumStatePopulateKategori.editSubkategorisuccess);
     }
+  }
+
+  _showToast(String messageToast) {
+    Widget toast = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25.0),
+        color: Colors.greenAccent,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.check),
+          SizedBox(
+            width: 12.0,
+          ),
+          Text(messageToast),
+        ],
+      ),
+    );
+
+
+    _flutterToast.showToast(
+      child: toast,
+      gravity: ToastGravity.BOTTOM,
+      toastDuration: Duration(seconds: 2),
+    );
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:keuangan/util/colors_utility.dart';
 
 /// untuk style yang tak terpengaruh baik mode normal maupun mode dark
 class StyleUi {
