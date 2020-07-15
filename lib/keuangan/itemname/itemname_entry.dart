@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:keuangan/database/db_utility.dart';
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/database/keuangan/dao_kategori.dart';
+import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/loading_view.dart';
@@ -21,12 +22,21 @@ class ItemNameEntry extends StatefulWidget {
 }
 
 class _ItemNameEntryState extends State<ItemNameEntry> {
-  List<Kategori> _listKategori;
+  List<Kategori> _listKategoriPengeluaran;
+  List<Kategori> _listKategoriPemasukan;
+
   List<DropdownMenuItem<Kategori>> _dropDownKategory;
   Kategori _currentCatogery;
 
+  EnumJenisTransaksi _cacheJnsTransaksi;
+
   TextEditingController _txtController;
   CommonUi _commonUi;
+  final TextStyle _styleTextDesc = TextStyle(fontSize: 12,fontWeight: FontWeight.bold,color: Colors.blue);
+  final _decorationNama = InputDecoration(
+    // border: OutlineInputBorder(),
+    hintText: 'nama item',
+  );
 
   @override
   void initState() {
@@ -44,29 +54,33 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
   }
 
   _populateKategori() {
-    _listKategori = new List();
-    DaoKategori daoKategori = new DaoKategori();
-    daoKategori.getAllKategori().then((kategories) {
-      if (kategories != null) {
-        _listKategori.addAll(kategories);
-        if (_listKategori.length > 0) {
-          _dropDownKategory = this._getDropDownKategori();
-          _currentCatogery = _dropDownKategory[0].value;
-        }
-        if (widget.stateItemName == StateItemNameEntry.edit) {
-          for (int i = 0; i < _dropDownKategory.length; i++) {
-            Kategori k = _dropDownKategory[i].value;
+    _initialitationKategori().then((value) {
+      if (widget.stateItemName == StateItemNameEntry.edit) {
+        for (int i = 0; i < _dropDownKategory.length; i++) {
+          Kategori k = _dropDownKategory[i].value;
 
-            if (k.id == widget.itemName.idKategori) {
-              _currentCatogery = _dropDownKategory[i].value;
-              break;
-            }
+          if (k.id == widget.itemName.idKategori) {
+            _currentCatogery = _dropDownKategory[i].value;
+            break;
           }
-          _txtController.text = widget.itemName.nama;
         }
-        setState(() {});
+        _txtController.text = widget.itemName.nama;
       }
+      setState(() {});
     });
+  }
+
+  Future<bool> _initialitationKategori()async{
+    DaoKategori daoKategori = new DaoKategori();
+    _listKategoriPemasukan = await daoKategori.getAllKategoriTermasukAbadi(EnumJenisTransaksi.pemasukan);
+    _listKategoriPengeluaran = await daoKategori.getAllKategoriTermasukAbadi(EnumJenisTransaksi.pengeluaran);
+    if (widget.stateItemName == StateItemNameEntry.baru){
+      _cacheJnsTransaksi = EnumJenisTransaksi.pengeluaran;
+      _dropDownKategory = this._getDropDownKategori(EnumJenisTransaksi.pengeluaran);
+      _currentCatogery = _dropDownKategory[0].value;
+    }
+
+      return true;
   }
 
   /// ada 2 kondisi
@@ -146,9 +160,15 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
     }
   }
 
-  List<DropdownMenuItem<Kategori>> _getDropDownKategori() {
+  List<DropdownMenuItem<Kategori>> _getDropDownKategori(EnumJenisTransaksi enumJenisTransaksi) {
     List<DropdownMenuItem<Kategori>> items = new List();
-    for (Kategori ktgori in _listKategori) {
+    List<Kategori> lk;
+    if(enumJenisTransaksi == EnumJenisTransaksi.pengeluaran){
+      lk = _listKategoriPengeluaran;
+    }else{
+      lk = _listKategoriPemasukan;
+    }
+    for (Kategori ktgori in lk) {
       items.add(new DropdownMenuItem(
         value: ktgori,
         child: new Text(ktgori.nama),
@@ -157,8 +177,25 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
     return items;
   }
 
+  List<DropdownMenuItem<EnumJenisTransaksi>> _getDropDownTransaksi() {
+    List<DropdownMenuItem<EnumJenisTransaksi>> items = new List();
+
+    items.add(new DropdownMenuItem(
+      value: EnumJenisTransaksi.pengeluaran,
+      child: new Text('Pengeluaran'),
+    ));
+
+    items.add(new DropdownMenuItem(
+      value: EnumJenisTransaksi.pemasukan,
+      child: new Text('Pemasukan'),
+    ));
+
+    return items;
+  }
+
   @override
   Widget build(BuildContext context) {
+
     // controll disable dropdown kategori
     String title = 'Ubah Item';
     if (widget.stateItemName == StateItemNameEntry.baru) {
@@ -166,9 +203,12 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
     } else if (widget.stateItemName == StateItemNameEntry.edit &&
         widget.itemName == null) {}
 
-    if (_listKategori.isEmpty) {
+    if (_listKategoriPemasukan == null) {
       return LoadingView();
     } else {
+      final List<DropdownMenuItem<EnumJenisTransaksi>> _dropDownTransaksi =
+      _getDropDownTransaksi();
+
       return Scaffold(
         appBar: AppBar(
           title: Text(title),
@@ -194,15 +234,22 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Text('Kategori'),
+                Text('Jenis Transaksi:',style: _styleTextDesc,),
+                new DropdownButton(
+                  value: _cacheJnsTransaksi,
+                  items: _dropDownTransaksi,
+                  onChanged: _changedDropDownTransaksi,
+                ),
+                Text('Kategori:',style: _styleTextDesc,),
                 new DropdownButton(
                   disabledHint: Text(""),
                   value: _currentCatogery,
                   items: _dropDownKategory,
                   onChanged: changedDropDownKategori,
                 ),
-                Text('Nama item'),
+                Text('Nama item:',style: _styleTextDesc,),
                 TextField(
+                  decoration: _decorationNama,
                   controller: _txtController,
                   maxLines: 1,
                 ),
@@ -217,6 +264,15 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
   void changedDropDownKategori(Kategori selectedCategory) {
     setState(() {
       _currentCatogery = selectedCategory;
+    });
+  }
+
+  void _changedDropDownTransaksi(EnumJenisTransaksi selectedTransaksi) {
+    _cacheJnsTransaksi = selectedTransaksi;
+    _dropDownKategory = this._getDropDownKategori(selectedTransaksi);
+    _currentCatogery = _dropDownKategory[0].value;
+    setState(() {
+
     });
   }
 }

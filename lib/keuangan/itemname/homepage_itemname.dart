@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:keuangan/keuangan/itemname/itemname_bloc.dart';
+import 'package:keuangan/keuangan/itemname/bloc_hpitemname.dart';
 import 'package:keuangan/keuangan/itemname/itemname_entry.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/common_ui.dart';
