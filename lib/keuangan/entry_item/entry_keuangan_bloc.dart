@@ -10,7 +10,10 @@ import 'package:rxdart/subjects.dart';
 
 class BlocEntryKeuangan {
   EntryKeuangan _cacheEntry;
-  Map<int, ItemName> _cacheMapItemName;
+  Map<int, ItemName> _cacheMapItemNamePemasukan;
+  Map<int, ItemName> _cacheMapItemNamePengeluaran;
+  Map<int, Kategori> _cacheMapKategoriPemasukan;
+  Map<int, Kategori> _cacheMapKategoriPangeluaran;
 
   final BehaviorSubject<EntryKeuangan> _entryKeuangan = BehaviorSubject();
   final BehaviorSubject<StateEntryKeuangan> _stateEntryKeuangan =
@@ -27,14 +30,24 @@ class BlocEntryKeuangan {
       finalResult: EnumFinalResult.inprogres,
     );
 
-    _cacheMapItemName = new Map();
+    _cacheMapItemNamePemasukan = new Map();
+    _cacheMapItemNamePengeluaran = new Map();
+    _cacheMapKategoriPemasukan = new Map();
+    _cacheMapKategoriPangeluaran = new Map();
+
     _stateEntryKeuangan.listen((entryState) {
       _cacheEntry.stateEntryKeuangan = entryState.stateEntry;
       switch (entryState.stateEntry) {
         case EnumEntryKeuangan.jenisKeuangan:
           {
             StateJenisKeuangan v = entryState;
+
             _cacheEntry.jenisKeuangan = v.jenisKeuangan;
+            if(v.jenisKeuangan == EnumJenisTransaksi.pemasukan){
+              _cacheEntry.mapKategori = _cacheMapKategoriPemasukan;
+            }else{
+              _cacheEntry.mapKategori = _cacheMapKategoriPangeluaran;
+            }
           }
           break;
         case EnumEntryKeuangan.pickDate:
@@ -53,8 +66,13 @@ class BlocEntryKeuangan {
           {
             StateTypingItem stateTypingItem = entryState;
             String text = stateTypingItem.text;
-            _cacheEntry.mapItemName =
-                this._filterForAutoComplete(text, _cacheMapItemName);
+            if (_cacheEntry.jenisKeuangan == EnumJenisTransaksi.pengeluaran) {
+              _cacheEntry.mapItemName = this
+                  ._filterForAutoComplete(text, _cacheMapItemNamePengeluaran);
+            } else {
+              _cacheEntry.mapItemName =
+                  this._filterForAutoComplete(text, _cacheMapItemNamePemasukan);
+            }
           }
           break;
         case EnumEntryKeuangan.amount:
@@ -186,9 +204,52 @@ class BlocEntryKeuangan {
   }
 
   void _reset() {
-    _cacheEntry.jenisKeuangan = EnumJenisTransaksi.pengeluaran;
+    //  _cacheEntry.jenisKeuangan = EnumJenisTransaksi.pengeluaran;
     _cacheEntry.itemName = null;
     _cacheEntry.keuangan = null;
+  }
+
+  Future<EnumFinalResult> update(String nama, String catatan) async {
+    _cacheEntry.itemName.setNama(nama);
+    _cacheEntry.keuangan.setCatatan(catatan);
+
+    EntryKeuangan entryKeuangan = _cacheEntry;
+
+    DaoItemName daoItemName = new DaoItemName();
+    DaoKeuangan daoKeuangan = new DaoKeuangan();
+    String strItemName = entryKeuangan.itemName.nama;
+    EnumFinalResult enumFinalResult;
+
+    ItemName itemName = await daoItemName.getItemNameByNamaNIdKategori(
+        strItemName, entryKeuangan.itemName.idKategori);
+    if (itemName != null) {
+      entryKeuangan.keuangan.setIdItemName(itemName.id);
+      bool resDb = await daoKeuangan.update1(entryKeuangan.keuangan);
+
+      if (resDb) {
+        enumFinalResult = EnumFinalResult.success;
+      } else {
+        enumFinalResult = EnumFinalResult.failed;
+      }
+    } else {
+      ItemName itemName =
+          new ItemName(strItemName, entryKeuangan.itemName.idKategori, 0);
+      int resDb = await daoItemName.saveItemName(itemName);
+
+      if (resDb > 0) {
+        entryKeuangan.keuangan.setIdItemName(resDb);
+        bool resK = await daoKeuangan.update1(entryKeuangan.keuangan);
+        if (resK) {
+          enumFinalResult = EnumFinalResult.success;
+        } else {
+          enumFinalResult = EnumFinalResult.failed;
+        }
+      } else {
+        enumFinalResult = EnumFinalResult.failed;
+      }
+    }
+
+    return enumFinalResult;
   }
 
   Map<int, ItemName> _filterForAutoComplete(
@@ -221,34 +282,71 @@ class BlocEntryKeuangan {
     return mi;
   }
 
-  void firstTimeLoadData(bool isEditMode, Keuangan kngan) {
-    if (_cacheEntry.mapKategori.isEmpty) {
-      DaoKategori daoKategori = new DaoKategori();
+  void firstTimeLoadData(
+      bool isEditMode, Keuangan kngan, EnumJenisTransaksi enumJenisTransaksi) {
+    _initialitationVariableCache().then((value) {
       DaoItemName daoItemName = new DaoItemName();
-      daoKategori.getAllKategori().then((kategories) {
-        if (kategories != null) {
-          _cacheEntry.mapKategori = _lkategoriToMap(kategories);
-          _cacheEntry.itemName.setKategori(kategories[0]);
-        }
+      DaoKategori daoKategori = new DaoKategori();
+      if (isEditMode && kngan != null) {
+        daoItemName.getItemNameById(kngan.idItemName).then((item) {
+          _cacheEntry.keuangan = kngan;
+          _cacheEntry.itemName = item;
+          _cacheEntry.jenisKeuangan = enumJenisTransaksi;
 
-        daoItemName.getAllItemNameVisible().then((itemNames) {
-          if (itemNames != null) {
-            _cacheMapItemName = this._lItmNameToMap(itemNames);
+          Kategori kt;
+          if (enumJenisTransaksi == EnumJenisTransaksi.pengeluaran) {
+            _cacheEntry.mapItemName = _cacheMapItemNamePengeluaran;
+            _cacheEntry.mapKategori = _cacheMapKategoriPangeluaran;
+            kt = _cacheMapKategoriPangeluaran[_cacheEntry.itemName.idKategori];
+          } else {
+            _cacheEntry.mapItemName = _cacheMapItemNamePemasukan;
+            _cacheEntry.mapKategori = _cacheMapKategoriPemasukan;
+            kt = _cacheMapKategoriPemasukan[_cacheEntry.itemName.idKategori];
           }
-        });
-        if (isEditMode && kngan != null) {
-          daoItemName.getItemNameById(kngan.idItemName).then((item) {
-            _cacheEntry.keuangan = kngan;
-            _cacheEntry.itemName = item;
-            _cacheEntry.itemName.setKategori(
-                _cacheEntry.mapKategori[_cacheEntry.itemName.idKategori]);
-            this._sinkEntryKeuangan(_cacheEntry);
-          });
-        }else{
+          _cacheEntry.itemName.setKategori(kt);
           this._sinkEntryKeuangan(_cacheEntry);
+        });
+      } else {
+        if (enumJenisTransaksi == EnumJenisTransaksi.pengeluaran) {
+          _cacheEntry.mapItemName = _cacheMapItemNamePengeluaran;
+          _cacheEntry.mapKategori = _cacheMapKategoriPangeluaran;
+        } else {
+          _cacheEntry.mapItemName = _cacheMapItemNamePemasukan;
+          _cacheEntry.mapKategori = _cacheMapKategoriPemasukan;
         }
-      });
+        daoKategori.getDefaultKategori(enumJenisTransaksi).then((ktg) {
+          _cacheEntry.itemName.setKategori(ktg);
+          this._sinkEntryKeuangan(_cacheEntry);
+        });
+
+      }
+    });
+  }
+
+  Future<bool> _initialitationVariableCache() async {
+    DaoKategori daoKategori = new DaoKategori();
+    DaoItemName daoItemName = new DaoItemName();
+
+    if (_cacheEntry.mapKategori.isEmpty) {
+      List<Kategori> lkpg = await daoKategori
+          .getAllKategoriTermasukAbadi(EnumJenisTransaksi.pengeluaran);
+      _cacheMapKategoriPangeluaran = _lkategoriToMap(lkpg);
+
+      List<Kategori> lkpm = await daoKategori
+          .getAllKategoriTermasukAbadi(EnumJenisTransaksi.pemasukan);
+      _cacheMapKategoriPemasukan = _lkategoriToMap(lkpm);
+
     }
+
+    if (_cacheEntry.mapItemName.isEmpty) {
+      UiItemNamesLazy uiItemNamesLazy =
+          await daoItemName.getAllItemNameVisibleLazy();
+      _cacheMapItemNamePemasukan =
+          _lItmNameToMap(uiItemNamesLazy.listPemasukan);
+      _cacheMapItemNamePengeluaran =
+          _lItmNameToMap(uiItemNamesLazy.listPengeluaran);
+    }
+    return true;
   }
 
   void dispose() {

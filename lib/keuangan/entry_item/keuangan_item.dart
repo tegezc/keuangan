@@ -4,17 +4,29 @@ import 'package:keuangan/keuangan/entry_item/dialog_calculator.dart';
 import 'package:keuangan/keuangan/entry_item/entry_keuangan_bloc.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
+import 'package:keuangan/util/colors_utility.dart';
 import 'package:keuangan/util/datepicker_singlescrollview.dart';
 import 'package:keuangan/util/loading_view.dart';
 import 'package:keuangan/util/process_string.dart';
 
 class KeuanganItemView extends StatefulWidget {
+  /// bernilai null jika edit mode
   final DateTime dateTime;
+
+  /// penanda edit mode
   final bool isEditMode;
+
+  /// jika edit mode maka tidak boleh null
   final Keuangan keuangan;
 
+  /// jika baru, maka tidak boleh null
+  final EnumJenisTransaksi enumJenisTransaksi;
+
   KeuanganItemView(
-      {this.dateTime, @required this.isEditMode, @required this.keuangan});
+      {this.dateTime,
+      @required this.isEditMode,
+      @required this.keuangan,
+      @required this.enumJenisTransaksi});
 
   @override
   _KeuanganItemViewState createState() => _KeuanganItemViewState();
@@ -54,6 +66,8 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
   String _cacheTextItemName = '';
   EnumEntryKeuangan _cacheStateEntry;
 
+  int _counterBuild = 0;
+
   @override
   dispose() {
     _controllerAutoComplete.dispose();
@@ -76,20 +90,6 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
     _controllerAutoComplete = ScrollController();
     _controllerTextItem = TextEditingController()
       ..addListener(_editingListener);
-    if (widget.isEditMode) {
-      int idItemname = widget.keuangan.idItemName;
-      DaoItemName daoItemName = new DaoItemName();
-      daoItemName.getItemNameById(idItemname).then((item) {
-        if (item != null) {
-          _txtNoteController.text = widget.keuangan.catatan;
-          _controllerTextItem.text = item.nama;
-          _blocEntryKeuangan.firstTimeLoadData(
-              widget.isEditMode, widget.keuangan);
-        }
-      });
-    } else {
-      _blocEntryKeuangan.firstTimeLoadData(widget.isEditMode, widget.keuangan);
-    }
 
     super.initState();
   }
@@ -143,6 +143,12 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
           _controllerTextItem.text, _txtNoteController.text);
       Navigator.pop(context, enumFinalResult);
     }
+  }
+
+  _updateKeuangan(BuildContext context) async {
+    EnumFinalResult enumFinalResult = await _blocEntryKeuangan.update(
+        _controllerTextItem.text, _txtNoteController.text);
+    Navigator.pop(context, enumFinalResult);
   }
 
   PropertyAutoComplete _setupAutoComplete(Size sizeWidget, double insetsBottom,
@@ -275,17 +281,6 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
         ));
       });
     }
-    listWidget.add(Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: new RaisedButton(
-          color: Colors.blueAccent,
-          child: new Text("Add Category"),
-          onPressed: () {
-            Navigator.pop(context, null);
-          },
-          shape: new RoundedRectangleBorder(
-              borderRadius: new BorderRadius.circular(15.0))),
-    ));
 
     return showDialog(
         context: context,
@@ -298,8 +293,40 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
         });
   }
 
+  _eksekusiSekaliDiBuildContext() {
+    if (_counterBuild == 0) {
+      if (widget.isEditMode) {
+        int idItemname = widget.keuangan.idItemName;
+        DaoItemName daoItemName = new DaoItemName();
+        daoItemName.getItemNameById(idItemname).then((item) {
+          if (item != null) {
+            _txtNoteController.text = widget.keuangan.catatan;
+            _controllerTextItem.text = item.nama;
+            EnumJenisTransaksi enumJenisTransaksi;
+            if (widget.keuangan.jenisTransaksi == 0) {
+              enumJenisTransaksi = EnumJenisTransaksi.pengeluaran;
+            } else {
+              enumJenisTransaksi = EnumJenisTransaksi.pemasukan;
+            }
+            _blocEntryKeuangan.firstTimeLoadData(
+                widget.isEditMode, widget.keuangan, enumJenisTransaksi);
+          }
+        });
+      } else {
+        _blocEntryKeuangan.firstTimeLoadData(
+            widget.isEditMode, widget.keuangan, widget.enumJenisTransaksi);
+      }
+      _counterBuild++;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    /// di ekse pertama kali dan hanya sekali
+    _eksekusiSekaliDiBuildContext();
+
+    /// end
+
     WidgetsBinding.instance.addPostFrameCallback((_) => _afterLayout());
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     Size _sizeWidget = mediaQueryData.size;
@@ -350,16 +377,25 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
 
             ///end setup auto complete
 
+            /// setup color icon (hijau jika pemasukan, merah jika pengeluaran)
+            Color iconColor;
+            if(snapshot.data.jenisKeuangan == EnumJenisTransaksi.pemasukan){
+              iconColor = HexColor('#0abf53');
+            }else{
+              iconColor = HexColor('#e04646');
+            }
+
+
             final List<Widget> _actionButtons = new List();
             _actionButtons.add(IconButton(
-                icon: Icon(Icons.check),
+                icon: Icon(Icons.check,color: Colors.cyan[600],size: 30,),
                 onPressed: () {
-
+                  _updateKeuangan(context);
                 }));
             return Scaffold(
               appBar: AppBar(
                 title: _headerAppBar(snapshot.data.jenisKeuangan),
-                actions: widget.isEditMode?_actionButtons:null,
+                actions: widget.isEditMode ? _actionButtons : null,
               ),
               body: Stack(children: <Widget>[
                 Container(
@@ -371,21 +407,15 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
                       child: Column(
                         children: <Widget>[
                           _widgetAmount1(snapshot.data.keuangan.jumlah.toInt()),
-                          Container(
-                            color: Colors.grey[200],
-                            width: double.infinity,
-                            height: 5.0,
-                          ),
-                          _widgetTextItem(),
+                          Divider(thickness: 2,),
+                          _widgetTextItem(iconColor),
                           _widgetKategori1(snapshot.data.itemName.kategori,
-                              snapshot.data.mapKategori),
-                          _widgetCatatan1(),
-                          Container(
-                            color: Colors.grey[200],
-                            width: double.infinity,
-                            height: 10.0,
-                          ),
-                          _widgetTanggal1(snapshot.data.keuangan.tanggal),
+                              snapshot.data.mapKategori,iconColor),
+                          Divider(thickness: 2,indent: 35,),
+                          _widgetCatatan1(iconColor),
+
+                          _widgetTanggal1(snapshot.data.keuangan.tanggal,iconColor),
+                          Divider(thickness: 2,indent: 35,),
                           new Container(
                             height: 70,
                             width: 40,
@@ -395,11 +425,15 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
                     ),
                   ),
                 ),
-                widget.isEditMode?Container():Transform(
-                  transform: Matrix4.translationValues(
-                      0, _sizeWidget.height - (127 + _insetsMedia.bottom), 0),
-                  child:_widgetButtonSave(_sizeWidget.width),
-                ),
+                widget.isEditMode
+                    ? Container()
+                    : Transform(
+                        transform: Matrix4.translationValues(
+                            0,
+                            _sizeWidget.height - (127 + _insetsMedia.bottom),
+                            0),
+                        child: _widgetButtonSave(_sizeWidget.width),
+                      ),
                 p != null
                     ? _widgetPadPositionAutoComplete1(p, _sizeWidget)
                     : new Container(),
@@ -415,7 +449,7 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
   Widget _headerAppBar(EnumJenisTransaksi stateJenisKeuangan) {
     if (widget.isEditMode) {
       String titleAppBar = 'Pengeluaran';
-      if(stateJenisKeuangan == EnumJenisTransaksi.pemasukan){
+      if (stateJenisKeuangan == EnumJenisTransaksi.pemasukan) {
         titleAppBar = 'Pemasukan';
       }
       return Text(titleAppBar);
@@ -483,13 +517,13 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
     );
   }
 
-  Widget _widgetTextItem() {
+  Widget _widgetTextItem(Color iconColor) {
     return Row(
       children: <Widget>[
         Icon(
           Icons.account_balance_wallet,
           size: _iconFieldSize,
-          color: Colors.grey,
+          color: iconColor,
         ),
         SizedBox(
           width: 15,
@@ -508,14 +542,14 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
     );
   }
 
-  Widget _widgetKategori1(Kategori kategori, Map<int, Kategori> lKategori) {
+  Widget _widgetKategori1(Kategori kategori, Map<int, Kategori> lKategori,Color iconColor) {
     String text = kategori == null ? '' : kategori.nama;
     return Row(
       children: <Widget>[
         Icon(
           Icons.category,
           size: _iconFieldSize,
-          color: Colors.grey,
+          color: iconColor,
         ),
         Expanded(
           child: FlatButton(
@@ -551,13 +585,13 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
     );
   }
 
-  Widget _widgetCatatan1() {
+  Widget _widgetCatatan1(Color iconColor) {
     return Row(
       children: <Widget>[
         Icon(
           Icons.note,
           size: _iconFieldSize,
-          color: Colors.grey,
+          color: iconColor,
         ),
         SizedBox(
           width: 15,
@@ -575,14 +609,14 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
     );
   }
 
-  Widget _widgetTanggal1(DateTime dateTime) {
+  Widget _widgetTanggal1(DateTime dateTime,Color iconColor) {
     ProcessString _processString = new ProcessString();
     return Row(
       children: <Widget>[
         Icon(
           Icons.calendar_today,
           size: _iconFieldSize,
-          color: Colors.grey,
+          color: iconColor,
         ),
         Expanded(
           child: FlatButton(
@@ -600,33 +634,37 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
   }
 
   Widget _widgetButtonSave(double width) {
+    double localWidth = width - 24;
+    final Color btnColor = Colors.cyan[600];
     return Container(
       width: double.infinity,
       height: 50,
       child: Row(
         children: <Widget>[
+          SizedBox(width: 8,),
           Container(
-            width: width / 2,
+            width: localWidth / 2,
             child: new RaisedButton(
               padding: const EdgeInsets.all(8.0),
               textColor: Colors.white,
-              color: Colors.blue,
+              color: btnColor,
               onPressed: () {
                 _simpanKeuangan(context, true);
               },
-              child: new Text("Simpan dan lagi"),
+              child: new Text("Simpan dan lagi",style: TextStyle(fontWeight: FontWeight.bold),),
             ),
           ),
+          SizedBox(width: 8,),
           Container(
-            width: width / 2,
+            width: localWidth / 2,
             child: new RaisedButton(
               padding: const EdgeInsets.all(8.0),
               textColor: Colors.white,
-              color: Colors.blue,
+              color: btnColor,
               onPressed: () {
                 _simpanKeuangan(context, false);
               },
-              child: new Text("Simpan"),
+              child: new Text("Simpan",style: TextStyle(fontWeight: FontWeight.bold)),
             ),
           )
         ],
