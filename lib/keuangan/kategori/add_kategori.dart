@@ -39,6 +39,16 @@ class _AddCategoryState extends State<AddCategory> {
 
   BlocAddKategori _blocAddKategori;
   int _counterBuild = 0;
+  final TextStyle _styleTextDesc = TextStyle(fontSize: 12,fontWeight: FontWeight.bold,color: Colors.blue);
+  final _decorationNama = InputDecoration(
+    // border: OutlineInputBorder(),
+    hintText: 'nama kategori',
+  );
+
+  final _decorationKet = InputDecoration(
+    // border: OutlineInputBorder(),
+    hintText: 'keterangan',
+  );
 
   @override
   void initState() {
@@ -137,19 +147,21 @@ class _AddCategoryState extends State<AddCategory> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
-                      Text('Jenis Transaksi'),
+                      Text('Jenis Transaksi:',style: _styleTextDesc,),
                       new DropdownButton(
                         value: snapshot.data.currentKategori.type.index,
                         items: dropDownTransaksi,
                         onChanged: _changedDropDownTransaksi,
                       ),
-                      Text('Nama Kategori'),
+                      Text('Nama Kategori:',style: _styleTextDesc,),
                       TextField(
+                        decoration: _decorationNama,
                         controller: _txtController,
                         maxLines: 1,
                       ),
-                      Text('Keterangan (Optional)'),
+                      Text('Keterangan (Optional):',style: _styleTextDesc,),
                       TextField(
+                        decoration: _decorationKet,
                         controller: _txtCatatanController,
                         maxLines: null,
                       ),
