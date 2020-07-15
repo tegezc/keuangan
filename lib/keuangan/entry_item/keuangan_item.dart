@@ -388,7 +388,7 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
 
             final List<Widget> _actionButtons = new List();
             _actionButtons.add(IconButton(
-                icon: Icon(Icons.check,color: Colors.cyan[600],size: 30,),
+                icon: Icon(Icons.check),
                 onPressed: () {
                   _updateKeuangan(context);
                 }));
