@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:keuangan/keuangan/kategori/subkategori/add_subkategori.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
+import 'package:keuangan/util/colors_utility.dart';
 import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/loading_view.dart';
 
@@ -22,12 +23,16 @@ class _HomePageKategoriState extends State<HomePageKategori> {
   BlocHomepageKategori _blocHomepageKategori;
   EnumStatePopulateKategori _enumState;
   FlutterToast _flutterToast;
+
   /// COUNTER UI
   int _counterBuild = 0;
   int _counterSaveSuccess = 0;
   int _counterEditSuccess = 0;
   int _counterSaveSubKategoriSuccess = 0;
   int _counterEditSubKategoriSuccess = 0;
+
+  final Color _colorButton = Colors.cyan[600];
+  final Color _colorTextBtn = Colors.white;
 
   @override
   initState() {
@@ -63,44 +68,75 @@ class _HomePageKategoriState extends State<HomePageKategori> {
       bgColor = Colors.red;
       text = 'Pengeluaran';
     }
-    return Container(
-      color: bgColor,
-      height: 25.0,
-      width: double.infinity,
-      child: Center(
-        child: Text(
-          text,
-          style: TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        color: bgColor,
+        height: 25.0,
+        width: double.infinity,
+        child: Center(
+          child: Text(
+            text,
+            style: TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+          ),
         ),
       ),
     );
   }
 
   Widget _cellKategori(Kategori kategori) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        FlatButton(
-          child: Row(
-            children: <Widget>[
-              Text(
-                '${kategori.nama}',
-                style: TextStyle(fontSize: 15),
+    return Padding(
+      padding:
+          const EdgeInsets.only(top: 3.0, left: 8.0, right: 8.0, bottom: 5.0),
+      child: Container(
+        decoration: BoxDecoration(
+            border: Border.all(color: Colors.cyan[600]),
+            borderRadius: BorderRadius.all(Radius.circular(5))),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 0, left: 8.0, right: 8.0, bottom: 0),
+              child: FlatButton(
+                color: HexColor('#c6f0ff'),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5.0),
+                  // side: BorderSide(color: Colors.lightGreen)
+                ),
+                child: Row(
+                  children: <Widget>[
+                    Text(
+                      '${kategori.nama}',
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                onPressed: () async {
+                  _showDialogPilihan(kategori);
+                },
               ),
-            ],
-          ),
-          onPressed: () async {
-            _showDialogPilihan(kategori);
-          },
+            ),
+            kategori.listKategori.length == 0
+                ? Container()
+                : Padding(
+                    padding: const EdgeInsets.only(
+                        left: 14.0, right: 8.0, top: 0.0, bottom: 0.0),
+                    child: Text(
+                        '(${kategori.listKategori.length} Sub-kategori)',
+                        style: TextStyle(fontSize: 12)),
+                  ),
+            kategori.listKategori.length == 0
+                ? Container()
+                : _cellSubKategori(kategori.listKategori),
+            Divider(
+              height: 1.0,
+            ),
+          ],
         ),
-        kategori.listKategori.length == 0
-            ? Container()
-            : _cellSubKategori(kategori.listKategori),
-        Divider(
-          height: 1.0,
-        ),
-      ],
+      ),
     );
   }
 
@@ -111,9 +147,14 @@ class _HomePageKategoriState extends State<HomePageKategori> {
       Kategori kategori = lsubkategori[i];
       String kname = kategori.nama;
       lw.add(ChoiceChip(
+        backgroundColor: HexColor('#e3f3fc'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+          //  side: BorderSide(color: Colors.lightGreen)
+        ),
         label: Text(
           kname,
-          style: TextStyle(fontSize: 10),
+          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
         ),
         selected: false,
         onSelected: (selected) async {
@@ -224,8 +265,8 @@ class _HomePageKategoriState extends State<HomePageKategori> {
             final List<Widget> _actionButtons = new List();
             _actionButtons.add(IconButton(
                 icon: Icon(Icons.add),
-               // color: Colors.blue,
-                onPressed: () async{
+                // color: Colors.blue,
+                onPressed: () async {
                   int res = await openPage(context, AddCategory.baru());
                   //prevent snacbar showing
                   if (res == null) {
@@ -278,47 +319,124 @@ class _HomePageKategoriState extends State<HomePageKategori> {
 
   _showDialogPilihan(Kategori kategori) {
     List<Widget> lw = new List();
+
     if (kategori.idParent == 0) {
-      lw.add(new OutlineButton(
-        onPressed: () {
-          _addSubKategori(kategori.id);
-        },
-        child: Text('tambah subkategori'),
-      ));
+      lw.add(
+        Padding(
+          padding: const EdgeInsets.only(right: 16.0, left: 16.0, bottom: 3.0),
+          child: RaisedButton(
+            color: _colorButton,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0),
+                side: BorderSide(color: Colors.cyan)),
+            onPressed: () async {
+              _addSubKategori(kategori.id);
+            },
+            child: Text(
+              'tambah subkategori',
+              style: TextStyle(
+                  color: _colorTextBtn,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.0),
+            ),
+          ),
+        ),
+      );
+      lw.add(
+        Padding(
+          padding: const EdgeInsets.only(right: 16.0, left: 16.0, bottom: 3.0),
+          child: RaisedButton(
+            color: _colorButton,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0),
+                side: BorderSide(color: Colors.cyan)),
+            onPressed: () async {
+              _edit(kategori);
+            },
+            child: Text(
+              'edit',
+              style: TextStyle(
+                  color: _colorTextBtn,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.0),
+            ),
+          ),
+        ),
+      );
 
-      lw.add(new OutlineButton(
-        onPressed: () {
-          _edit(kategori);
-        },
-        child: Text('edit'),
-      ));
-
-      lw.add(new OutlineButton(
-        onPressed: () {
-          Navigator.of(context).pop();
-          _showDialogConfirmDelete(kategori);
-        },
-        child: Text('delete'),
-      ));
+      lw.add(
+        Padding(
+          padding: const EdgeInsets.only(right: 16.0, left: 16.0, bottom: 3.0),
+          child: RaisedButton(
+            color: _colorButton,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0),
+                side: BorderSide(color: Colors.cyan)),
+            onPressed: () async {
+              Navigator.of(context).pop();
+              _showDialogConfirmDelete(kategori);
+            },
+            child: Text(
+              'delete',
+              style: TextStyle(
+                  color: _colorTextBtn,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.0),
+            ),
+          ),
+        ),
+      );
     } else {
-      lw.add(new OutlineButton(
-        onPressed: () {
-          _editSubKategori(kategori);
-        },
-        child: Text('edit subkategori'),
-      ));
+      lw.add(
+        Padding(
+          padding: const EdgeInsets.only(right: 16.0, left: 16.0, bottom: 3.0),
+          child: RaisedButton(
+            color: _colorButton,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0),
+                side: BorderSide(color: Colors.cyan)),
+            onPressed: () async {
+              _editSubKategori(kategori);
+            },
+            child: Text(
+              'edit subkategori',
+              style: TextStyle(
+                  color: _colorTextBtn,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.0),
+            ),
+          ),
+        ),
+      );
 
-      lw.add(new OutlineButton(
-        onPressed: () {
-          Navigator.of(context).pop();
-          _showDialogConfirmDelete(kategori);
-        },
-        child: Text('delete'),
-      ));
+      lw.add(
+        Padding(
+          padding: const EdgeInsets.only(right: 16.0, left: 16.0, bottom: 3.0),
+          child: RaisedButton(
+            color: _colorButton,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0),
+                side: BorderSide(color: Colors.cyan)),
+            onPressed: () async {
+              Navigator.of(context).pop();
+              _showDialogConfirmDelete(kategori);
+            },
+            child: Text(
+              'delete',
+              style: TextStyle(
+                  color: _colorTextBtn,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.0),
+            ),
+          ),
+        ),
+      );
     }
     showDialog<String>(
         context: context,
         builder: (BuildContext context) => SimpleDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15.0))),
               title: Text('Pilihan'),
               children: lw,
             ));
@@ -329,18 +447,48 @@ class _HomePageKategoriState extends State<HomePageKategori> {
         context: context,
         builder: (BuildContext context) => SimpleDialog(
               title: Text('Apakah anda yakin akan menghapus record ini?'),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15.0))),
               children: <Widget>[
-                new OutlineButton(
-                  onPressed: () {
-                    _deleteConfirmed(kategori);
-                  },
-                  child: Text('ya'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: 16.0, left: 16.0, bottom: 3.0),
+                  child: RaisedButton(
+                    color: _colorButton,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(color: Colors.cyan)),
+                    onPressed: () async {
+                      _deleteConfirmed(kategori);
+                    },
+                    child: Text(
+                      'ya',
+                      style: TextStyle(
+                          color: _colorTextBtn,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0),
+                    ),
+                  ),
                 ),
-                new OutlineButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('tidak'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: 16.0, left: 16.0, bottom: 3.0),
+                  child: RaisedButton(
+                    color: _colorButton,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(color: Colors.cyan)),
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'delete',
+                      style: TextStyle(
+                          color: _colorTextBtn,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0),
+                    ),
+                  ),
                 ),
               ],
             ));
@@ -415,7 +563,6 @@ class _HomePageKategoriState extends State<HomePageKategori> {
         ],
       ),
     );
-
 
     _flutterToast.showToast(
       child: toast,

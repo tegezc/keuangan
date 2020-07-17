@@ -22,6 +22,8 @@ class HomepageKeuangan extends StatefulWidget {
 class _HomepageKeuanganState extends State<HomepageKeuangan> {
   int _counterBuild = 0;
   BlocHpKeuangan _blocHpKeuangan;
+  final Color colorButton = Colors.cyan[600];
+  final Color colorTextBtn = Colors.white;
 
   @override
   void initState() {
@@ -31,7 +33,7 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
 
   Widget _textSmall(String text) {
     return Padding(
-      padding: const EdgeInsets.only(top:5.0),
+      padding: const EdgeInsets.only(top: 5.0),
       child: Text(
         text,
         style: Theme.of(context).textTheme.headline4,
@@ -59,7 +61,10 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
             _textSmall('Balance'),
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
-              child: Text('Rp $txtBalance',style: styleBesar,),
+              child: Text(
+                'Rp $txtBalance',
+                style: styleBesar,
+              ),
             ),
           ],
         ),
@@ -73,7 +78,8 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
               child: Column(
                 children: <Widget>[
                   _textSmall('Pengeluaran'),
-                  Text('Rp $txtPengeluran', style:StyleUi.textStyleBalanceMediumPengeluaran),
+                  Text('Rp $txtPengeluran',
+                      style: StyleUi.textStyleBalanceMediumPengeluaran),
                 ],
               ),
             ),
@@ -87,7 +93,8 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
               child: Column(
                 children: <Widget>[
                   _textSmall('Pemasukan'),
-                  Text('Rp $txtPemasukan',style: StyleUi.textStyleBalanceMediumPemasukan),
+                  Text('Rp $txtPemasukan',
+                      style: StyleUi.textStyleBalanceMediumPemasukan),
                 ],
               ),
             ),
@@ -101,24 +108,56 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
     ProcessString processString = new ProcessString();
     ItemName inm = k.lazyItemName;
     String tanggal = processString.dateToStringDdMmmmYyyy(k.tanggal);
-    Entry entry = new Entry(inm.nama, inm.kategori, tanggal,k.tanggal, k, true, true);
+    Entry entry =
+        new Entry(inm.nama, inm.kategori, tanggal, k.tanggal, k, true, true);
+
     showDialog<String>(
         context: context,
         builder: (BuildContext context) => SimpleDialog(
               title: Text('Pilihan'),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15.0))),
               children: <Widget>[
-                new OutlineButton(
-                  onPressed: () {
-                    _edit(entry);
-                  },
-                  child: Text('edit'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: 16.0, left: 16.0, bottom: 3.0),
+                  child: RaisedButton(
+                    color: colorButton,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(color: Colors.cyan)),
+                    onPressed: () async {
+                      _edit(entry);
+                    },
+                    child: Text(
+                      'edit',
+                      style: TextStyle(
+                          color: colorTextBtn,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    ),
+                  ),
                 ),
-                new OutlineButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    _showDialogConfirmDelete(entry);
-                  },
-                  child: Text('delete'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: 16.0, left: 16.0, bottom: 3.0),
+                  child: RaisedButton(
+                    color: colorButton,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(color: Colors.cyan)),
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      _showDialogConfirmDelete(entry);
+                    },
+                    child: Text(
+                      'delete',
+                      style: TextStyle(
+                          color: colorTextBtn,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0),
+                    ),
+                  ),
                 ),
               ],
             ));
@@ -129,50 +168,58 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
         context: context,
         builder: (BuildContext context) => SimpleDialog(
               title: Text('Apakah anda yakin akan menghapus record ini?'),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15.0))),
               children: <Widget>[
-                new OutlineButton(
-                  onPressed: () {
-                    _deleteConfirmed(entry);
-                  },
-                  child: Text('ya'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: 16.0, left: 16.0, bottom: 3.0),
+                  child: RaisedButton(
+                    color: colorButton,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(color: Colors.cyan)),
+                    onPressed: () async {
+                      _deleteConfirmed(entry);
+                    },
+                    child: Text(
+                      'ya',
+                      style: TextStyle(
+                          color: colorTextBtn,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0),
+                    ),
+                  ),
                 ),
-                new OutlineButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('tidak'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: 16.0, left: 16.0, bottom: 3.0),
+                  child: RaisedButton(
+                    color: colorButton,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(color: Colors.cyan)),
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'tidak',
+                      style: TextStyle(
+                          color: colorTextBtn,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0),
+                    ),
+                  ),
                 ),
               ],
             ));
   }
 
-  _showDialogConfirmDeleteBeautifull(Entry entry) {
-    showDialog<String>(
-        context: context,
-        builder: (BuildContext context) => SimpleDialog(
-          title: Text('Apakah anda yakin akan menghapus record ini?'),
-          children: <Widget>[
-            new OutlineButton(
-              onPressed: () {
-                _deleteConfirmed(entry);
-              },
-              child: Text('ya'),
-            ),
-            new OutlineButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('tidak'),
-            ),
-          ],
-        ));
-  }
-
   _edit(Entry entry) async {
-    EnumJenisTransaksi enumJenisTransaksi ;
-    if(entry.keuangan.jenisTransaksi == 0){
+    EnumJenisTransaksi enumJenisTransaksi;
+    if (entry.keuangan.jenisTransaksi == 0) {
       enumJenisTransaksi = EnumJenisTransaksi.pengeluaran;
-    }else{
+    } else {
       enumJenisTransaksi = EnumJenisTransaksi.pemasukan;
     }
     EnumFinalResult res = await openPage(
@@ -215,8 +262,12 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
       alignment: Alignment.centerLeft,
       child: Container(
         child: Padding(
-          padding: const EdgeInsets.only(left:12.0),
-          child: Text('Transaksi terakhir',style: Theme.of(context).textTheme.headline2,textAlign: TextAlign.left,),
+          padding: const EdgeInsets.only(left: 12.0),
+          child: Text(
+            'Transaksi terakhir',
+            style: Theme.of(context).textTheme.headline2,
+            textAlign: TextAlign.left,
+          ),
         ),
       ),
     ));
@@ -224,8 +275,8 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
       height: 3,
     ));
     if (data.listKeuangan != null) {
-     List<Keuangan> lKeuangan = data.listKeuangan;
-      for(int i = 0; i< lKeuangan.length;i++){
+      List<Keuangan> lKeuangan = data.listKeuangan;
+      for (int i = 0; i < lKeuangan.length; i++) {
         Keuangan ke = lKeuangan[i];
 
 //      Keuangan copyKeuangan = new Keuangan.fromUI(ke.tanggal, ke.idItemName, ke.jumlah, ke.catatan);
@@ -316,7 +367,8 @@ class _CellKeuanganStateLessState extends State<CellKeuanganStateLess> {
   Widget build(BuildContext context) {
     final formatCurrency = new NumberFormat("#,##0", "idr");
     int uang = widget.keuangan.jumlah.toInt();
-    String tanggal = _processString.dateToStringDdMmmYyyyPendek(widget.keuangan.tanggal);
+    String tanggal =
+        _processString.dateToStringDdMmmYyyyPendek(widget.keuangan.tanggal);
 
     ItemName itemName = widget.keuangan.lazyItemName;
     String subTitle = '${itemName.kategori.nama} ($tanggal)';

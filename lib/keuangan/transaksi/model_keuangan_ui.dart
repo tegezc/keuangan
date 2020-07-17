@@ -11,12 +11,14 @@ import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/global_string_database.dart';
 
 class Entry {
-  Entry(this.title, this.kategori, this.tanggal,this.date, this.keuangan, this.flag,
-      this.isLast);
+  Entry(this.title, this.kategori, this.tanggal, this.date, this.keuangan,
+      this.flag, this.isLast);
 
   final String title;
   final Kategori kategori;
-  final String tanggal; ///ex: 23 Maret 2019
+  final String tanggal;
+
+  ///ex: 23 Maret 2019
   final DateTime date;
   final Keuangan keuangan;
   final bool flag;
@@ -39,6 +41,8 @@ class _CellKeuanganState extends State<CellKeuangan> {
   final styleTextItem = TextStyle(fontWeight: FontWeight.normal, fontSize: 14);
 
   final styleTextKategori = TextStyle(fontSize: 10, color: Colors.blueAccent);
+  final Color colorButton = Colors.cyan[600];
+  final Color colorTextBtn = Colors.white;
 
   @override
   Widget build(BuildContext context) {
@@ -95,23 +99,54 @@ class _CellKeuanganState extends State<CellKeuangan> {
   }
 
   _showDialogPilihan() {
+
     showDialog<String>(
         context: context,
         builder: (BuildContext context) => SimpleDialog(
               title: Text('Pilihan'),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15.0))),
               children: <Widget>[
-                new OutlineButton(
-                  onPressed: () {
-                    _edit(widget.entry);
-                  },
-                  child: Text('edit'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: 16.0, left: 16.0, bottom: 3.0),
+                  child: RaisedButton(
+                    color: colorButton,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(color: Colors.cyan)),
+                    onPressed: () async {
+                      _edit(widget.entry);
+                    },
+                    child: Text(
+                      'edit',
+                      style: TextStyle(
+                          color: colorTextBtn,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    ),
+                  ),
                 ),
-                new OutlineButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    _showDialogConfirmDelete();
-                  },
-                  child: Text('delete'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: 16.0, left: 16.0, bottom: 3.0),
+                  child: RaisedButton(
+                    color: colorButton,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(color: Colors.cyan)),
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      _showDialogConfirmDelete();
+                    },
+                    child: Text(
+                      'delete',
+                      style: TextStyle(
+                          color: colorTextBtn,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0),
+                    ),
+                  ),
                 ),
               ],
             ));
@@ -122,28 +157,58 @@ class _CellKeuanganState extends State<CellKeuangan> {
         context: context,
         builder: (BuildContext context) => SimpleDialog(
               title: Text('Apakah anda yakin akan menghapus record ini?'),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0))),
               children: <Widget>[
-                new OutlineButton(
-                  onPressed: () {
-                    _deleteConfirmed(widget.entry);
-                  },
-                  child: Text('ya'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: 16.0, left: 16.0, bottom: 3.0),
+                  child: RaisedButton(
+                    color: colorButton,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(color: Colors.cyan)),
+                    onPressed: () async {
+                      _deleteConfirmed(widget.entry);
+                    },
+                    child: Text(
+                      'ya',
+                      style: TextStyle(
+                          color: colorTextBtn,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    ),
+                  ),
                 ),
-                new OutlineButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('tidak'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: 16.0, left: 16.0, bottom: 3.0),
+                  child: RaisedButton(
+                    color: colorButton,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(color: Colors.cyan)),
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'tidak',
+                      style: TextStyle(
+                          color: colorTextBtn,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0),
+                    ),
+                  ),
                 ),
               ],
             ));
   }
 
   _edit(Entry entry) async {
-    EnumJenisTransaksi enumJenisTransaksi ;
-    if(entry.keuangan.jenisTransaksi == 0){
+    EnumJenisTransaksi enumJenisTransaksi;
+    if (entry.keuangan.jenisTransaksi == 0) {
       enumJenisTransaksi = EnumJenisTransaksi.pengeluaran;
-    }else{
+    } else {
       enumJenisTransaksi = EnumJenisTransaksi.pemasukan;
     }
     await openPage(
@@ -184,12 +249,12 @@ class HeaderCellTanggalTransaksi extends StatelessWidget {
   final String namaBulan;
   final String namaHari;
 
-  HeaderCellTanggalTransaksi(this.date,this.namaHari,this.namaBulan);
+  HeaderCellTanggalTransaksi(this.date, this.namaHari, this.namaBulan);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-     // height: 80,
+      // height: 80,
       width: double.infinity,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -207,7 +272,10 @@ class HeaderCellTanggalTransaksi extends StatelessWidget {
               children: <Widget>[
                 Text(
                   date.day.toString(),
-                  style: TextStyle(fontWeight: FontWeight.bold,fontSize: 24,color: Colors.white),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      color: Colors.white),
                 ),
                 SizedBox(
                   width: 8,
@@ -215,8 +283,20 @@ class HeaderCellTanggalTransaksi extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(namaHari,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12,color: Colors.white),),
-                    Text('$namaBulan ${date.year}',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12,color: Colors.white),),
+                    Text(
+                      namaHari,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                          color: Colors.white),
+                    ),
+                    Text(
+                      '$namaBulan ${date.year}',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                          color: Colors.white),
+                    ),
                   ],
                 ),
               ],

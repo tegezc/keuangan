@@ -21,6 +21,9 @@ class _HomePageItemNameState extends State<HomePageItemName> {
   int _counterBuild = 0;
   CommonUi _commonUi;
   FlutterToast _flutterToast;
+  final Color _colorButton = Colors.cyan[600];
+  final Color _colorTextBtn = Colors.white;
+
   @override
   initState() {
     _flutterToast = FlutterToast(context);
@@ -101,7 +104,9 @@ class _HomePageItemNameState extends State<HomePageItemName> {
       }
     }
 
-    lW.add(SizedBox(height: 200.0,));
+    lW.add(SizedBox(
+      height: 200.0,
+    ));
 
     return lW;
   }
@@ -131,7 +136,7 @@ class _HomePageItemNameState extends State<HomePageItemName> {
             final List<Widget> _actionButtons = new List();
             _actionButtons.add(IconButton(
                 icon: Icon(Icons.add),
-                onPressed: () async{
+                onPressed: () async {
                   int res =
                       await _commonUi.openPage(context, ItemNameEntry.baru());
 
@@ -195,19 +200,49 @@ class _HomePageItemNameState extends State<HomePageItemName> {
         context: context,
         builder: (BuildContext context) => SimpleDialog(
               title: Text('Pilihan'),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15.0))),
               children: <Widget>[
-                new OutlineButton(
-                  onPressed: () {
-                    _edit(itemName);
-                  },
-                  child: Text('edit'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: 16.0, left: 16.0, bottom: 3.0),
+                  child: RaisedButton(
+                    color: _colorButton,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(color: Colors.cyan)),
+                    onPressed: () async {
+                      _edit(itemName);
+                    },
+                    child: Text(
+                      'edit',
+                      style: TextStyle(
+                          color: _colorTextBtn,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0),
+                    ),
+                  ),
                 ),
-                new OutlineButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    _showDialogConfirmDelete(itemName);
-                  },
-                  child: Text('delete'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: 16.0, left: 16.0, bottom: 3.0),
+                  child: RaisedButton(
+                    color: _colorButton,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(color: Colors.cyan)),
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      _showDialogConfirmDelete(itemName);
+                    },
+                    child: Text(
+                      'delete',
+                      style: TextStyle(
+                          color: _colorTextBtn,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0),
+                    ),
+                  ),
                 ),
               ],
             ));
@@ -218,18 +253,48 @@ class _HomePageItemNameState extends State<HomePageItemName> {
         context: context,
         builder: (BuildContext context) => SimpleDialog(
               title: Text('Apakah anda yakin akan menghapus record ini?'),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15.0))),
               children: <Widget>[
-                new OutlineButton(
-                  onPressed: () {
-                    _deleteConfirmed(itemName);
-                  },
-                  child: Text('ya'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: 16.0, left: 16.0, bottom: 3.0),
+                  child: RaisedButton(
+                    color: _colorButton,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(color: Colors.cyan)),
+                    onPressed: () async {
+                      _deleteConfirmed(itemName);
+                    },
+                    child: Text(
+                      'ya',
+                      style: TextStyle(
+                          color: _colorTextBtn,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0),
+                    ),
+                  ),
                 ),
-                new OutlineButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('tidak'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: 16.0, left: 16.0, bottom: 3.0),
+                  child: RaisedButton(
+                    color: _colorButton,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(color: Colors.cyan)),
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'tidak',
+                      style: TextStyle(
+                          color: _colorTextBtn,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0),
+                    ),
+                  ),
                 ),
               ],
             ));
@@ -278,7 +343,6 @@ class _HomePageItemNameState extends State<HomePageItemName> {
         ],
       ),
     );
-
 
     _flutterToast.showToast(
       child: toast,
