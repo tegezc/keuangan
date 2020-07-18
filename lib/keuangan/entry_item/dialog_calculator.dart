@@ -3,8 +3,9 @@ import 'package:keuangan/model/enum_keuangan.dart';
 
 class CalculatorDialog extends ModalRoute<void> {
   Function callBackLastResult;
+  int amount;
 
-  CalculatorDialog({this.callBackLastResult});
+  CalculatorDialog({this.callBackLastResult, this.amount});
 
   @override
   Duration get transitionDuration => Duration(milliseconds: 220);
@@ -26,10 +27,10 @@ class CalculatorDialog extends ModalRoute<void> {
 
   @override
   Widget buildPage(
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      ) {
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
     // This makes sure that text and other content follows the material style
     return Material(
       type: MaterialType.transparency,
@@ -82,10 +83,10 @@ class CalculatorDialog extends ModalRoute<void> {
                       context),
                   Container(
                     width: sizeWidget.width - 60,
-                    color: Colors.transparent,
                     child: CalculatorView(
                       widthWidget: sizeWidget.width - 60,
                       functionResult: finalResultFunc,
+                      amount: amount,
                     ),
                   ),
                   _gestureDetector(
@@ -126,8 +127,9 @@ class CalculatorView extends StatefulWidget {
   //double dimension;
   final double widthWidget;
   final Function functionResult;
+  final int amount;
 
-  CalculatorView({this.widthWidget, this.functionResult});
+  CalculatorView({this.widthWidget, this.functionResult, this.amount});
 
   @override
   _CalculatorViewState createState() => _CalculatorViewState();
@@ -138,24 +140,33 @@ class _CalculatorViewState extends State<CalculatorView> {
   static final heighCell = 50.0;
   int finalResult = 0;
   final TextStyle textStyleKet = TextStyle(
-      fontSize: 12, color: Colors.grey[700], fontWeight: FontWeight.normal);
+      fontSize: 14, color: Colors.grey[700], fontWeight: FontWeight.normal);
 
-  final TextStyle textStyleCell = TextStyle(
-      fontSize: 20, color: Colors.grey[700], fontWeight: FontWeight.normal);
+  final TextStyle textStyleCell =
+      TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold);
+  final TextStyle textStyleBtn =
+      TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold);
   final TextStyle textStyleAmount =
-  TextStyle(fontSize: 30, color: Colors.black, fontWeight: FontWeight.bold);
+      TextStyle(fontSize: 30, color: Colors.black, fontWeight: FontWeight.bold);
+
+  final Color _colorNonNumber = Colors.grey[100];
+  final Color _colorNumber = Colors.white;
+  final Color _colorButton = Colors.cyan[600];
 
   GlobalKey _keyButtonSave = GlobalKey();
 
   //calculator logic
-  String isiText = initialText;
+  String isiText;
+
   double num1;
   double num2;
   Operator operator = Operator.kosong;
+  bool _isFirstimeClickNumber;
 
   @override
   initState() {
-    //isiText = initialText;
+    _isFirstimeClickNumber = true;
+    isiText = '${widget.amount}';
     super.initState();
   }
 
@@ -183,8 +194,9 @@ class _CalculatorViewState extends State<CalculatorView> {
   _clickNumber(int value) {
     _log('Sebelum click Number');
     if (operator == Operator.kosong) {
-      if (isiText == initialText || isiText.length == 0) {
+      if (isiText == initialText || isiText.length == 0||_isFirstimeClickNumber) {
         num1 = value.toDouble();
+        _isFirstimeClickNumber = false;
       } else {
         String sn = isiText + '$value';
         num1 = double.parse(sn);
@@ -208,6 +220,11 @@ class _CalculatorViewState extends State<CalculatorView> {
     if (num1 != null && num2 != null) {
       _clickSamaDengan();
     }
+
+    if(_isFirstimeClickNumber){
+      _isFirstimeClickNumber = false;
+      num1 = double.parse(isiText);
+    }
     //else if(num1 > 0){
     operator = op;
     // }
@@ -216,21 +233,19 @@ class _CalculatorViewState extends State<CalculatorView> {
 
   _clickDelete() {
     String txt = isiText;
-    if(txt.length == 1){
+    if (txt.length == 1) {
       isiText = '0';
-    }else{
-      isiText = txt.substring(0,txt.length-1);
+    } else {
+      isiText = txt.substring(0, txt.length - 1);
     }
 
-    if(num2 != null){
-      num2 =  double.parse(isiText);
-    }else{
+    if (num2 != null) {
+      num2 = double.parse(isiText);
+    } else {
       num1 = double.parse(isiText);
       operator = Operator.kosong;
     }
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   _clickClear() {
@@ -238,12 +253,10 @@ class _CalculatorViewState extends State<CalculatorView> {
     num2 = null;
     operator = Operator.kosong;
     _setTextDisplay(0.0);
-    setState(() {
-
-    });
+    setState(() {});
   }
 
-  double _logicOperation(double n1,double n2,Operator op){
+  double _logicOperation(double n1, double n2, Operator op) {
     var value = num1;
     LogicCalculator logicCalculator = new LogicCalculator();
     switch (op) {
@@ -264,6 +277,7 @@ class _CalculatorViewState extends State<CalculatorView> {
     }
     return value;
   }
+
   _clickSamaDengan() {
     _log('Sebelum Sama Dengan');
     if (num1 > 0 && num2 > 0) {
@@ -283,23 +297,26 @@ class _CalculatorViewState extends State<CalculatorView> {
       color: Colors.white,
       child: Column(
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Container(),
-              ),
-              Text(
-                'JUMLAH TRANSAKSI',
-                maxLines: 1,
-                style: textStyleKet,
-              ),
-              SizedBox(
-                width: 15,
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Container(),
+                ),
+                Text(
+                  'JUMLAH TRANSAKSI',
+                  maxLines: 1,
+                  style: textStyleKet,
+                ),
+                SizedBox(
+                  width: 15,
+                ),
+              ],
+            ),
           ),
           SizedBox(
-            height: 10,
+            height: 8,
           ),
           Row(
             children: <Widget>[
@@ -321,13 +338,53 @@ class _CalculatorViewState extends State<CalculatorView> {
     );
   }
 
+  Widget _btnCacel() {
+    return Expanded(
+      flex: 1,
+      child: Container(
+        height: heighCell,
+        color: _colorButton,
+        child: OutlineButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text(
+            'Cancel',
+            style: textStyleBtn,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _btnDone() {
+    return Expanded(
+      key: _keyButtonSave,
+      flex: 1,
+      child: Container(
+        height: heighCell,
+        color: _colorButton,
+        child: OutlineButton(
+          onPressed: () {
+            _exseButtonSave();
+            Navigator.pop(context);
+          },
+          child: Text(
+            'Done',
+            style: textStyleBtn,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _cellClear() {
     return Expanded(
       flex: 1,
       child: Container(
         height: heighCell,
-        color: Colors.white,
-        child: FlatButton(
+        color: _colorNonNumber,
+        child: OutlineButton(
           onPressed: () {
             _clickClear();
           },
@@ -344,9 +401,9 @@ class _CalculatorViewState extends State<CalculatorView> {
     return Expanded(
       flex: 2,
       child: Container(
-        color: Colors.white,
+        color: _colorNonNumber,
         height: heighCell,
-        child: FlatButton(
+        child: OutlineButton(
           onPressed: () {
             _clickDelete();
           },
@@ -363,9 +420,9 @@ class _CalculatorViewState extends State<CalculatorView> {
     return Flexible(
       flex: 1,
       child: Container(
-        color: Colors.white,
+        color: _colorNonNumber,
         height: heighCell,
-        child: FlatButton(
+        child: OutlineButton(
           onPressed: () {
             if (char == '=') {
               _clickSamaDengan();
@@ -384,9 +441,9 @@ class _CalculatorViewState extends State<CalculatorView> {
     return Expanded(
       flex: 2,
       child: Container(
-        color: Colors.white,
+        color: _colorNumber,
         height: heighCell,
-        child: FlatButton(
+        child: OutlineButton(
           onPressed: () {
             _clickNumber(0);
           },
@@ -403,9 +460,9 @@ class _CalculatorViewState extends State<CalculatorView> {
     return Expanded(
       flex: 1,
       child: Container(
-        color: Colors.white,
+        color: _colorNumber,
         height: heighCell,
-        child: FlatButton(
+        child: OutlineButton(
           onPressed: () {
             _clickNumber(value);
           },
@@ -439,9 +496,9 @@ class _CalculatorViewState extends State<CalculatorView> {
     return Flexible(
       flex: 1,
       child: Container(
-        color: Colors.grey[200],
+        color: _colorNonNumber,
         height: heighCell,
-        child: FlatButton(
+        child: OutlineButton(
           onPressed: () {
             _clickOperator(op);
           },
@@ -508,6 +565,16 @@ class _CalculatorViewState extends State<CalculatorView> {
     );
   }
 
+  Widget _rowCalc5() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        _btnCacel(),
+        _btnDone(),
+      ],
+    );
+  }
+
   _exseButtonSave() {
 //    var val = 0.0;
 //    if(num2 != null && operator != Operator.kosong){
@@ -518,67 +585,43 @@ class _CalculatorViewState extends State<CalculatorView> {
     widget.functionResult(int.parse(isiText));
   }
 
-  Widget _widgetButton(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.max,
-      children: <Widget>[
-        Expanded(
-          child: RaisedButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: Text('Cancel'),
-          ),
-        ),
-        Expanded(
-          child: RaisedButton(
-            key: _keyButtonSave,
-            onPressed: () {
-              _exseButtonSave();
-              Navigator.pop(context);
-            },
-            child: Text('Done'),
-          ),
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapUp: (TapUpDetails details){
-
+      onTapUp: (TapUpDetails details) {
         RenderBox getBox = context.findRenderObject();
         var local = getBox.localToGlobal(details.globalPosition);
 
         final RenderBox renderBoxRed =
-        _keyButtonSave.currentContext.findRenderObject();
+            _keyButtonSave.currentContext.findRenderObject();
 
         Offset positionTextfieldItem = renderBoxRed.localToGlobal(Offset.zero);
 
-        if(local.dy> positionTextfieldItem.dy){
+        if (local.dy > positionTextfieldItem.dy) {
           Navigator.pop(context);
         }
       },
       child: Column(
         children: <Widget>[
-          SizedBox(
-            height: 15,
+          Container(
+            child: Column(
+              children: <Widget>[
+                _widgetText(),
+                Container(
+                  color: Colors.grey,
+                  height: 1,
+                  width: widget.widthWidget,
+                ),
+                _rowTop(),
+                _rowCalc1(),
+                _rowCalc2(),
+                _rowCalc3(),
+                _rowCalc4(),
+                _rowCalc5(),
+                // _widgetButton(context),
+              ],
+            ),
           ),
-          _widgetText(),
-          SizedBox(
-            width: widget.widthWidget,
-            height: 2,
-            child: Container(),
-          ),
-          _rowTop(),
-          _rowCalc1(),
-          _rowCalc2(),
-          _rowCalc3(),
-          _rowCalc4(),
-          _widgetButton(context),
           Flexible(
             child: Container(
               color: Colors.transparent,
@@ -607,5 +650,3 @@ class LogicCalculator {
     return num1 / num2;
   }
 }
-
-

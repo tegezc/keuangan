@@ -18,7 +18,7 @@ enum EnumEntryKeuangan {
   dismissAutoComplete,
   clickAutoComplete,
   simpandanlagi,
-  finishLagi,
+  finishLagi
 }
 
 enum EnumFinalResult{

@@ -372,7 +372,7 @@ class EntryKeuangan {
     @required this.itemName,
     @required this.keuangan,
     @required this.stateEntryKeuangan,
-    @required this.finalResult,
+    @required this.finalResult
   });
 }
 

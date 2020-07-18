@@ -66,6 +66,8 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
   String _cacheTextItemName = '';
   EnumEntryKeuangan _cacheStateEntry;
 
+  bool _isFirstime;
+
   int _counterBuild = 0;
 
   final Color _colorButton = Colors.cyan[600];
@@ -86,6 +88,11 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
 
   @override
   initState() {
+    if(widget.isEditMode){
+      _isFirstime = false;
+    }else {
+      _isFirstime = true;
+    }
     _blocEntryKeuangan = BlocEntryKeuangan();
     WidgetsBinding.instance.addObserver(this);
     _txtNoteController = TextEditingController();
@@ -119,6 +126,12 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
   _afterLayout() {
     if (_cacheRenderBox == null && _keyTextItem.currentContext != null) {
       _cacheRenderBox = _keyTextItem.currentContext.findRenderObject();
+    }
+
+    // saat pertama kail membuat transaksi, calculator otomatis muncul.
+    if(_isFirstime){
+      _isFirstime = false;
+      _showOverlay(context, 0);
     }
   }
 
@@ -518,9 +531,9 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
     _blocEntryKeuangan.sinkState(entryState);
   }
 
-  void _showOverlay(BuildContext context) {
+  void _showOverlay(BuildContext context,int amount) {
     Navigator.of(context)
-        .push(CalculatorDialog(callBackLastResult: callBackFinalResult));
+        .push(CalculatorDialog(callBackLastResult: callBackFinalResult,amount: amount));
   }
 
   Widget _widgetAmount1(int amount) {
@@ -540,7 +553,7 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
         ],
       ),
       onPressed: () {
-        _showOverlay(context);
+        _showOverlay(context,amount);
       },
     );
   }
