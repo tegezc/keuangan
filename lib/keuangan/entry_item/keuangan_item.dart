@@ -68,6 +68,9 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
 
   int _counterBuild = 0;
 
+  final Color _colorButton = Colors.cyan[600];
+  final Color _colorTextBtn = Colors.white;
+
   @override
   dispose() {
     _controllerAutoComplete.dispose();
@@ -273,12 +276,28 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
     List<Widget> listWidget = new List();
     if (lKategori.isNotEmpty) {
       lKategori.forEach((k, v) {
-        listWidget.add(OutlineButton(
-          onPressed: () {
-            Navigator.pop(context, v);
-          },
-          child: Text(v.nama),
-        ));
+        listWidget.add(
+          Padding(
+            padding:
+                const EdgeInsets.only(right: 16.0, left: 16.0, bottom: 3.0),
+            child: RaisedButton(
+              color: _colorButton,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                  side: BorderSide(color: Colors.cyan)),
+              onPressed: () async {
+                Navigator.pop(context, v);
+              },
+              child: Text(
+                '${v.nama}',
+                style: TextStyle(
+                    color: _colorTextBtn,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.0),
+              ),
+            ),
+          ),
+        );
       });
     }
 
@@ -287,6 +306,8 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
         barrierDismissible: true,
         builder: (BuildContext context) {
           return SimpleDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
             title: const Text('Select Kategori '),
             children: listWidget,
           );
@@ -379,12 +400,11 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
 
             /// setup color icon (hijau jika pemasukan, merah jika pengeluaran)
             Color iconColor;
-            if(snapshot.data.jenisKeuangan == EnumJenisTransaksi.pemasukan){
+            if (snapshot.data.jenisKeuangan == EnumJenisTransaksi.pemasukan) {
               iconColor = HexColor('#0abf53');
-            }else{
+            } else {
               iconColor = HexColor('#e04646');
             }
-
 
             final List<Widget> _actionButtons = new List();
             _actionButtons.add(IconButton(
@@ -407,15 +427,23 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
                       child: Column(
                         children: <Widget>[
                           _widgetAmount1(snapshot.data.keuangan.jumlah.toInt()),
-                          Divider(thickness: 2,),
+                          Divider(
+                            thickness: 2,
+                          ),
                           _widgetTextItem(iconColor),
                           _widgetKategori1(snapshot.data.itemName.kategori,
-                              snapshot.data.mapKategori,iconColor),
-                          Divider(thickness: 2,indent: 35,),
+                              snapshot.data.mapKategori, iconColor),
+                          Divider(
+                            thickness: 2,
+                            indent: 35,
+                          ),
                           _widgetCatatan1(iconColor),
-
-                          _widgetTanggal1(snapshot.data.keuangan.tanggal,iconColor),
-                          Divider(thickness: 2,indent: 35,),
+                          _widgetTanggal1(
+                              snapshot.data.keuangan.tanggal, iconColor),
+                          Divider(
+                            thickness: 2,
+                            indent: 35,
+                          ),
                           new Container(
                             height: 70,
                             width: 40,
@@ -542,7 +570,8 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
     );
   }
 
-  Widget _widgetKategori1(Kategori kategori, Map<int, Kategori> lKategori,Color iconColor) {
+  Widget _widgetKategori1(
+      Kategori kategori, Map<int, Kategori> lKategori, Color iconColor) {
     String text = kategori == null ? '' : kategori.nama;
     return Row(
       children: <Widget>[
@@ -609,7 +638,7 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
     );
   }
 
-  Widget _widgetTanggal1(DateTime dateTime,Color iconColor) {
+  Widget _widgetTanggal1(DateTime dateTime, Color iconColor) {
     ProcessString _processString = new ProcessString();
     return Row(
       children: <Widget>[
@@ -641,7 +670,9 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
       height: 50,
       child: Row(
         children: <Widget>[
-          SizedBox(width: 8,),
+          SizedBox(
+            width: 8,
+          ),
           Container(
             width: localWidth / 2,
             child: new RaisedButton(
@@ -651,10 +682,15 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
               onPressed: () {
                 _simpanKeuangan(context, true);
               },
-              child: new Text("Simpan dan lagi",style: TextStyle(fontWeight: FontWeight.bold),),
+              child: new Text(
+                "Simpan dan lagi",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ),
-          SizedBox(width: 8,),
+          SizedBox(
+            width: 8,
+          ),
           Container(
             width: localWidth / 2,
             child: new RaisedButton(
@@ -664,7 +700,8 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
               onPressed: () {
                 _simpanKeuangan(context, false);
               },
-              child: new Text("Simpan",style: TextStyle(fontWeight: FontWeight.bold)),
+              child: new Text("Simpan",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
             ),
           )
         ],
