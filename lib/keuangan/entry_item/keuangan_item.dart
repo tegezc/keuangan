@@ -396,8 +396,10 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
 
             if (snapshot.data.stateEntryKeuangan ==
                 EnumEntryKeuangan.finishLagi) {
-              _controllerTextItem.text = snapshot.data.itemName.nama;
-              _txtNoteController.text = snapshot.data.keuangan.catatan;
+//              _controllerTextItem.text = snapshot.data.itemName.nama;
+//              _txtNoteController.text = snapshot.data.keuangan.catatan;
+              _controllerTextItem.text = '';
+              _txtNoteController.text = '';
             }
 
             ///setup auto complete
@@ -488,6 +490,7 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
   }
 
   Widget _headerAppBar(EnumJenisTransaksi stateJenisKeuangan) {
+
     if (widget.isEditMode) {
       String titleAppBar = 'Pengeluaran';
       if (stateJenisKeuangan == EnumJenisTransaksi.pemasukan) {
@@ -495,11 +498,11 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
       }
       return Text(titleAppBar);
     } else {
-      return dropdownWidget1(stateJenisKeuangan);
+      return _dropdownWidget1(stateJenisKeuangan);
     }
   }
 
-  Widget dropdownWidget1(EnumJenisTransaksi stateJenisKeuangan) {
+  Widget _dropdownWidget1(EnumJenisTransaksi stateJenisKeuangan) {
     return DropdownButton<int>(
       //map each value from the lIst to our dropdownMenuItem widget
       items: [

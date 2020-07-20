@@ -59,7 +59,7 @@ class DaoKeuangan {
     DaoKategori daoKategori = new DaoKategori();
     var dbClient = await DatabaseHelper().db;
     List<Map> list = await dbClient
-        .rawQuery('SELECT * FROM ${tb.name} ORDER BY ${tb.fId} DESC limit 5');
+        .rawQuery('SELECT * FROM ${tb.name} ORDER BY ${tb.fLastUpdate} DESC limit 5');
     List<Keuangan> keuangans = new List();
     for (int i = 0; i < list.length; i++) {
       var keuangan = new Keuangan.fromDB(

@@ -9,6 +9,7 @@ import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/loading_view.dart';
 import 'package:keuangan/util/process_string.dart';
 import 'package:keuangan/util/style.dart';
+import 'dart:math' as math;
 
 class HomepageKeuangan extends StatefulWidget {
   final Widget drawer;
@@ -19,16 +20,35 @@ class HomepageKeuangan extends StatefulWidget {
   _HomepageKeuanganState createState() => _HomepageKeuanganState();
 }
 
-class _HomepageKeuanganState extends State<HomepageKeuangan> {
+class _HomepageKeuanganState extends State<HomepageKeuangan>
+    with TickerProviderStateMixin {
   int _counterBuild = 0;
   BlocHpKeuangan _blocHpKeuangan;
   final Color colorButton = Colors.cyan[600];
   final Color colorTextBtn = Colors.white;
 
+  AnimationController _controller;
+
+  static const List<IconData> icons = const [
+    Icons.monetization_on,
+    Icons.money_off
+  ];
+
   @override
   void initState() {
     _blocHpKeuangan = new BlocHpKeuangan();
+    _controller = new AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
     super.initState();
+  }
+
+  @override
+  void dispose(){
+    _controller.dispose();
+    _blocHpKeuangan.dispose();
+    super.dispose();
   }
 
   Widget _textSmall(String text) {
@@ -320,24 +340,88 @@ class _HomepageKeuanganState extends State<HomepageKeuangan> {
                   ),
                 ),
               ),
-              floatingActionButton: new FloatingActionButton(
-                onPressed: () async {
-                  EnumFinalResult res = await openPage(
-                      context,
-                      KeuanganItemView(
-                        dateTime: DateTime.now(),
-                        isEditMode: false,
-                        keuangan: null,
-                        enumJenisTransaksi: EnumJenisTransaksi.pengeluaran,
-                      ));
-                  if (res == EnumFinalResult.success) {
-                    _blocHpKeuangan.fullReload();
-                  } else {
-                    /// TODO gagal
-                  }
-                },
-                tooltip: 'add Item',
-                child: new Icon(Icons.add),
+              floatingActionButton: new Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: new List.generate(icons.length, (int index) {
+                  Widget child = new Container(
+                    height: 60.0,
+                    width: 160.0,
+                    alignment: FractionalOffset.topCenter,
+                    child: new ScaleTransition(
+                      scale: new CurvedAnimation(
+                        parent: _controller,
+                        curve: new Interval(
+                            0.0, 1.0 - index / icons.length / 2.0,
+                            curve: Curves.easeOut),
+                      ),
+                      child: new FloatingActionButton.extended(
+                        onPressed: () async {
+                          EnumJenisTransaksi enumJns;
+                          /// index == 0 : pemasukan
+                          if (index == 0) {
+
+                            enumJns = EnumJenisTransaksi.pemasukan;
+                          } else {
+                            enumJns = EnumJenisTransaksi.pengeluaran;
+                          }
+                          EnumFinalResult res = await openPage(
+                              context,
+                              KeuanganItemView(
+                                dateTime: DateTime.now(),
+                                isEditMode: false,
+                                keuangan: null,
+                                enumJenisTransaksi: enumJns,
+                              ));
+
+                          /// Kembalikan FAB ke posisi normal
+                          if (!_controller.isDismissed) {
+                            _controller.reverse();
+                          }
+
+                          if (res == EnumFinalResult.success) {
+                            _blocHpKeuangan.fullReload();
+                          } else {
+                            /// TODO gagal
+                          }
+                        },
+                        label:
+                            Text('${index == 0 ? 'Pemasukan' : 'Pengeluaran'}'),
+                        icon: index == 0
+                            ? Icon(Icons.monetization_on)
+                            : Icon(Icons.money_off),
+                        backgroundColor: index == 0 ? Colors.green : Colors.red,
+                        foregroundColor: Colors.white,
+                        heroTag: null,
+                      ),
+                    ),
+                  );
+                  return child;
+                }).toList()
+                  ..add(
+                    new FloatingActionButton(
+                      child: new AnimatedBuilder(
+                        animation: _controller,
+                        builder: (BuildContext context, Widget child) {
+                          return new Transform(
+                            transform: new Matrix4.rotationZ(
+                                _controller.value * 0.5 * math.pi),
+                            alignment: FractionalOffset.center,
+                            child: new Icon(_controller.isDismissed
+                                ? Icons.add
+                                : Icons.close),
+                          );
+                        },
+                      ),
+                      onPressed: () {
+                        if (_controller.isDismissed) {
+                          _controller.forward();
+                        } else {
+                          _controller.reverse();
+                        }
+                      },
+                    ),
+                  ),
               ),
             );
           } else {

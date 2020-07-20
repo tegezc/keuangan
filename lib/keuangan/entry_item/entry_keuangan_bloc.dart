@@ -43,9 +43,9 @@ class BlocEntryKeuangan {
             StateJenisKeuangan v = entryState;
 
             _cacheEntry.jenisKeuangan = v.jenisKeuangan;
-            if(v.jenisKeuangan == EnumJenisTransaksi.pemasukan){
+            if (v.jenisKeuangan == EnumJenisTransaksi.pemasukan) {
               _cacheEntry.mapKategori = _cacheMapKategoriPemasukan;
-            }else{
+            } else {
               _cacheEntry.mapKategori = _cacheMapKategoriPangeluaran;
             }
           }
@@ -111,12 +111,13 @@ class BlocEntryKeuangan {
           break;
         case EnumEntryKeuangan.finishLagi:
           {
-            this._reset();
+            this._handleFinishDanLagi(_cacheEntry.jenisKeuangan);
           }
           break;
       }
-
-      this._sinkEntryKeuangan(_cacheEntry);
+      if (entryState.stateEntry != EnumEntryKeuangan.finishLagi) {
+        this._sinkEntryKeuangan(_cacheEntry);
+      }
     });
   }
 
@@ -201,12 +202,6 @@ class BlocEntryKeuangan {
     }
 
     return enumFinalResult;
-  }
-
-  void _reset() {
-    //  _cacheEntry.jenisKeuangan = EnumJenisTransaksi.pengeluaran;
-    _cacheEntry.itemName = null;
-    _cacheEntry.keuangan = null;
   }
 
   Future<EnumFinalResult> update(String nama, String catatan) async {
@@ -295,11 +290,11 @@ class BlocEntryKeuangan {
 
           Kategori kt;
           if (enumJenisTransaksi == EnumJenisTransaksi.pengeluaran) {
-            _cacheEntry.mapItemName = _cacheMapItemNamePengeluaran;
+            //  _cacheEntry.mapItemName = _cacheMapItemNamePengeluaran;
             _cacheEntry.mapKategori = _cacheMapKategoriPangeluaran;
             kt = _cacheMapKategoriPangeluaran[_cacheEntry.itemName.idKategori];
           } else {
-            _cacheEntry.mapItemName = _cacheMapItemNamePemasukan;
+            // _cacheEntry.mapItemName = _cacheMapItemNamePemasukan;
             _cacheEntry.mapKategori = _cacheMapKategoriPemasukan;
             kt = _cacheMapKategoriPemasukan[_cacheEntry.itemName.idKategori];
           }
@@ -308,18 +303,39 @@ class BlocEntryKeuangan {
         });
       } else {
         if (enumJenisTransaksi == EnumJenisTransaksi.pengeluaran) {
-          _cacheEntry.mapItemName = _cacheMapItemNamePengeluaran;
+          // _cacheEntry.mapItemName = _cacheMapItemNamePengeluaran;
           _cacheEntry.mapKategori = _cacheMapKategoriPangeluaran;
         } else {
-          _cacheEntry.mapItemName = _cacheMapItemNamePemasukan;
+          //_cacheEntry.mapItemName = _cacheMapItemNamePemasukan;
           _cacheEntry.mapKategori = _cacheMapKategoriPemasukan;
         }
+        _cacheEntry.jenisKeuangan = enumJenisTransaksi;
         daoKategori.getDefaultKategori(enumJenisTransaksi).then((ktg) {
           _cacheEntry.itemName.setKategori(ktg);
           this._sinkEntryKeuangan(_cacheEntry);
         });
-
       }
+    });
+  }
+
+  void _handleFinishDanLagi(EnumJenisTransaksi enumJenisTransaksi) {
+    _cacheEntry.keuangan = new Keuangan.fromUI(DateTime.now(), 0, 0, '');
+    _cacheEntry.itemName = new ItemName('', 0, 0);
+    _cacheEntry.stateEntryKeuangan = EnumEntryKeuangan.finishLagi;
+    _cacheEntry.finalResult = EnumFinalResult.inprogres;
+    DaoKategori daoKategori = new DaoKategori();
+
+    if (enumJenisTransaksi == EnumJenisTransaksi.pengeluaran) {
+      // _cacheEntry.mapItemName = _cacheMapItemNamePengeluaran;
+      _cacheEntry.mapKategori = _cacheMapKategoriPangeluaran;
+    } else {
+      //_cacheEntry.mapItemName = _cacheMapItemNamePemasukan;
+      _cacheEntry.mapKategori = _cacheMapKategoriPemasukan;
+    }
+    _cacheEntry.jenisKeuangan = enumJenisTransaksi;
+    daoKategori.getDefaultKategori(enumJenisTransaksi).then((ktg) {
+      _cacheEntry.itemName.setKategori(ktg);
+      this._sinkEntryKeuangan(_cacheEntry);
     });
   }
 
@@ -335,7 +351,6 @@ class BlocEntryKeuangan {
       List<Kategori> lkpm = await daoKategori
           .getAllKategoriTermasukAbadi(EnumJenisTransaksi.pemasukan);
       _cacheMapKategoriPemasukan = _lkategoriToMap(lkpm);
-
     }
 
     if (_cacheEntry.mapItemName.isEmpty) {
@@ -365,15 +380,14 @@ class EntryKeuangan {
   EnumEntryKeuangan stateEntryKeuangan;
   EnumFinalResult finalResult;
 
-  EntryKeuangan({
-    @required this.mapKategori,
-    @required this.mapItemName,
-    @required this.jenisKeuangan,
-    @required this.itemName,
-    @required this.keuangan,
-    @required this.stateEntryKeuangan,
-    @required this.finalResult
-  });
+  EntryKeuangan(
+      {@required this.mapKategori,
+      @required this.mapItemName,
+      @required this.jenisKeuangan,
+      @required this.itemName,
+      @required this.keuangan,
+      @required this.stateEntryKeuangan,
+      @required this.finalResult});
 }
 
 class StateEntryKeuangan {
