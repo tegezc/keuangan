@@ -39,7 +39,8 @@ class _AddCategoryState extends State<AddCategory> {
 
   BlocAddKategori _blocAddKategori;
   int _counterBuild = 0;
-  final TextStyle _styleTextDesc = TextStyle(fontSize: 12,fontWeight: FontWeight.bold,color: Colors.blue);
+  final TextStyle _styleTextDesc =
+      TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.blue);
   final _decorationNama = InputDecoration(
     // border: OutlineInputBorder(),
     hintText: 'nama kategori',
@@ -70,8 +71,10 @@ class _AddCategoryState extends State<AddCategory> {
   _saveKategori(ItemUiAddKategori itemUi) async {
     String nama = _txtController.text;
     String catatan = _txtCatatanController.text;
-    _blocAddKategori.submitKategori(nama,catatan);
+    EnumFinalResult enumFinalResult =
+        await _blocAddKategori.submitKategori(nama, catatan);
 
+    Navigator.of(context).pop(enumFinalResult);
   }
 
   List<DropdownMenuItem<int>> _getDropDownTransaksi() {
@@ -90,16 +93,17 @@ class _AddCategoryState extends State<AddCategory> {
     return items;
   }
 
-  _eksekusiAfterBuild(BuildContext context, ItemUiAddKategori data)async{
-    if(data.enumStateFromBloc == EnumStateFromBloc.finish){
-      Navigator.of(context).pop(1);
-    }
-  }
+//  _eksekusiAfterBuild(BuildContext context, ItemUiAddKategori data)async{
+//    if(data.enumStateFromBloc == EnumStateFromBloc.finish){
+//      Navigator.of(context).pop(1);
+//    }
+//  }
 
   @override
   Widget build(BuildContext context) {
     if (_counterBuild == 0) {
-      _blocAddKategori.loadFirstTime(widget.stateAddCategory, widget.kategori,widget.idparent);
+      _blocAddKategori.loadFirstTime(
+          widget.stateAddCategory, widget.kategori, widget.idparent);
       _counterBuild++;
     }
 
@@ -116,8 +120,8 @@ class _AddCategoryState extends State<AddCategory> {
                 )),
                 body: LoadingView());
           } else {
-            WidgetsBinding.instance.addPostFrameCallback(
-                    (_) => _eksekusiAfterBuild(context, snapshot.data));
+//            WidgetsBinding.instance.addPostFrameCallback(
+//                    (_) => _eksekusiAfterBuild(context, snapshot.data));
             _txtController.text = snapshot.data.currentKategori.nama;
             _txtCatatanController.text = snapshot.data.currentKategori.catatan;
             return Scaffold(
@@ -147,19 +151,28 @@ class _AddCategoryState extends State<AddCategory> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
-                      Text('Jenis Transaksi:',style: _styleTextDesc,),
+                      Text(
+                        'Jenis Transaksi:',
+                        style: _styleTextDesc,
+                      ),
                       new DropdownButton(
                         value: snapshot.data.currentKategori.type.index,
                         items: dropDownTransaksi,
                         onChanged: _changedDropDownTransaksi,
                       ),
-                      Text('Nama Kategori:',style: _styleTextDesc,),
+                      Text(
+                        'Nama Kategori:',
+                        style: _styleTextDesc,
+                      ),
                       TextField(
                         decoration: _decorationNama,
                         controller: _txtController,
                         maxLines: 1,
                       ),
-                      Text('Keterangan (Optional):',style: _styleTextDesc,),
+                      Text(
+                        'Keterangan (Optional):',
+                        style: _styleTextDesc,
+                      ),
                       TextField(
                         decoration: _decorationKet,
                         controller: _txtCatatanController,

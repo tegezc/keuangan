@@ -47,23 +47,25 @@ class _AddSubCategoryState extends State<AddSubCategory> {
     super.dispose();
   }
 
-  _saveKategori(Kategori k) async {
+  _saveSubKategori(Kategori k) async {
     String nama = _txtController.text;
     String catatan = _txtCatatanController.text;
-    _blocAddKategori.submitKategori(nama,catatan);
+    EnumFinalResult enumFinalResult =
+        await _blocAddKategori.submitKategori(nama, catatan);
+    Navigator.of(context).pop(enumFinalResult);
   }
 
-
-  _eksekusiAfterBuild(BuildContext context, ItemUiAddSubKategori data)async{
-    if(data.enumStateFromBloc == EnumStateFromBloc.finish){
-      Navigator.of(context).pop(1);
-    }
-  }
+//  _eksekusiAfterBuild(BuildContext context, ItemUiAddSubKategori data)async{
+//    if(data.enumStateFromBloc == EnumStateFromBloc.finish){
+//      Navigator.of(context).pop(1);
+//    }
+//  }
 
   @override
   Widget build(BuildContext context) {
     if (_counterBuild == 0) {
-      _blocAddKategori.loadFirstTime(widget.stateAddCategory, widget.kategori,widget.idparent);
+      _blocAddKategori.loadFirstTime(
+          widget.stateAddCategory, widget.kategori, widget.idparent);
       _counterBuild++;
     }
 
@@ -74,13 +76,16 @@ class _AddSubCategoryState extends State<AddSubCategory> {
             return Scaffold(
                 appBar: AppBar(
                     title: Text(
-                      'tunggu sebentar...',
-                    )),
+                  'tunggu sebentar...',
+                )),
                 body: LoadingView());
           } else {
-            WidgetsBinding.instance.addPostFrameCallback(
-                    (_) => _eksekusiAfterBuild(context, snapshot.data));
-            String header = snapshot.data.currentKategori.type==EnumJenisTransaksi.pemasukan?"Pemasukan":'Pengeluaran';
+//            WidgetsBinding.instance.addPostFrameCallback(
+//                    (_) => _eksekusiAfterBuild(context, snapshot.data));
+            String header = snapshot.data.currentKategori.type ==
+                    EnumJenisTransaksi.pemasukan
+                ? "Pemasukan"
+                : 'Pengeluaran';
 
             _txtCatatanController.text = snapshot.data.currentKategori.catatan;
             _txtController.text = snapshot.data.currentKategori.nama;
@@ -95,7 +100,7 @@ class _AddSubCategoryState extends State<AddSubCategory> {
                     color: Colors.green[900],
                     icon: Icon(Icons.done),
                     onPressed: () {
-                      _saveKategori(snapshot.data.currentKategori);
+                      _saveSubKategori(snapshot.data.currentKategori);
                     },
                   ),
                   // overflow menu
@@ -103,7 +108,7 @@ class _AddSubCategoryState extends State<AddSubCategory> {
               ),
               body: new Container(
                 padding:
-                EdgeInsets.only(top: 15, left: 20, right: 15, bottom: 0),
+                    EdgeInsets.only(top: 15, left: 20, right: 15, bottom: 0),
                 height: double.infinity,
                 width: double.infinity,
                 child: SingleChildScrollView(
@@ -112,8 +117,11 @@ class _AddSubCategoryState extends State<AddSubCategory> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
-                      Text('$header - Parent: ${snapshot.data.kategoriParent.nama}'),
-                      SizedBox(height: 5,),
+                      Text(
+                          '$header - Parent: ${snapshot.data.kategoriParent.nama}'),
+                      SizedBox(
+                        height: 5,
+                      ),
                       Text('Nama Sub Kategori'),
                       TextField(
                         controller: _txtController,
@@ -132,5 +140,4 @@ class _AddSubCategoryState extends State<AddSubCategory> {
           }
         });
   }
-
 }

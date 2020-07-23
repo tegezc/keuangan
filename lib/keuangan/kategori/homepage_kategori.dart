@@ -214,31 +214,31 @@ class _HomePageKategoriState extends State<HomePageKategori> {
     );
   }
 
-  _eksekusiAfterBuild(BuildContext context, ItemUIHomepageKategori data) {
-    if (data.enumState == EnumStatePopulateKategori.savesuccess &&
-        _counterSaveSuccess == 0) {
-      _counterSaveSuccess++;
-      String messageToast = 'Kategori berhasil di simpan.';
-      this._showToast(messageToast);
-    } else if (data.enumState == EnumStatePopulateKategori.editsuccess &&
-        _counterEditSuccess == 0) {
-      _counterEditSuccess++;
-      String messageToast = 'Kategori berhasil di ubah.';
-      this._showToast(messageToast);
-    } else if (data.enumState ==
-            EnumStatePopulateKategori.editSubkategorisuccess &&
-        _counterEditSubKategoriSuccess == 0) {
-      _counterEditSubKategoriSuccess++;
-      String messageToast = 'Subkategori berhasil di ubah.';
-      this._showToast(messageToast);
-    } else if (data.enumState ==
-            EnumStatePopulateKategori.saveSubkategorisuccess &&
-        _counterSaveSubKategoriSuccess == 0) {
-      _counterSaveSubKategoriSuccess++;
-      String messageToast = 'Subkategori berhasil di simpan.';
-      this._showToast(messageToast);
-    }
-  }
+  // _eksekusiAfterBuild(BuildContext context, ItemUIHomepageKategori data) {
+//    if (data.enumState == EnumStatePopulateKategori.savesuccess &&
+//        _counterSaveSuccess == 0) {
+//      _counterSaveSuccess++;
+//      String messageToast = 'Kategori berhasil di simpan.';
+//      this._showToast(messageToast);
+//    } else if (data.enumState == EnumStatePopulateKategori.editsuccess &&
+//        _counterEditSuccess == 0) {
+//      _counterEditSuccess++;
+//      String messageToast = 'Kategori berhasil di ubah.';
+//      this._showToast(messageToast);
+//    } else if (data.enumState ==
+//            EnumStatePopulateKategori.editSubkategorisuccess &&
+//        _counterEditSubKategoriSuccess == 0) {
+//      _counterEditSubKategoriSuccess++;
+//      String messageToast = 'Subkategori berhasil di ubah.';
+//      this._showToast(messageToast);
+//    } else if (data.enumState ==
+//            EnumStatePopulateKategori.saveSubkategorisuccess &&
+//        _counterSaveSubKategoriSuccess == 0) {
+//      _counterSaveSubKategoriSuccess++;
+//      String messageToast = 'Subkategori berhasil di simpan.';
+//      this._showToast(messageToast);
+//    }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -247,72 +247,65 @@ class _HomePageKategoriState extends State<HomePageKategori> {
           .populateAllKategoriFromDb(EnumStatePopulateKategori.firsttime);
       _counterBuild++;
     }
-    return StreamBuilder<ItemUIHomepageKategori>(
-        stream: _blocHomepageKategori.itemUIHomepageKategori,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            ///prevent snacbar show twice
-            //_enumState = snapshot.data.enumState;
-            if (_enumState != snapshot.data.enumState) {
-              _enumState = snapshot.data.enumState;
+    return CustomToastForMe(
+      child: StreamBuilder<ItemUIHomepageKategori>(
+          stream: _blocHomepageKategori.itemUIHomepageKategori,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              ///prevent snacbar show twice
+              //_enumState = snapshot.data.enumState;
+              if (_enumState != snapshot.data.enumState) {
+                _enumState = snapshot.data.enumState;
+              } else {
+                _enumState = null;
+              }
+//              WidgetsBinding.instance.addPostFrameCallback(
+//                  (_) => _eksekusiAfterBuild(context, snapshot.data));
+              final List<Widget> _actionButtons = new List();
+              _actionButtons.add(IconButton(
+                  icon: Icon(Icons.add),
+                  // color: Colors.blue,
+                  onPressed: () async {
+                    EnumFinalResult res =
+                        await openPage(context, AddCategory.baru());
+                    //prevent snacbar showing
+                    if (res != null) {
+                      if (res == EnumFinalResult.success) {
+                        _blocHomepageKategori.populateAllKategoriFromDb(
+                            EnumStatePopulateKategori.savesuccess);
+                        _showToast('Kategori berhasil di simpan.');
+                      }
+                    }
+                  }));
+              return Scaffold(
+                drawer: widget.drawer,
+                appBar: new AppBar(
+                  title: new Text('Kategori'),
+                  actions: _actionButtons,
+                ),
+                body: Container(
+                  height: double.infinity,
+                  width: double.infinity,
+                  child: ListView(
+                    scrollDirection: Axis.vertical,
+                    children: _listKategori(
+                        snapshot.data.listKategoriPengeluaran,
+                        snapshot.data.listKategoriPemasukan),
+                  ),
+                ),
+              );
             } else {
               _enumState = null;
+              return Scaffold(
+                drawer: widget.drawer,
+                appBar: new AppBar(
+                  title: new Text('Transaksi'),
+                ),
+                body: LoadingView(),
+              );
             }
-            WidgetsBinding.instance.addPostFrameCallback(
-                (_) => _eksekusiAfterBuild(context, snapshot.data));
-            final List<Widget> _actionButtons = new List();
-            _actionButtons.add(IconButton(
-                icon: Icon(Icons.add),
-                // color: Colors.blue,
-                onPressed: () async {
-                  int res = await openPage(context, AddCategory.baru());
-                  //prevent snacbar showing
-                  if (res == null) {
-                    _enumState = null;
-                  } else {
-                    _counterSaveSuccess = 0;
-                    _blocHomepageKategori.populateAllKategoriFromDb(
-                        EnumStatePopulateKategori.savesuccess);
-                  }
-                }));
-            return Scaffold(
-              drawer: widget.drawer,
-              appBar: new AppBar(
-                title: new Text('Kategori'),
-                actions: _actionButtons,
-              ),
-              body: ListView(
-                scrollDirection: Axis.vertical,
-                children: _listKategori(snapshot.data.listKategoriPengeluaran,
-                    snapshot.data.listKategoriPemasukan),
-              ),
-//              floatingActionButton: new FloatingActionButton(
-//                onPressed: () async {
-//                  int res = await openPage(context, AddCategory.baru());
-//                  //prevent snacbar showing
-//                  if (res == null) {
-//                    _enumState = null;
-//                  } else {
-//                    _counterSaveSuccess = 0;
-//                    _blocHomepageKategori.populateAllKategoriFromDb(
-//                        EnumStatePopulateKategori.savesuccess);
-//                  }
-//                },
-//                tooltip: 'add kategori',
-//                child: new Icon(Icons.add),
-//              ),
-            );
-          } else {
-            _enumState = null;
-            return Scaffold(
-              drawer: widget.drawer,
-              appBar: new AppBar(
-                title: new Text('Transaksi'),
-              ),
-              body: LoadingView(),
-            );
-          }
-        });
+          }),
+    );
   }
 
   _showDialogPilihan(Kategori kategori) {
@@ -500,55 +493,56 @@ class _HomePageKategoriState extends State<HomePageKategori> {
   }
 
   _edit(Kategori kategori) async {
-    int res = await openPage(context, AddCategory.edit(kategori));
+    EnumFinalResult res = await openPage(context, AddCategory.edit(kategori));
 
     /// dismiss showDialog
-    Navigator.of(context).pop();
 
-    //prevent snacbar showing
-    if (res == null) {
-      _enumState = null;
-    } else {
-      _counterEditSuccess = 0;
-      _blocHomepageKategori
-          .populateAllKategoriFromDb(EnumStatePopulateKategori.editsuccess);
+    if (res != null) {
+      if (res == EnumFinalResult.success) {
+        _blocHomepageKategori
+            .populateAllKategoriFromDb(EnumStatePopulateKategori.savesuccess);
+        _showToast('Kategori berhasil di edit.');
+      }
     }
+    Navigator.of(context).pop();
   }
 
   _addSubKategori(int idparent) async {
-    int res = await openPage(context, AddSubCategory.baru(idparent));
-    Navigator.of(context).pop();
+    EnumFinalResult res =
+        await openPage(context, AddSubCategory.baru(idparent));
 
-    ///prevent snacbar showing
-    if (res == null) {
-      _enumState = null;
-    } else {
-      _counterSaveSubKategoriSuccess = 0;
-      _blocHomepageKategori.populateAllKategoriFromDb(
-          EnumStatePopulateKategori.saveSubkategorisuccess);
+    if (res != null) {
+      if (res == EnumFinalResult.success) {
+        _blocHomepageKategori
+            .populateAllKategoriFromDb(EnumStatePopulateKategori.savesuccess);
+        _showToast('Sub-Kategori berhasil di simpan.');
+      }
     }
+
+    Navigator.of(context).pop();
   }
 
   _editSubKategori(Kategori kategori) async {
-    int res = await openPage(context, AddSubCategory.edit(kategori));
-    Navigator.of(context).pop();
-
-    //prevent snacbar showing
-    if (res == null) {
-      _enumState = null;
-    } else {
-      _counterEditSubKategoriSuccess = 0;
-      _blocHomepageKategori.populateAllKategoriFromDb(
-          EnumStatePopulateKategori.editSubkategorisuccess);
+    EnumFinalResult res =
+        await openPage(context, AddSubCategory.edit(kategori));
+    if (res != null) {
+      if (res == EnumFinalResult.success) {
+        _blocHomepageKategori
+            .populateAllKategoriFromDb(EnumStatePopulateKategori.savesuccess);
+        _showToast('Sub-Kategori berhasil di edit.');
+      }
     }
+    Navigator.of(context).pop();
   }
 
   _showToast(String messageToast) {
     showToast(messageToast,
         context: context,
+        duration: Duration(seconds: 1),
+        textStyle: TextStyle(fontSize: 16, color: Colors.white),
+        backgroundColor: Colors.cyan[600],
         toastHorizontalMargin: 10.0,
-        position: StyledToastPosition(
-            align: Alignment.bottomCenter, offset: 70.0));
+        position:
+            StyledToastPosition(align: Alignment.topCenter, offset: 70.0));
   }
-
 }
