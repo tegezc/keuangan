@@ -275,7 +275,6 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
     } else {
       /// TODO gagal
     }
-    print('res : $res');
     Navigator.of(context).pop();
   }
 
@@ -381,8 +380,11 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
                               curve: Curves.easeOut),
                         ),
                         child: new FloatingActionButton.extended(
-
                           onPressed: () async {
+                            /// Kembalikan FAB ke posisi normal
+                            if (!_controller.isDismissed) {
+                              _controller.reverse();
+                            }
                             EnumJenisTransaksi enumJns;
                             /// index == 0 : pemasukan
                             if (index == 0) {
@@ -400,11 +402,6 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
                                   enumJenisTransaksi: enumJns,
                                 ));
 
-                            /// Kembalikan FAB ke posisi normal
-                            if (!_controller.isDismissed) {
-                              _controller.reverse();
-                            }
-                              print('kembalian homepage keuangan: $res');
                             if(res == null){
                               _blocHpKeuangan.fullReload();
                             }else if (res == EnumFinalResult.success) {

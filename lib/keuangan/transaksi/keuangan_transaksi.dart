@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/database/keuangan/dao_kategori.dart';
 import 'package:keuangan/database/keuangan/dao_keuangan.dart';
@@ -94,6 +95,15 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
 
   _callbackActionDelete(String s) {
     _fullReload();
+  }
+
+  _callbackActionUpdate(EnumFinalResult enumFinalResult){
+    if(enumFinalResult == null){
+      _fullReload();
+    }else if (enumFinalResult == EnumFinalResult.success){
+      _fullReload();
+      _showToast('Transaksi berhasil di update');
+    }
   }
 
   _reloadFirstTime() {
@@ -393,6 +403,7 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
       lw.add(CellKeuangan(
         entry: element,
         callbackDelete: _callbackActionDelete,
+        callbackUpdate: _callbackActionUpdate,
       ));
     });
 
@@ -421,98 +432,113 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
         body: LoadingView(),
       );
     } else {
-      return Scaffold(
-        drawer: widget.drawer,
-        appBar: new AppBar(
-          title: new Text('Transaksi'),
-        ),
-        body: _bodyTransaksi(mediaQueryData.size),
-        floatingActionButton: new Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
-          children: new List.generate(icons.length, (int index) {
-            Widget child = new Container(
-              height: 60.0,
-              width: 160.0,
-              alignment: FractionalOffset.topCenter,
-              child: new ScaleTransition(
-                scale: new CurvedAnimation(
-                  parent: _controller,
-                  curve: new Interval(0.0, 1.0 - index / icons.length / 2.0,
-                      curve: Curves.easeOut),
+      return CustomToastForMe(
+        child: Scaffold(
+          drawer: widget.drawer,
+          appBar: new AppBar(
+            title: new Text('Transaksi'),
+          ),
+          body: _bodyTransaksi(mediaQueryData.size),
+          floatingActionButton: new Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: new List.generate(icons.length, (int index) {
+              Widget child = new Container(
+                height: 60.0,
+                width: 160.0,
+                alignment: FractionalOffset.topCenter,
+                child: new ScaleTransition(
+                  scale: new CurvedAnimation(
+                    parent: _controller,
+                    curve: new Interval(0.0, 1.0 - index / icons.length / 2.0,
+                        curve: Curves.easeOut),
+                  ),
+                  child: new FloatingActionButton.extended(
+                    onPressed: () async {
+                      /// Kembalikan FAB ke posisi normal
+                      if (!_controller.isDismissed) {
+                        _controller.reverse();
+                      }
+                      EnumJenisTransaksi enumJns;
+
+                      /// index == 0 : pemasukan
+                      if (index == 0) {
+                        enumJns = EnumJenisTransaksi.pemasukan;
+                      } else {
+                        enumJns = EnumJenisTransaksi.pengeluaran;
+                      }
+                      EnumFinalResult res = await openPage(
+                          context,
+                          KeuanganItemView(
+                            dateTime: DateTime.now(),
+                            isEditMode: false,
+                            keuangan: null,
+                            enumJenisTransaksi: enumJns,
+                          ));
+
+
+                      if (res == null) {
+                        _fullReload();
+                      } else if (res == EnumFinalResult.success) {
+                        _fullReload();
+                        _showToast('Transaksi berhasil disimpan.');
+                      } else {
+                        /// TODO gagal
+                      }
+                    },
+                    label: Text('${index == 0 ? 'Pemasukan' : 'Pengeluaran'}'),
+                    icon: index == 0
+                        ? Icon(Icons.monetization_on)
+                        : Icon(Icons.money_off),
+                    backgroundColor: index == 0 ? Colors.green : Colors.red,
+                    foregroundColor: Colors.white,
+                    heroTag: null,
+                  ),
                 ),
-                child: new FloatingActionButton.extended(
-                  onPressed: () async {
-                    EnumJenisTransaksi enumJns;
-
-                    /// index == 0 : pemasukan
-                    if (index == 0) {
-                      enumJns = EnumJenisTransaksi.pemasukan;
+              );
+              return child;
+            }).toList()
+              ..add(
+                new FloatingActionButton(
+                  child: new AnimatedBuilder(
+                    animation: _controller,
+                    builder: (BuildContext context, Widget child) {
+                      return new Transform(
+                        transform: new Matrix4.rotationZ(
+                            _controller.value * 0.5 * math.pi),
+                        alignment: FractionalOffset.center,
+                        child: new Icon(
+                            _controller.isDismissed ? Icons.add : Icons.close),
+                      );
+                    },
+                  ),
+                  onPressed: () {
+                    if (_controller.isDismissed) {
+                      print('contoller dismiss');
+                      _controller.forward();
                     } else {
-                      enumJns = EnumJenisTransaksi.pengeluaran;
-                    }
-                    EnumFinalResult res = await openPage(
-                        context,
-                        KeuanganItemView(
-                          dateTime: DateTime.now(),
-                          isEditMode: false,
-                          keuangan: null,
-                          enumJenisTransaksi: enumJns,
-                        ));
-
-                    /// Kembalikan FAB ke posisi normal
-                    if (!_controller.isDismissed) {
+                      print('controller tdk dismiss');
                       _controller.reverse();
                     }
-                    if (res == null) {
-                      _fullReload();
-                    } else if (res == EnumFinalResult.success) {
-                      _fullReload();
-                    } else {
-                      /// TODO gagal
-                    }
-                  },
-                  label: Text('${index == 0 ? 'Pemasukan' : 'Pengeluaran'}'),
-                  icon: index == 0
-                      ? Icon(Icons.monetization_on)
-                      : Icon(Icons.money_off),
-                  backgroundColor: index == 0 ? Colors.green : Colors.red,
-                  foregroundColor: Colors.white,
-                  heroTag: null,
-                ),
-              ),
-            );
-            return child;
-          }).toList()
-            ..add(
-              new FloatingActionButton(
-                child: new AnimatedBuilder(
-                  animation: _controller,
-                  builder: (BuildContext context, Widget child) {
-                    return new Transform(
-                      transform: new Matrix4.rotationZ(
-                          _controller.value * 0.5 * math.pi),
-                      alignment: FractionalOffset.center,
-                      child: new Icon(
-                          _controller.isDismissed ? Icons.add : Icons.close),
-                    );
                   },
                 ),
-                onPressed: () {
-                  if (_controller.isDismissed) {
-                    print('contoller dismiss');
-                    _controller.forward();
-                  } else {
-                    print('controller tdk dismiss');
-                    _controller.reverse();
-                  }
-                },
-              ),
-            )
-          ..add(Container(height: 40,)),
+              )
+            ..add(Container(height: 40,)),
+          ),
         ),
       );
     }
+  }
+
+  _showToast(String messageToast) {
+    showToast(messageToast,
+        context: context,
+        duration: Duration(seconds: 2),
+        textStyle: TextStyle(fontSize: 16,color: Colors.white),
+        backgroundColor: Colors.cyan[600],
+        toastHorizontalMargin: 10.0,
+        position: StyledToastPosition(
+            align: Alignment.topCenter, offset: 70.0));
   }
 }
 

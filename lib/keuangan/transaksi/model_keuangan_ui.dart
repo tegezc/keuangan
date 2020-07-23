@@ -28,8 +28,9 @@ class Entry {
 class CellKeuangan extends StatefulWidget {
   final Entry entry;
   final ValueChanged<String> callbackDelete;
+  final Function callbackUpdate;
 
-  CellKeuangan({this.entry, this.callbackDelete});
+  CellKeuangan({this.entry, this.callbackDelete,this.callbackUpdate});
 
   @override
   _CellKeuanganState createState() => _CellKeuanganState();
@@ -211,7 +212,7 @@ class _CellKeuanganState extends State<CellKeuangan> {
     } else {
       enumJenisTransaksi = EnumJenisTransaksi.pemasukan;
     }
-    await openPage(
+    EnumFinalResult res = await openPage(
         context,
         KeuanganItemView(
           dateTime: DateTime.now(),
@@ -219,6 +220,12 @@ class _CellKeuanganState extends State<CellKeuangan> {
           keuangan: entry.keuangan,
           enumJenisTransaksi: enumJenisTransaksi,
         ));
+
+    if (res == EnumFinalResult.success) {
+      widget.callbackUpdate(res);
+    } else {
+      /// TODO gagal
+    }
     Navigator.of(context).pop();
   }
 
