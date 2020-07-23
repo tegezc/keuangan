@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 
 class CalculatorDialog extends ModalRoute<void> {
   Function callBackLastResult;
-  int amount;
+  double amount;
 
   CalculatorDialog({this.callBackLastResult, this.amount});
 
@@ -127,7 +128,7 @@ class CalculatorView extends StatefulWidget {
   //double dimension;
   final double widthWidget;
   final Function functionResult;
-  final int amount;
+  final double amount;
 
   CalculatorView({this.widthWidget, this.functionResult, this.amount});
 
@@ -136,17 +137,15 @@ class CalculatorView extends StatefulWidget {
 }
 
 class _CalculatorViewState extends State<CalculatorView> {
-  static final initialText = '0';
-  static final heighCell = 50.0;
-  int finalResult = 0;
-  final TextStyle textStyleKet = TextStyle(
+  static final _heighCell = 50.0;
+  final TextStyle _textStyleKet = TextStyle(
       fontSize: 14, color: Colors.grey[700], fontWeight: FontWeight.normal);
 
-  final TextStyle textStyleCell =
+  final TextStyle _textStyleCell =
       TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold);
-  final TextStyle textStyleBtn =
+  final TextStyle _textStyleBtn =
       TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold);
-  final TextStyle textStyleAmount =
+  final TextStyle _textStyleAmount =
       TextStyle(fontSize: 30, color: Colors.black, fontWeight: FontWeight.bold);
 
   final Color _colorNonNumber = Colors.grey[100];
@@ -156,32 +155,34 @@ class _CalculatorViewState extends State<CalculatorView> {
   GlobalKey _keyButtonSave = GlobalKey();
 
   //calculator logic
-  String isiText;
+  IsiTextAmount _isiText;
 
-  double num1;
-  double num2;
-  Operator operator = Operator.kosong;
+  double _num1;
+  double _num2;
+  Operator _operator = Operator.kosong;
   bool _isFirstimeClickNumber;
 
   @override
   initState() {
+    _isiText = IsiTextAmount();
     _isFirstimeClickNumber = true;
-    isiText = '${widget.amount}';
+    _isiText.setRealValue(widget.amount);
     super.initState();
   }
 
   _setTextDisplay(double value) {
-    String s = '$value';
-    List<String> d = s.split('.');
-    if (d.length == 2) {
-      if (d[1].startsWith('0')) {
-        isiText = d[0];
-      } else {
-        isiText = value.toStringAsFixed(1);
-      }
-    } else {
-      isiText = '$value';
-    }
+    _isiText.setRealValue(value);
+//    String s = '$value';
+//    List<String> d = s.split('.');
+//    if (d.length == 2) {
+//      if (d[1].startsWith('0')) {
+//        _isiText = d[0];
+//      } else {
+//        _isiText = value.toStringAsFixed(1);
+//      }
+//    } else {
+//      _isiText = '$value';
+//    }
   }
 
   _log(String ket) {
@@ -192,24 +193,25 @@ class _CalculatorViewState extends State<CalculatorView> {
   }
 
   _clickNumber(int value) {
-    _log('Sebelum click Number');
-    if (operator == Operator.kosong) {
-      if (isiText == initialText || isiText.length == 0||_isFirstimeClickNumber) {
-        num1 = value.toDouble();
+    if (_operator == Operator.kosong) {
+      if (_isiText.realValue == 0 || _isFirstimeClickNumber) {
+        _num1 = value.toDouble();
         _isFirstimeClickNumber = false;
       } else {
-        String sn = isiText + '$value';
-        num1 = double.parse(sn);
+        String tmp = _isiText.realValue.toInt().toString();
+        String sn = tmp + '$value';
+        _num1 = double.parse(sn);
       }
-      _setTextDisplay(num1);
+      _setTextDisplay(_num1);
     } else {
-      if (num2 == null) {
-        num2 = value.toDouble();
+      if (_num2 == null) {
+        _num2 = value.toDouble();
       } else {
-        String sn = isiText + '$value';
-        num2 = double.parse(sn);
+        String tmp = _isiText.realValue.toInt().toString();
+        String sn = tmp + '$value';
+        _num2 = double.parse(sn);
       }
-      _setTextDisplay(num2);
+      _setTextDisplay(_num2);
     }
     _log('Setelah Number');
     setState(() {});
@@ -217,60 +219,61 @@ class _CalculatorViewState extends State<CalculatorView> {
 
   _clickOperator(Operator op) {
     _log('Sebelum click operator');
-    if (num1 != null && num2 != null) {
+    if (_num1 != null && _num2 != null) {
       _clickSamaDengan();
     }
 
-    if(_isFirstimeClickNumber){
+    if (_isFirstimeClickNumber) {
       _isFirstimeClickNumber = false;
-      num1 = double.parse(isiText);
+      _num1 = _isiText.realValue;
     }
     //else if(num1 > 0){
-    operator = op;
+    _operator = op;
     // }
     _log('Setelah click operator');
   }
 
   _clickDelete() {
-    String txt = isiText;
+    String txt = _isiText.realValue.toInt().toString();
     if (txt.length == 1) {
-      isiText = '0';
+      _isiText.setRealValue(0);
     } else {
-      isiText = txt.substring(0, txt.length - 1);
+      String tmp = txt.substring(0, txt.length - 1);
+      _isiText.setRealValue(double.parse(tmp));
     }
 
-    if (num2 != null) {
-      num2 = double.parse(isiText);
+    if (_num2 != null) {
+      _num2 = _isiText.realValue;
     } else {
-      num1 = double.parse(isiText);
-      operator = Operator.kosong;
+      _num1 = _isiText.realValue;
+      _operator = Operator.kosong;
     }
     setState(() {});
   }
 
   _clickClear() {
-    num1 = null;
-    num2 = null;
-    operator = Operator.kosong;
+    _num1 = null;
+    _num2 = null;
+    _operator = Operator.kosong;
     _setTextDisplay(0.0);
     setState(() {});
   }
 
   double _logicOperation(double n1, double n2, Operator op) {
-    var value = num1;
+    var value = _num1;
     LogicCalculator logicCalculator = new LogicCalculator();
     switch (op) {
       case Operator.addition:
-        value = logicCalculator.addition(num1, num2);
+        value = logicCalculator.addition(_num1, _num2);
         break;
       case Operator.subtraction:
-        value = logicCalculator.subtraction(num1, num2);
+        value = logicCalculator.subtraction(_num1, _num2);
         break;
       case Operator.multiplication:
-        value = logicCalculator.multiplication(num1, num2);
+        value = logicCalculator.multiplication(_num1, _num2);
         break;
       case Operator.division:
-        value = logicCalculator.division(num1, num2);
+        value = logicCalculator.division(_num1, _num2);
         break;
       case Operator.kosong:
         break;
@@ -280,12 +283,12 @@ class _CalculatorViewState extends State<CalculatorView> {
 
   _clickSamaDengan() {
     _log('Sebelum Sama Dengan');
-    if (num1 > 0 && num2 > 0) {
-      num1 = this._logicOperation(num1, num2, operator);
-      num2 = null;
-      operator = Operator.kosong;
+    if (_num1 > 0 && _num2 > 0) {
+      _num1 = this._logicOperation(_num1, _num2, _operator);
+      _num2 = null;
+      _operator = Operator.kosong;
       _log('Setelah Sama Dengan');
-      _setTextDisplay(num1);
+      _setTextDisplay(_num1);
       setState(() {});
     }
   }
@@ -307,7 +310,7 @@ class _CalculatorViewState extends State<CalculatorView> {
                 Text(
                   'JUMLAH TRANSAKSI',
                   maxLines: 1,
-                  style: textStyleKet,
+                  style: _textStyleKet,
                 ),
                 SizedBox(
                   width: 15,
@@ -324,9 +327,9 @@ class _CalculatorViewState extends State<CalculatorView> {
                 child: Container(),
               ),
               Text(
-                isiText,
+                _isiText.formatedCurrency,
                 maxLines: 1,
-                style: textStyleAmount,
+                style: _textStyleAmount,
               ),
               SizedBox(
                 width: 15,
@@ -342,7 +345,7 @@ class _CalculatorViewState extends State<CalculatorView> {
     return Expanded(
       flex: 1,
       child: Container(
-        height: heighCell,
+        height: _heighCell,
         color: _colorButton,
         child: OutlineButton(
           onPressed: () {
@@ -350,7 +353,7 @@ class _CalculatorViewState extends State<CalculatorView> {
           },
           child: Text(
             'Cancel',
-            style: textStyleBtn,
+            style: _textStyleBtn,
           ),
         ),
       ),
@@ -362,7 +365,7 @@ class _CalculatorViewState extends State<CalculatorView> {
       key: _keyButtonSave,
       flex: 1,
       child: Container(
-        height: heighCell,
+        height: _heighCell,
         color: _colorButton,
         child: OutlineButton(
           onPressed: () {
@@ -371,7 +374,7 @@ class _CalculatorViewState extends State<CalculatorView> {
           },
           child: Text(
             'Done',
-            style: textStyleBtn,
+            style: _textStyleBtn,
           ),
         ),
       ),
@@ -382,7 +385,7 @@ class _CalculatorViewState extends State<CalculatorView> {
     return Expanded(
       flex: 1,
       child: Container(
-        height: heighCell,
+        height: _heighCell,
         color: _colorNonNumber,
         child: OutlineButton(
           onPressed: () {
@@ -390,7 +393,7 @@ class _CalculatorViewState extends State<CalculatorView> {
           },
           child: Text(
             'C',
-            style: textStyleCell,
+            style: _textStyleCell,
           ),
         ),
       ),
@@ -402,14 +405,14 @@ class _CalculatorViewState extends State<CalculatorView> {
       flex: 2,
       child: Container(
         color: _colorNonNumber,
-        height: heighCell,
+        height: _heighCell,
         child: OutlineButton(
           onPressed: () {
             _clickDelete();
           },
           child: Text(
             'Del',
-            style: textStyleCell,
+            style: _textStyleCell,
           ),
         ),
       ),
@@ -421,7 +424,7 @@ class _CalculatorViewState extends State<CalculatorView> {
       flex: 1,
       child: Container(
         color: _colorNonNumber,
-        height: heighCell,
+        height: _heighCell,
         child: OutlineButton(
           onPressed: () {
             if (char == '=') {
@@ -430,7 +433,7 @@ class _CalculatorViewState extends State<CalculatorView> {
           },
           child: Text(
             char,
-            style: textStyleCell,
+            style: _textStyleCell,
           ),
         ),
       ),
@@ -442,14 +445,14 @@ class _CalculatorViewState extends State<CalculatorView> {
       flex: 2,
       child: Container(
         color: _colorNumber,
-        height: heighCell,
+        height: _heighCell,
         child: OutlineButton(
           onPressed: () {
             _clickNumber(0);
           },
           child: Text(
             '0',
-            style: textStyleCell,
+            style: _textStyleCell,
           ),
         ),
       ),
@@ -461,14 +464,14 @@ class _CalculatorViewState extends State<CalculatorView> {
       flex: 1,
       child: Container(
         color: _colorNumber,
-        height: heighCell,
+        height: _heighCell,
         child: OutlineButton(
           onPressed: () {
             _clickNumber(value);
           },
           child: Text(
             '$value',
-            style: textStyleCell,
+            style: _textStyleCell,
           ),
         ),
       ),
@@ -497,14 +500,14 @@ class _CalculatorViewState extends State<CalculatorView> {
       flex: 1,
       child: Container(
         color: _colorNonNumber,
-        height: heighCell,
+        height: _heighCell,
         child: OutlineButton(
           onPressed: () {
             _clickOperator(op);
           },
           child: Text(
             value,
-            style: textStyleCell,
+            style: _textStyleCell,
           ),
         ),
       ),
@@ -582,7 +585,7 @@ class _CalculatorViewState extends State<CalculatorView> {
 //    }else{
 //      val = num1;
 //    }
-    widget.functionResult(int.parse(isiText));
+    widget.functionResult(_isiText.realValue.toInt());
   }
 
   @override
@@ -648,5 +651,25 @@ class LogicCalculator {
 
   double division(double num1, double num2) {
     return num1 / num2;
+  }
+}
+
+class IsiTextAmount {
+  double _realValue;
+  String _formatedCurrency;
+
+  double get realValue => this._realValue;
+
+  String get formatedCurrency => this._formatedCurrency;
+
+  void setRealValue(double amount) {
+    this._realValue = amount;
+
+    final formatCurrency = new NumberFormat("#,##0", "idr");
+    int tmpValue = amount.toInt();
+
+    this._formatedCurrency = formatCurrency.format(tmpValue);
+
+    print('realvalue2: $_realValue || Currency: $_formatedCurrency');
   }
 }
