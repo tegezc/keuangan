@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+import 'package:intl/intl.dart' as intl;
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/keuangan/entry_item/dialog_calculator.dart';
 import 'package:keuangan/keuangan/entry_item/entry_keuangan_bloc.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/colors_utility.dart';
+import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/datepicker_singlescrollview.dart';
 import 'package:keuangan/util/loading_view.dart';
 import 'package:keuangan/util/process_string.dart';
@@ -88,9 +91,9 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
 
   @override
   initState() {
-    if(widget.isEditMode){
+    if (widget.isEditMode) {
       _isFirstime = false;
-    }else {
+    } else {
       _isFirstime = true;
     }
     _blocEntryKeuangan = BlocEntryKeuangan();
@@ -123,18 +126,6 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
     }
   }
 
-  _afterLayout() {
-    if (_cacheRenderBox == null && _keyTextItem.currentContext != null) {
-      _cacheRenderBox = _keyTextItem.currentContext.findRenderObject();
-    }
-
-    // saat pertama kail membuat transaksi, calculator otomatis muncul.
-    if(_isFirstime){
-      _isFirstime = false;
-      _showOverlay(context, 0);
-    }
-  }
-
   _dismissAutoComplete() {
     StateDismissAutoComplete stateDismissAutoComplete =
         new StateDismissAutoComplete();
@@ -154,6 +145,7 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
       StateSimpanLagi stateSimpanLagi = new StateSimpanLagi(
           _controllerTextItem.text, _txtNoteController.text);
       _blocEntryKeuangan.sinkState(stateSimpanLagi);
+      _showToast('Transaksi berhasil disimpan.');
     } else {
       EnumFinalResult enumFinalResult = await _blocEntryKeuangan.simpan(
           _controllerTextItem.text, _txtNoteController.text);
@@ -354,6 +346,18 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
     }
   }
 
+  _afterLayout() {
+    if (_cacheRenderBox == null && _keyTextItem.currentContext != null) {
+      _cacheRenderBox = _keyTextItem.currentContext.findRenderObject();
+    }
+
+    // saat pertama kail membuat transaksi, calculator otomatis muncul.
+    if (_isFirstime) {
+      _isFirstime = false;
+      _showOverlay(context, 0);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     /// di ekse pertama kali dan hanya sekali
@@ -365,132 +369,143 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     Size _sizeWidget = mediaQueryData.size;
     _insetsMedia = MediaQuery.of(context).viewInsets;
-    return StreamBuilder<EntryKeuangan>(
-        stream: _blocEntryKeuangan.entryKeuanganStream,
-        builder: (context, snapshot) {
-          if (snapshot == null) {
-            return Scaffold(
-                appBar: AppBar(
-                  title: Text('tunggu sebentar...'),
-                ),
-                body: LoadingView());
-          } else if (snapshot.data == null) {
-            return Scaffold(
-                appBar: AppBar(
-                  title: Text('tunggu sebentar...'),
-                ),
-                body: LoadingView());
-          } else {
-            /// set state to [_cacheStateEntry]
-            _cacheStateEntry = snapshot.data.stateEntryKeuangan;
-
-            ///menunggu proses save ke database selesai. menanggulangi user klik UI saat proses save
-            if (snapshot.data.stateEntryKeuangan ==
-                EnumEntryKeuangan.simpandanlagi) {
+    return CustomToastForMe(
+      child: StreamBuilder<EntryKeuangan>(
+          stream: _blocEntryKeuangan.entryKeuanganStream,
+          builder: (context, snapshot) {
+            if (snapshot == null) {
               return Scaffold(
                   appBar: AppBar(
                     title: Text('tunggu sebentar...'),
                   ),
                   body: LoadingView());
-            }
+            } else if (snapshot.data == null) {
+              return Scaffold(
+                  appBar: AppBar(
+                    title: Text('tunggu sebentar...'),
+                  ),
+                  body: LoadingView());
+            } else {
+              /// set state to [_cacheStateEntry]
+              _cacheStateEntry = snapshot.data.stateEntryKeuangan;
 
-            if (snapshot.data.stateEntryKeuangan ==
-                EnumEntryKeuangan.finishLagi) {
+              ///menunggu proses save ke database selesai. menanggulangi user klik UI saat proses save
+              if (snapshot.data.stateEntryKeuangan ==
+                  EnumEntryKeuangan.simpandanlagi) {
+                return Scaffold(
+                    appBar: AppBar(
+                      title: Text('tunggu sebentar...'),
+                    ),
+                    body: LoadingView());
+              }
+
+              if (snapshot.data.stateEntryKeuangan ==
+                  EnumEntryKeuangan.finishLagi) {
 //              _controllerTextItem.text = snapshot.data.itemName.nama;
 //              _txtNoteController.text = snapshot.data.keuangan.catatan;
-              _controllerTextItem.text = '';
-              _txtNoteController.text = '';
-            }
+                _controllerTextItem.text = '';
+                _txtNoteController.text = '';
+              }
 
-            ///setup auto complete
-            PropertyAutoComplete p;
+              ///setup auto complete
+              PropertyAutoComplete p;
 
-            //auto complete akan muncul jika user mengetikkan minimal 2 hurug
-            if (_controllerTextItem.text.length > 1) {
-              p = this._setupAutoComplete(_sizeWidget, _insetsMedia.bottom,
-                  snapshot.data.stateEntryKeuangan, snapshot.data.mapItemName);
-            }
+              //auto complete akan muncul jika user mengetikkan minimal 2 hurug
+              if (_controllerTextItem.text.length > 1) {
+                p = this._setupAutoComplete(_sizeWidget, _insetsMedia.bottom,
+                    snapshot.data.stateEntryKeuangan, snapshot.data.mapItemName);
+              }
 
-            ///end setup auto complete
+              ///end setup auto complete
 
-            /// setup color icon (hijau jika pemasukan, merah jika pengeluaran)
-            Color iconColor;
-            if (snapshot.data.jenisKeuangan == EnumJenisTransaksi.pemasukan) {
-              iconColor = HexColor('#0abf53');
-            } else {
-              iconColor = HexColor('#e04646');
-            }
+              /// setup color icon (hijau jika pemasukan, merah jika pengeluaran)
+              Color iconColor;
+              if (snapshot.data.jenisKeuangan == EnumJenisTransaksi.pemasukan) {
+                iconColor = HexColor('#0abf53');
+              } else {
+                iconColor = HexColor('#e04646');
+              }
 
-            final List<Widget> _actionButtons = new List();
-            _actionButtons.add(IconButton(
-                icon: Icon(Icons.check),
-                onPressed: () {
-                  _updateKeuangan(context);
-                }));
-            return Scaffold(
-              appBar: AppBar(
-                title: _headerAppBar(snapshot.data.jenisKeuangan),
-                actions: widget.isEditMode ? _actionButtons : null,
-              ),
-              body: Stack(children: <Widget>[
-                Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      child: Column(
-                        children: <Widget>[
-                          _widgetAmount1(snapshot.data.keuangan.jumlah.toInt()),
-                          Divider(
-                            thickness: 2,
-                          ),
-                          _widgetTextItem(iconColor),
-                          _widgetKategori1(snapshot.data.itemName.kategori,
-                              snapshot.data.mapKategori, iconColor),
-                          Divider(
-                            thickness: 2,
-                            indent: 35,
-                          ),
-                          _widgetCatatan1(iconColor),
-                          _widgetTanggal1(
-                              snapshot.data.keuangan.tanggal, iconColor),
-                          Divider(
-                            thickness: 2,
-                            indent: 35,
-                          ),
-                          new Container(
-                            height: 70,
-                            width: 40,
-                          ),
-                        ],
+              final List<Widget> _actionButtons = new List();
+              _actionButtons.add(IconButton(
+                  icon: Icon(Icons.check),
+                  onPressed: () {
+                    _updateKeuangan(context);
+                  }));
+              return Scaffold(
+                appBar: AppBar(
+                  title: _headerAppBar(snapshot.data.jenisKeuangan),
+                  actions: widget.isEditMode ? _actionButtons : null,
+                ),
+                body: Stack(children: <Widget>[
+                  Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        child: Column(
+                          children: <Widget>[
+                            _widgetAmount1(snapshot.data.keuangan.jumlah),
+                            Divider(
+                              thickness: 2,
+                            ),
+                            _widgetTextItem(iconColor),
+                            _widgetKategori1(snapshot.data.itemName.kategori,
+                                snapshot.data.mapKategori, iconColor),
+                            Divider(
+                              thickness: 2,
+                              indent: 35,
+                            ),
+                            _widgetCatatan1(iconColor),
+                            _widgetTanggal1(
+                                snapshot.data.keuangan.tanggal, iconColor),
+                            Divider(
+                              thickness: 2,
+                              indent: 35,
+                            ),
+                            new Container(
+                              height: 70,
+                              width: 40,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                widget.isEditMode
-                    ? Container()
-                    : Transform(
-                        transform: Matrix4.translationValues(
-                            0,
-                            _sizeWidget.height - (127 + _insetsMedia.bottom),
-                            0),
-                        child: _widgetButtonSave(_sizeWidget.width),
-                      ),
-                p != null
-                    ? _widgetPadPositionAutoComplete1(p, _sizeWidget)
-                    : new Container(),
-                p != null
-                    ? _widgetPositionAutoComplete1(snapshot.data.mapItemName, p)
-                    : new Container(),
-              ]),
-            );
-          }
-        });
+                  widget.isEditMode
+                      ? Container()
+                      : Transform(
+                          transform: Matrix4.translationValues(
+                              0,
+                              _sizeWidget.height - (127 + _insetsMedia.bottom),
+                              0),
+                          child: _widgetButtonSave(_sizeWidget.width),
+                        ),
+                  p != null
+                      ? _widgetPadPositionAutoComplete1(p, _sizeWidget)
+                      : new Container(),
+                  p != null
+                      ? _widgetPositionAutoComplete1(snapshot.data.mapItemName, p)
+                      : new Container(),
+                ]),
+              );
+            }
+          }),
+    );
+  }
+  _showToast(String messageToast) {
+    showToast(messageToast,
+        context: context,
+        duration: Duration(seconds: 1),
+        textStyle: TextStyle(fontSize: 16,color: Colors.white),
+        backgroundColor: Colors.cyan[600],
+        toastHorizontalMargin: 10.0,
+        position: StyledToastPosition(
+            align: Alignment.topCenter, offset: 70.0));
   }
 
   Widget _headerAppBar(EnumJenisTransaksi stateJenisKeuangan) {
-
     if (widget.isEditMode) {
       String titleAppBar = 'Pengeluaran';
       if (stateJenisKeuangan == EnumJenisTransaksi.pemasukan) {
@@ -534,12 +549,16 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
     _blocEntryKeuangan.sinkState(entryState);
   }
 
-  void _showOverlay(BuildContext context,int amount) {
-    Navigator.of(context)
-        .push(CalculatorDialog(callBackLastResult: callBackFinalResult,amount: amount));
+  void _showOverlay(BuildContext context, double amount) {
+    Navigator.of(context).push(CalculatorDialog(
+        callBackLastResult: callBackFinalResult, amount: amount));
   }
 
-  Widget _widgetAmount1(int amount) {
+  Widget _widgetAmount1(double amount) {
+    final formatCurrency = new intl.NumberFormat("#,##0", "idr");
+    int tmpValue = amount.toInt();
+
+    String strAmount = formatCurrency.format(tmpValue);
     return FlatButton(
       child: Column(
         children: <Widget>[
@@ -549,14 +568,14 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               AutoFontSize(
-                text: '$amount',
+                text: strAmount,
               ),
             ],
           ),
         ],
       ),
       onPressed: () {
-        _showOverlay(context,amount);
+        _showOverlay(context, amount);
       },
     );
   }
