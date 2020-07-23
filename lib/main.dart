@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:keuangan/file_non_production/bulk_insert.dart';
 import 'package:keuangan/keuangan/itemname/homepage_itemname.dart';
 import 'package:keuangan/keuangan/kategori/homepage_kategori.dart';
 import 'package:keuangan/keuangan/report/hp_report.dart';
 import 'package:keuangan/keuangan/transaksi/keuangan_transaksi.dart';
 import 'package:flutter/material.dart';
+import 'package:keuangan/util/adsmob.dart';
 import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/style.dart';
 
@@ -52,9 +54,14 @@ class MyHomePageState extends State<MyHomePage> {
 
   @override
   initState() {
-    //_testingonly();
-
+   // _testingonly();
+    _initAdMob();
     super.initState();
+  }
+
+  Future<void> _initAdMob() {
+    // TODO: Initialize AdMob SDK
+    return FirebaseAdMob.instance.initialize(appId: AdManager.appId);
   }
 
   _testingonly() {
@@ -75,7 +82,7 @@ class MyHomePageState extends State<MyHomePage> {
     switch (pos) {
       case 0:
         {
-         // return CobaFB();
+          // return CobaFB();
           return HomepageKeuangan(drawer: _createDrawer(pos));
         }
         break;
@@ -86,7 +93,7 @@ class MyHomePageState extends State<MyHomePage> {
         break;
       case 2:
         {
-    //      return new ReportByCategories(drawer: _createDrawer(pos));
+          //      return new ReportByCategories(drawer: _createDrawer(pos));
           return HpReport(drawer: _createDrawer(pos));
         }
         break;

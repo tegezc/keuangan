@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:keuangan/keuangan/itemname/bloc_hpitemname.dart';
 import 'package:keuangan/keuangan/itemname/itemname_entry.dart';
 import 'package:keuangan/model/keuangan.dart';
@@ -20,13 +20,13 @@ class _HomePageItemNameState extends State<HomePageItemName> {
   EnumStatePopulateItemName _enumState;
   int _counterBuild = 0;
   CommonUi _commonUi;
-  FlutterToast _flutterToast;
+
   final Color _colorButton = Colors.cyan[600];
   final Color _colorTextBtn = Colors.white;
 
   @override
   initState() {
-    _flutterToast = FlutterToast(context);
+
     _commonUi = new CommonUi();
     _blocHomepageItemName = new BlocHomepageItemName();
     super.initState();
@@ -326,28 +326,10 @@ class _HomePageItemNameState extends State<HomePageItemName> {
   }
 
   _showToast(String messageToast) {
-    Widget toast = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(25.0),
-        color: Colors.greenAccent,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.check),
-          SizedBox(
-            width: 12.0,
-          ),
-          Text(messageToast),
-        ],
-      ),
-    );
-
-    _flutterToast.showToast(
-      child: toast,
-      gravity: ToastGravity.BOTTOM,
-      toastDuration: Duration(seconds: 2),
-    );
+    showToast(messageToast,
+        context: context,
+        toastHorizontalMargin: 10.0,
+        position: StyledToastPosition(
+            align: Alignment.bottomCenter, offset: 70.0));
   }
 }

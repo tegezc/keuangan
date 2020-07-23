@@ -47,7 +47,8 @@ class TransactionKeuangan extends StatefulWidget {
   _TransactionKeuanganState createState() => _TransactionKeuanganState();
 }
 
-class _TransactionKeuanganState extends State<TransactionKeuangan>  with TickerProviderStateMixin {
+class _TransactionKeuanganState extends State<TransactionKeuangan>
+    with TickerProviderStateMixin {
   List<Keuangan> _listKeuangan;
   List<ForCellTransaksi> _listEntry;
 
@@ -86,7 +87,7 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>  with TickerP
   }
 
   @override
-  void dispose(){
+  void dispose() {
     _controller.dispose();
     super.dispose();
   }
@@ -426,25 +427,6 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>  with TickerP
           title: new Text('Transaksi'),
         ),
         body: _bodyTransaksi(mediaQueryData.size),
-//        floatingActionButton: new FloatingActionButton(
-//          onPressed: () async {
-//            EnumFinalResult res = await openPage(
-//                context,
-//                KeuanganItemView(
-//                  dateTime: DateTime.now(),
-//                  isEditMode: false,
-//                  keuangan: null,
-//                  enumJenisTransaksi: EnumJenisTransaksi.pengeluaran,
-//                ));
-//            if (res == EnumFinalResult.success) {
-//              _fullReload();
-//            } else {
-//              /// TODO gagal
-//            }
-//          },
-//          tooltip: 'add Transaksi',
-//          child: new Icon(Icons.add),
-//        ),
         floatingActionButton: new Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisSize: MainAxisSize.min,
@@ -456,16 +438,15 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>  with TickerP
               child: new ScaleTransition(
                 scale: new CurvedAnimation(
                   parent: _controller,
-                  curve: new Interval(
-                      0.0, 1.0 - index / icons.length / 2.0,
+                  curve: new Interval(0.0, 1.0 - index / icons.length / 2.0,
                       curve: Curves.easeOut),
                 ),
                 child: new FloatingActionButton.extended(
                   onPressed: () async {
                     EnumJenisTransaksi enumJns;
+
                     /// index == 0 : pemasukan
                     if (index == 0) {
-
                       enumJns = EnumJenisTransaksi.pemasukan;
                     } else {
                       enumJns = EnumJenisTransaksi.pengeluaran;
@@ -483,14 +464,15 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>  with TickerP
                     if (!_controller.isDismissed) {
                       _controller.reverse();
                     }
-                    if (res == EnumFinalResult.success) {
+                    if (res == null) {
+                      _fullReload();
+                    } else if (res == EnumFinalResult.success) {
                       _fullReload();
                     } else {
                       /// TODO gagal
                     }
                   },
-                  label:
-                  Text('${index == 0 ? 'Pemasukan' : 'Pengeluaran'}'),
+                  label: Text('${index == 0 ? 'Pemasukan' : 'Pengeluaran'}'),
                   icon: index == 0
                       ? Icon(Icons.monetization_on)
                       : Icon(Icons.money_off),
@@ -511,9 +493,8 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>  with TickerP
                       transform: new Matrix4.rotationZ(
                           _controller.value * 0.5 * math.pi),
                       alignment: FractionalOffset.center,
-                      child: new Icon(_controller.isDismissed
-                          ? Icons.add
-                          : Icons.close),
+                      child: new Icon(
+                          _controller.isDismissed ? Icons.add : Icons.close),
                     );
                   },
                 ),
@@ -527,7 +508,8 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>  with TickerP
                   }
                 },
               ),
-            ),
+            )
+          ..add(Container(height: 40,)),
         ),
       );
     }

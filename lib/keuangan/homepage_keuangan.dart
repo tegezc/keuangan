@@ -1,10 +1,13 @@
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:intl/intl.dart';
 import 'package:keuangan/keuangan/bloc_hpkeuangan.dart';
 import 'package:keuangan/keuangan/entry_item/keuangan_item.dart';
 import 'package:keuangan/keuangan/transaksi/model_keuangan_ui.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
+import 'package:keuangan/util/adsmob.dart';
 import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/loading_view.dart';
 import 'package:keuangan/util/process_string.dart';
@@ -34,6 +37,8 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
     Icons.money_off
   ];
 
+  BannerAd _bannerAd;
+
   @override
   void initState() {
     _blocHpKeuangan = new BlocHpKeuangan();
@@ -41,6 +46,9 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
       vsync: this,
       duration: const Duration(milliseconds: 200),
     );
+
+    // TODO: Load a Banner Ad
+    //_loadBannerAd();
     super.initState();
   }
 
@@ -48,7 +56,18 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
   void dispose(){
     _controller.dispose();
     _blocHpKeuangan.dispose();
+    _bannerAd?.dispose();
     super.dispose();
+  }
+
+  void _loadBannerAd() {
+    _bannerAd = BannerAd(
+      adUnitId: AdManager.bannerAdUnitId,
+      size: AdSize.banner,
+    );
+    _bannerAd
+      ..load()
+      ..show(anchorType: AnchorType.bottom);
   }
 
   Widget _textSmall(String text) {
@@ -252,6 +271,7 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
         ));
     if (res == EnumFinalResult.success) {
       _blocHpKeuangan.fullReload();
+      _showToast('Transaksi berhasil di update.');
     } else {
       /// TODO gagal
     }
@@ -304,11 +324,15 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
 
         lw.add(FlatButton(
             onPressed: () {
+
               _showDialogPilihan(ke);
             },
             child: CellKeuanganStateLess(ke)));
       }
     }
+
+    /// berikan space untuk scroll (karena dapat tertutup oleh ads dan FAB
+    lw.add(Container(height: 220,));
     return lw;
   }
 
@@ -321,117 +345,135 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
       _counterBuild++;
     }
 
-    return StreamBuilder<UIHPKeuangan>(
-        stream: _blocHpKeuangan.uiHPKeuangan,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text('Keuangan'),
-              ),
-              drawer: widget.drawer,
-              body: Container(
-                height: double.infinity,
-                width: double.infinity,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: listWidget(sizeWidget, snapshot.data),
-                  ),
-                ),
-              ),
-              floatingActionButton: new Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children: new List.generate(icons.length, (int index) {
-                  Widget child = new Container(
-                    height: 60.0,
-                    width: 160.0,
-                    alignment: FractionalOffset.topCenter,
-                    child: new ScaleTransition(
-                      scale: new CurvedAnimation(
-                        parent: _controller,
-                        curve: new Interval(
-                            0.0, 1.0 - index / icons.length / 2.0,
-                            curve: Curves.easeOut),
-                      ),
-                      child: new FloatingActionButton.extended(
-                        onPressed: () async {
-                          EnumJenisTransaksi enumJns;
-                          /// index == 0 : pemasukan
-                          if (index == 0) {
-
-                            enumJns = EnumJenisTransaksi.pemasukan;
-                          } else {
-                            enumJns = EnumJenisTransaksi.pengeluaran;
-                          }
-                          EnumFinalResult res = await openPage(
-                              context,
-                              KeuanganItemView(
-                                dateTime: DateTime.now(),
-                                isEditMode: false,
-                                keuangan: null,
-                                enumJenisTransaksi: enumJns,
-                              ));
-
-                          /// Kembalikan FAB ke posisi normal
-                          if (!_controller.isDismissed) {
-                            _controller.reverse();
-                          }
-
-                          if (res == EnumFinalResult.success) {
-                            _blocHpKeuangan.fullReload();
-                          } else {
-                            /// TODO gagal
-                          }
-                        },
-                        label:
-                            Text('${index == 0 ? 'Pemasukan' : 'Pengeluaran'}'),
-                        icon: index == 0
-                            ? Icon(Icons.monetization_on)
-                            : Icon(Icons.money_off),
-                        backgroundColor: index == 0 ? Colors.green : Colors.red,
-                        foregroundColor: Colors.white,
-                        heroTag: null,
-                      ),
-                    ),
-                  );
-                  return child;
-                }).toList()
-                  ..add(
-                    new FloatingActionButton(
-                      child: new AnimatedBuilder(
-                        animation: _controller,
-                        builder: (BuildContext context, Widget child) {
-                          return new Transform(
-                            transform: new Matrix4.rotationZ(
-                                _controller.value * 0.5 * math.pi),
-                            alignment: FractionalOffset.center,
-                            child: new Icon(_controller.isDismissed
-                                ? Icons.add
-                                : Icons.close),
-                          );
-                        },
-                      ),
-                      onPressed: () {
-                        if (_controller.isDismissed) {
-                          _controller.forward();
-                        } else {
-                          _controller.reverse();
-                        }
-                      },
-                    ),
-                  ),
-              ),
-            );
-          } else {
-            return Scaffold(
+    return CustomToastForMe(
+      child: StreamBuilder<UIHPKeuangan>(
+          stream: _blocHpKeuangan.uiHPKeuangan,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Scaffold(
                 appBar: AppBar(
                   title: Text('Keuangan'),
                 ),
-                body: LoadingView());
-          }
-        });
+                drawer: widget.drawer,
+                body: Container(
+                  height: double.infinity,
+                  width: double.infinity,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: listWidget(sizeWidget, snapshot.data),
+                    ),
+                  ),
+                ),
+                floatingActionButton: new Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: new List.generate(icons.length, (int index) {
+                    Widget child = new Container(
+                      height: 60.0,
+                      width: 160.0,
+                      alignment: FractionalOffset.topCenter,
+                      child: new ScaleTransition(
+                        scale: new CurvedAnimation(
+                          parent: _controller,
+                          curve: new Interval(
+                              0.0, 1.0 - index / icons.length / 2.0,
+                              curve: Curves.easeOut),
+                        ),
+                        child: new FloatingActionButton.extended(
+
+                          onPressed: () async {
+                            EnumJenisTransaksi enumJns;
+                            /// index == 0 : pemasukan
+                            if (index == 0) {
+
+                              enumJns = EnumJenisTransaksi.pemasukan;
+                            } else {
+                              enumJns = EnumJenisTransaksi.pengeluaran;
+                            }
+                            EnumFinalResult res = await openPage(
+                                context,
+                                KeuanganItemView(
+                                  dateTime: DateTime.now(),
+                                  isEditMode: false,
+                                  keuangan: null,
+                                  enumJenisTransaksi: enumJns,
+                                ));
+
+                            /// Kembalikan FAB ke posisi normal
+                            if (!_controller.isDismissed) {
+                              _controller.reverse();
+                            }
+                              print('kembalian homepage keuangan: $res');
+                            if(res == null){
+                              _blocHpKeuangan.fullReload();
+                            }else if (res == EnumFinalResult.success) {
+                              _blocHpKeuangan.fullReload();
+                              _showToast('Transaksi berhasil di simpan.');
+                            } else {
+                              /// TODO gagal
+                            }
+                          },
+                          label:
+                              Text('${index == 0 ? 'Pemasukan' : 'Pengeluaran'}'),
+                          icon: index == 0
+                              ? Icon(Icons.monetization_on)
+                              : Icon(Icons.money_off),
+                          backgroundColor: index == 0 ? Colors.green : Colors.red,
+                          foregroundColor: Colors.white,
+                          heroTag: null,
+                        ),
+                      ),
+                    );
+                    return child;
+                  }).toList()
+                    ..add(
+                      new FloatingActionButton(
+                        child: new AnimatedBuilder(
+                          animation: _controller,
+                          builder: (BuildContext context, Widget child) {
+                            return new Transform(
+                              transform: new Matrix4.rotationZ(
+                                  _controller.value * 0.5 * math.pi),
+                              alignment: FractionalOffset.center,
+                              child: new Icon(_controller.isDismissed
+                                  ? Icons.add
+                                  : Icons.close),
+                            );
+                          },
+                        ),
+                        onPressed: () {
+                          if (_controller.isDismissed) {
+                            _controller.forward();
+                          } else {
+                            _controller.reverse();
+                          }
+                        },
+                      ),
+                    )
+                  ..add(Container(height: 40,)),
+                ),
+              );
+            } else {
+              return Scaffold(
+                  appBar: AppBar(
+                    title: Text('Keuangan'),
+                  ),
+                  body: LoadingView());
+            }
+          }),
+    );
+  }
+
+  _showToast(String messageToast) {
+    showToast(messageToast,
+        context: context,
+        duration: Duration(seconds: 1),
+        textStyle: TextStyle(fontSize: 16,color: Colors.white),
+        backgroundColor: Colors.cyan[600],
+        toastHorizontalMargin: 10.0,
+        position: StyledToastPosition(
+            align: Alignment.topCenter, offset: 70.0));
   }
 }
 

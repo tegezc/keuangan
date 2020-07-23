@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:keuangan/keuangan/kategori/subkategori/add_subkategori.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
@@ -22,7 +22,6 @@ class HomePageKategori extends StatefulWidget {
 class _HomePageKategoriState extends State<HomePageKategori> {
   BlocHomepageKategori _blocHomepageKategori;
   EnumStatePopulateKategori _enumState;
-  FlutterToast _flutterToast;
 
   /// COUNTER UI
   int _counterBuild = 0;
@@ -36,7 +35,6 @@ class _HomePageKategoriState extends State<HomePageKategori> {
 
   @override
   initState() {
-    _flutterToast = FlutterToast(context);
     _blocHomepageKategori = new BlocHomepageKategori();
     super.initState();
   }
@@ -546,28 +544,11 @@ class _HomePageKategoriState extends State<HomePageKategori> {
   }
 
   _showToast(String messageToast) {
-    Widget toast = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(25.0),
-        color: Colors.greenAccent,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.check),
-          SizedBox(
-            width: 12.0,
-          ),
-          Text(messageToast),
-        ],
-      ),
-    );
-
-    _flutterToast.showToast(
-      child: toast,
-      gravity: ToastGravity.BOTTOM,
-      toastDuration: Duration(seconds: 2),
-    );
+    showToast(messageToast,
+        context: context,
+        toastHorizontalMargin: 10.0,
+        position: StyledToastPosition(
+            align: Alignment.bottomCenter, offset: 70.0));
   }
+
 }
