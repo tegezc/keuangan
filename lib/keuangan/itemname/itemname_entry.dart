@@ -5,6 +5,7 @@ import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/database/keuangan/dao_kategori.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
+import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/loading_view.dart';
 
 class ItemNameEntry extends StatefulWidget {
@@ -39,7 +40,6 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
 
   @override
   void initState() {
-    print(widget.itemName.toString());
     _txtController = new TextEditingController();
     _populateKategori();
     super.initState();
@@ -54,6 +54,9 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
   _populateKategori() {
     _initialitationKategori().then((value) {
       if (widget.stateItemName == StateItemNameEntry.edit) {
+        _dropDownKategory = this._getDropDownKategori(widget.itemName.kategori.type);
+        _cacheJnsTransaksi = widget.itemName.kategori.type;
+
         for (int i = 0; i < _dropDownKategory.length; i++) {
           Kategori k = _dropDownKategory[i].value;
 
@@ -105,7 +108,7 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
         if (itemName == null) {
           daoItemName.saveItemName(iname).then((value) {
             if (value > 0) {
-              Navigator.of(context).pop(1);
+              Navigator.of(context).pop(EnumFinalResult.success);
             } else {
               isShowToast = true;
               messageToast = 'Item gagal disimpan';
@@ -123,7 +126,7 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
       if (nama.trim() == widget.itemName.nama &&
           widget.itemName.idKategori == _currentCatogery.id) {
         /// kondisi user klik edit, namun tidak melakukan perubahan apapun
-        Navigator.of(context).pop(3);
+        Navigator.of(context).pop(null);
       } else {
         ItemName k;
         if (_currentCatogery.idParent == null) {
@@ -140,7 +143,7 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
             daoItemName.saveItemName(k);
             daoItemName.update(oldItemName).then((value) {
               if (value == EnumResultDb.success) {
-                Navigator.of(context).pop(2);
+                Navigator.of(context).pop(EnumFinalResult.success);
               } else {
                 isShowToast = true;
                 messageToast = 'Item gagal disimpan';
@@ -207,51 +210,53 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
       final List<DropdownMenuItem<EnumJenisTransaksi>> _dropDownTransaksi =
       _getDropDownTransaksi();
 
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(title),
-          actions: <Widget>[
-            // action button
-            IconButton(
-              color: Colors.green[900],
-              icon: Icon(Icons.done),
-              onPressed: () {
-                _saveItemName();
-              },
-            ),
-            // overflow menu
-          ],
-        ),
-        body: new Container(
-          padding: EdgeInsets.only(top: 15, left: 20, right: 15, bottom: 0),
-          height: double.infinity,
-          width: double.infinity,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Text('Jenis Transaksi:',style: _styleTextDesc,),
-                new DropdownButton(
-                  value: _cacheJnsTransaksi,
-                  items: _dropDownTransaksi,
-                  onChanged: _changedDropDownTransaksi,
-                ),
-                Text('Kategori:',style: _styleTextDesc,),
-                new DropdownButton(
-                  disabledHint: Text(""),
-                  value: _currentCatogery,
-                  items: _dropDownKategory,
-                  onChanged: changedDropDownKategori,
-                ),
-                Text('Nama item:',style: _styleTextDesc,),
-                TextField(
-                  decoration: _decorationNama,
-                  controller: _txtController,
-                  maxLines: 1,
-                ),
-              ],
+      return CustomToastForMe(
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(title),
+            actions: <Widget>[
+              // action button
+              IconButton(
+                color: Colors.green[900],
+                icon: Icon(Icons.done),
+                onPressed: () {
+                  _saveItemName();
+                },
+              ),
+              // overflow menu
+            ],
+          ),
+          body: new Container(
+            padding: EdgeInsets.only(top: 15, left: 20, right: 15, bottom: 0),
+            height: double.infinity,
+            width: double.infinity,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Text('Jenis Transaksi:',style: _styleTextDesc,),
+                  new DropdownButton(
+                    value: _cacheJnsTransaksi,
+                    items: _dropDownTransaksi,
+                    onChanged: _changedDropDownTransaksi,
+                  ),
+                  Text('Kategori:',style: _styleTextDesc,),
+                  new DropdownButton(
+                    disabledHint: Text(""),
+                    value: _currentCatogery,
+                    items: _dropDownKategory,
+                    onChanged: changedDropDownKategori,
+                  ),
+                  Text('Nama item:',style: _styleTextDesc,),
+                  TextField(
+                    decoration: _decorationNama,
+                    controller: _txtController,
+                    maxLines: 1,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -276,9 +281,12 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
   _showToast(String messageToast) {
     showToast(messageToast,
         context: context,
+        duration: Duration(seconds: 1),
+        textStyle: TextStyle(fontSize: 16, color: Colors.white),
+        backgroundColor: Colors.cyan[600],
         toastHorizontalMargin: 10.0,
-        position: StyledToastPosition(
-            align: Alignment.bottomCenter, offset: 70.0));
+        position:
+        StyledToastPosition(align: Alignment.topCenter, offset: 70.0));
   }
 }
 

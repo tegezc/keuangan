@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:keuangan/keuangan/itemname/bloc_hpitemname.dart';
 import 'package:keuangan/keuangan/itemname/itemname_entry.dart';
+import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/loading_view.dart';
@@ -26,7 +27,6 @@ class _HomePageItemNameState extends State<HomePageItemName> {
 
   @override
   initState() {
-
     _commonUi = new CommonUi();
     _blocHomepageItemName = new BlocHomepageItemName();
     super.initState();
@@ -119,80 +119,61 @@ class _HomePageItemNameState extends State<HomePageItemName> {
           .populateSemuaItemNameFromDb(EnumStatePopulateItemName.firsttime);
     }
 
-    return StreamBuilder<ItemUIHomepageItemName>(
-        stream: _blocHomepageItemName.listItemNameStream,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            ///prevent snacbar show twice
-            //_enumState = snapshot.data.enumState;
-            if (_enumState != snapshot.data.enumState) {
-              _enumState = snapshot.data.enumState;
+    return CustomToastForMe(
+      child: StreamBuilder<ItemUIHomepageItemName>(
+          stream: _blocHomepageItemName.listItemNameStream,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              ///prevent snacbar show twice
+              //_enumState = snapshot.data.enumState;
+              if (_enumState != snapshot.data.enumState) {
+                _enumState = snapshot.data.enumState;
+              } else {
+                _enumState = null;
+              }
+
+              //////////////
+
+              final List<Widget> _actionButtons = new List();
+              _actionButtons.add(IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: () async {
+                    EnumFinalResult res =
+                        await _commonUi.openPage(context, ItemNameEntry.baru());
+                    print('res: $res');
+                    if (res != null) {
+                      if (res == EnumFinalResult.success) {
+                        _blocHomepageItemName.populateSemuaItemNameFromDb(
+                            EnumStatePopulateItemName.savesuccess);
+                        _showToast('Item berhasil di disimpan.');
+                      }
+                    }
+                    // Navigator.of(context).pop();
+                  }));
+              return Scaffold(
+                drawer: widget.drawer,
+                appBar: new AppBar(
+                  title: new Text('Item Cepat'),
+                  actions: _actionButtons,
+                ),
+                body: ListView(
+                  scrollDirection: Axis.vertical,
+                  children: _listWidgetItemName(snapshot.data.listPengeluaran,
+                      snapshot.data.listPemasukan),
+                ),
+              );
             } else {
               _enumState = null;
+              return Scaffold(
+                drawer: widget.drawer,
+                appBar: new AppBar(
+                  title: new Text('Item Cepat'),
+                ),
+                body: LoadingView(),
+              );
             }
-
-            //////////////
-
-            final List<Widget> _actionButtons = new List();
-            _actionButtons.add(IconButton(
-                icon: Icon(Icons.add),
-                onPressed: () async {
-                  int res =
-                      await _commonUi.openPage(context, ItemNameEntry.baru());
-
-                  //prevent snacbar showing
-                  if (res == null) {
-                    _enumState = null;
-                  } else if (res == 1) {
-                    /// 1 konstanta penanda save success
-                    _blocHomepageItemName.populateSemuaItemNameFromDb(
-                        EnumStatePopulateItemName.savesuccess);
-                    String messageToast = 'Item berhasil di simpan.';
-                    this._showToast(messageToast);
-                  }
-                }));
-            return Scaffold(
-              drawer: widget.drawer,
-              appBar: new AppBar(
-                title: new Text('Item Cepat'),
-                actions: _actionButtons,
-              ),
-              body: ListView(
-                scrollDirection: Axis.vertical,
-                children: _listWidgetItemName(
-                    snapshot.data.listPengeluaran, snapshot.data.listPemasukan),
-              ),
-//              floatingActionButton: new FloatingActionButton(
-//                onPressed: () async {
-//                  int res =
-//                      await _commonUi.openPage(context, ItemNameEntry.baru());
-//
-//                  //prevent snacbar showing
-//                  if (res == null) {
-//                    _enumState = null;
-//                  } else if (res == 1) {
-//                    /// 1 konstanta penanda save success
-//                    _blocHomepageItemName.populateSemuaItemNameFromDb(
-//                        EnumStatePopulateItemName.savesuccess);
-//                    String messageToast = 'Item berhasil di simpan.';
-//                    _commonUi.showToastBottom(messageToast);
-//                  }
-//                },
-//                tooltip: 'add Item',
-//                child: new Icon(Icons.add),
-//              ),
-            );
-          } else {
-            _enumState = null;
-            return Scaffold(
-              drawer: widget.drawer,
-              appBar: new AppBar(
-                title: new Text('Item Cepat'),
-              ),
-              body: LoadingView(),
-            );
-          }
-        });
+          }),
+    );
   }
 
   _showDialogPilihan(ItemName itemName) {
@@ -309,27 +290,27 @@ class _HomePageItemNameState extends State<HomePageItemName> {
   }
 
   _edit(ItemName itemname) async {
-    int res = await _commonUi.openPage(context, ItemNameEntry.edit(itemname));
-    Navigator.of(context).pop();
+    EnumFinalResult res =
+        await _commonUi.openPage(context, ItemNameEntry.edit(itemname));
 
-    //prevent snacbar showing
-    if (res == null) {
-      _enumState = null;
-    } else if (res == 2) {
-      /// 2 konstanta penanda proses update
-      _blocHomepageItemName
-          .populateSemuaItemNameFromDb(EnumStatePopulateItemName.editsuccess);
-
-      String messageToast = 'Item berhasil di update';
-      this._showToast(messageToast);
+    if (res != null) {
+      if (res == EnumFinalResult.success) {
+        _blocHomepageItemName
+            .populateSemuaItemNameFromDb(EnumStatePopulateItemName.editsuccess);
+        _showToast('Item berhasil di update.');
+      }
     }
+    Navigator.of(context).pop();
   }
 
   _showToast(String messageToast) {
     showToast(messageToast,
         context: context,
+        duration: Duration(seconds: 1),
+        textStyle: TextStyle(fontSize: 16, color: Colors.white),
+        backgroundColor: Colors.cyan[600],
         toastHorizontalMargin: 10.0,
-        position: StyledToastPosition(
-            align: Alignment.bottomCenter, offset: 70.0));
+        position:
+            StyledToastPosition(align: Alignment.topCenter, offset: 70.0));
   }
 }
