@@ -69,7 +69,7 @@ class BlocAddSubKategori {
     return itemUiAddKategori;
   }
 
-  Future<EnumFinalResult> submitKategori(String nama, String catatan) async {
+  Future<EnumResultDb> submitKategori(String nama, String catatan) async {
     ColorManagement colorManagement = new ColorManagement();
     String hexColor = await colorManagement
         .hexColor(_cacheUIKategori.currentKategori.idParent);
@@ -80,17 +80,13 @@ class BlocAddSubKategori {
     if (_cacheStateCategiri == StateAddCategory.baruSubkategori) {
       ResultDb resultDb =
           await this._saveKategori(_cacheUIKategori.currentKategori);
-      if (resultDb.enumResultDb == EnumResultDb.success) {
-        return EnumFinalResult.success;
-      }
+      return resultDb.enumResultDb;
     } else if (_cacheStateCategiri == StateAddCategory.editSubkategori) {
       ResultDb resultDb =
           await this._updateKategori(_cacheUIKategori.currentKategori);
-      if (resultDb.enumResultDb == EnumResultDb.success) {
-        return EnumFinalResult.success;
-      }
+      return resultDb.enumResultDb;
     }
-    return EnumFinalResult.failed;
+    return EnumResultDb.failed;
   }
 
   Future<ResultDb> _saveKategori(Kategori kategori) async {

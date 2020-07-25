@@ -25,10 +25,6 @@ class _HomePageKategoriState extends State<HomePageKategori> {
 
   /// COUNTER UI
   int _counterBuild = 0;
-  int _counterSaveSuccess = 0;
-  int _counterEditSuccess = 0;
-  int _counterSaveSubKategoriSuccess = 0;
-  int _counterEditSubKategoriSuccess = 0;
 
   final Color _colorButton = Colors.cyan[600];
   final Color _colorTextBtn = Colors.white;

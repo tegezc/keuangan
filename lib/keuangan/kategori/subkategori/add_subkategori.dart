@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+import 'package:keuangan/database/db_utility.dart';
 import 'package:keuangan/keuangan/kategori/subkategori/add_subkategori_bloc.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
+import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/loading_view.dart';
 
 class AddSubCategory extends StatefulWidget {
@@ -50,9 +53,19 @@ class _AddSubCategoryState extends State<AddSubCategory> {
   _saveSubKategori(Kategori k) async {
     String nama = _txtController.text;
     String catatan = _txtCatatanController.text;
-    EnumFinalResult enumFinalResult =
+    EnumResultDb enumResultDb =
         await _blocAddKategori.submitKategori(nama, catatan);
-    Navigator.of(context).pop(enumFinalResult);
+    if (enumResultDb == EnumResultDb.success) {
+      Navigator.of(context).pop(EnumFinalResult.success);
+    } else if (enumResultDb == EnumResultDb.duplicate) {
+      _showToast('Kategori sudah ada.');
+    } else {
+      if (widget.stateAddCategory == StateAddCategory.baru) {
+        _showToast('Kategori gagal di simpan');
+      } else {
+        _showToast('Kategori gagal di di edit');
+      }
+    }
   }
 
 //  _eksekusiAfterBuild(BuildContext context, ItemUiAddSubKategori data)async{
@@ -69,75 +82,88 @@ class _AddSubCategoryState extends State<AddSubCategory> {
       _counterBuild++;
     }
 
-    return StreamBuilder<ItemUiAddSubKategori>(
-        stream: _blocAddKategori.uiItemAddKategori,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Scaffold(
-                appBar: AppBar(
-                    title: Text(
-                  'tunggu sebentar...',
-                )),
-                body: LoadingView());
-          } else {
+    return CustomToastForMe(
+      child: StreamBuilder<ItemUiAddSubKategori>(
+          stream: _blocAddKategori.uiItemAddKategori,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Scaffold(
+                  appBar: AppBar(
+                      title: Text(
+                    'tunggu sebentar...',
+                  )),
+                  body: LoadingView());
+            } else {
 //            WidgetsBinding.instance.addPostFrameCallback(
 //                    (_) => _eksekusiAfterBuild(context, snapshot.data));
-            String header = snapshot.data.currentKategori.type ==
-                    EnumJenisTransaksi.pemasukan
-                ? "Pemasukan"
-                : 'Pengeluaran';
+              String header = snapshot.data.currentKategori.type ==
+                      EnumJenisTransaksi.pemasukan
+                  ? "Pemasukan"
+                  : 'Pengeluaran';
 
-            _txtCatatanController.text = snapshot.data.currentKategori.catatan;
-            _txtController.text = snapshot.data.currentKategori.nama;
+              _txtCatatanController.text = snapshot.data.currentKategori.catatan;
+              _txtController.text = snapshot.data.currentKategori.nama;
 
-            return Scaffold(
-              key: _scaffoldKey,
-              appBar: AppBar(
-                title: Text(snapshot.data.titleBar),
-                actions: <Widget>[
-                  // action button
-                  IconButton(
-                    color: Colors.green[900],
-                    icon: Icon(Icons.done),
-                    onPressed: () {
-                      _saveSubKategori(snapshot.data.currentKategori);
-                    },
-                  ),
-                  // overflow menu
-                ],
-              ),
-              body: new Container(
-                padding:
-                    EdgeInsets.only(top: 15, left: 20, right: 15, bottom: 0),
-                height: double.infinity,
-                width: double.infinity,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                          '$header - Parent: ${snapshot.data.kategoriParent.nama}'),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Text('Nama Sub Kategori'),
-                      TextField(
-                        controller: _txtController,
-                        maxLines: 1,
-                      ),
-                      Text('Keterangan (Optional)'),
-                      TextField(
-                        controller: _txtCatatanController,
-                        maxLines: null,
-                      ),
-                    ],
+              return Scaffold(
+                key: _scaffoldKey,
+                appBar: AppBar(
+                  title: Text(snapshot.data.titleBar),
+                  actions: <Widget>[
+                    // action button
+                    IconButton(
+                      color: Colors.green[900],
+                      icon: Icon(Icons.done),
+                      onPressed: () {
+                        _saveSubKategori(snapshot.data.currentKategori);
+                      },
+                    ),
+                    // overflow menu
+                  ],
+                ),
+                body: new Container(
+                  padding:
+                      EdgeInsets.only(top: 15, left: 20, right: 15, bottom: 0),
+                  height: double.infinity,
+                  width: double.infinity,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                            '$header - Parent: ${snapshot.data.kategoriParent.nama}'),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text('Nama Sub Kategori'),
+                        TextField(
+                          controller: _txtController,
+                          maxLines: 1,
+                        ),
+                        Text('Keterangan (Optional)'),
+                        TextField(
+                          controller: _txtCatatanController,
+                          maxLines: null,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          }
-        });
+              );
+            }
+          }),
+    );
+  }
+
+  _showToast(String messageToast) {
+    showToast(messageToast,
+        context: context,
+        duration: Duration(seconds: 1),
+        textStyle: TextStyle(fontSize: 16, color: Colors.white),
+        backgroundColor: Colors.cyan[600],
+        toastHorizontalMargin: 10.0,
+        position:
+        StyledToastPosition(align: Alignment.topCenter, offset: 70.0));
   }
 }
