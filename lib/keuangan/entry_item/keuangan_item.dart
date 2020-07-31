@@ -464,6 +464,10 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
                               thickness: 2,
                               indent: 35,
                             ),
+                            widget.isEditMode
+                                ? Container()
+                                :_widgetButtonSave(_sizeWidget.width),
+
                             new Container(
                               height: 70,
                               width: 40,
@@ -473,15 +477,7 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
                       ),
                     ),
                   ),
-                  widget.isEditMode
-                      ? Container()
-                      : Transform(
-                          transform: Matrix4.translationValues(
-                              0,
-                              _sizeWidget.height - (127 + _insetsMedia.bottom),
-                              0),
-                          child: _widgetButtonSave(_sizeWidget.width),
-                        ),
+
                   p != null
                       ? _widgetPadPositionAutoComplete1(p, _sizeWidget)
                       : new Container(),
@@ -698,10 +694,9 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
   }
 
   Widget _widgetButtonSave(double width) {
-    double localWidth = width - 24;
+    double localWidth = width - 40;
     final Color btnColor = Colors.cyan[600];
     return Container(
-      width: double.infinity,
       height: 50,
       child: Row(
         children: <Widget>[
