@@ -48,7 +48,7 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
     );
 
     // TODO: Load a Banner Ad
-    //_loadBannerAd();
+    _loadBannerAd();
     super.initState();
   }
 
@@ -56,18 +56,31 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
   void dispose(){
     _controller.dispose();
     _blocHpKeuangan.dispose();
-    _bannerAd?.dispose();
+   this._disposeBanner();
     super.dispose();
   }
 
   void _loadBannerAd() {
-    _bannerAd = BannerAd(
-      adUnitId: AdManager.bannerAdUnitId,
-      size: AdSize.banner,
-    );
-    _bannerAd
-      ..load()
-      ..show(anchorType: AnchorType.bottom);
+    if(_bannerAd == null){
+      _bannerAd = BannerAd(
+        adUnitId: AdManager.bannerAdUnitId,
+        size: AdSize.banner,
+      );
+      _bannerAd
+        ..load().then((value) {
+          if(value){
+            _bannerAd..show(anchorType: AnchorType.bottom);
+          }
+
+        });
+
+    }
+
+  }
+  
+  void _disposeBanner(){
+    _bannerAd?.dispose();
+    _bannerAd = null;
   }
 
   Widget _textSmall(String text) {
@@ -165,8 +178,8 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16.0),
                         side: BorderSide(color: Colors.cyan)),
-                    onPressed: () async {
-                      _edit(entry);
+                    onPressed: () {
+                      this._actionPushPage(entry, null);
                     },
                     child: Text(
                       'edit',
@@ -254,7 +267,8 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
             ));
   }
 
-  _edit(Entry entry) async {
+  _editAction(Entry entry) async {
+
     EnumJenisTransaksi enumJenisTransaksi;
     if (entry.keuangan.jenisTransaksi == 0) {
       enumJenisTransaksi = EnumJenisTransaksi.pengeluaran;
@@ -276,6 +290,56 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
       /// TODO gagal
     }
     Navigator.of(context).pop();
+
+  }
+
+  _baruAction(int index)async{
+    /// Kembalikan FAB ke posisi normal
+    if (!_controller.isDismissed) {
+      _controller.reverse();
+    }
+    EnumJenisTransaksi enumJns;
+    /// index == 0 : pemasukan
+    if (index == 0) {
+
+      enumJns = EnumJenisTransaksi.pemasukan;
+    } else {
+      enumJns = EnumJenisTransaksi.pengeluaran;
+    }
+    EnumFinalResult res = await openPage(
+        context,
+        KeuanganItemView(
+          dateTime: DateTime.now(),
+          isEditMode: false,
+          keuangan: null,
+          enumJenisTransaksi: enumJns,
+        ));
+
+    if(res == null){
+      _blocHpKeuangan.fullReload();
+    }else if (res == EnumFinalResult.success) {
+      _blocHpKeuangan.fullReload();
+      _showToast('Transaksi berhasil di simpan.');
+    } else {
+      /// TODO gagal
+    }
+
+  }
+
+  _actionPushPage(Entry entry,int index){
+    /// setiap push ke entry transaksi, banner di dispose
+    this._disposeBanner();
+    /// proses baru
+    if(entry == null){
+      _baruAction(index);
+    }
+    ///proses edit
+    else{
+      _editAction(entry);
+    }
+
+    /// setiap kembali ke page ini, banner di load kembali
+    _loadBannerAd();
   }
 
   _deleteConfirmed(Entry entry) {
@@ -380,37 +444,9 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
                               curve: Curves.easeOut),
                         ),
                         child: new FloatingActionButton.extended(
-                          onPressed: () async {
-                            /// Kembalikan FAB ke posisi normal
-                            if (!_controller.isDismissed) {
-                              _controller.reverse();
-                            }
-                            EnumJenisTransaksi enumJns;
-                            /// index == 0 : pemasukan
-                            if (index == 0) {
-
-                              enumJns = EnumJenisTransaksi.pemasukan;
-                            } else {
-                              enumJns = EnumJenisTransaksi.pengeluaran;
-                            }
-                            EnumFinalResult res = await openPage(
-                                context,
-                                KeuanganItemView(
-                                  dateTime: DateTime.now(),
-                                  isEditMode: false,
-                                  keuangan: null,
-                                  enumJenisTransaksi: enumJns,
-                                ));
-
-                            if(res == null){
-                              _blocHpKeuangan.fullReload();
-                            }else if (res == EnumFinalResult.success) {
-                              _blocHpKeuangan.fullReload();
-                              _showToast('Transaksi berhasil di simpan.');
-                            } else {
-                              /// TODO gagal
-                            }
-                          },
+                          onPressed: () {
+                            this._actionPushPage(null, index);
+                           },
                           label:
                               Text('${index == 0 ? 'Pemasukan' : 'Pengeluaran'}'),
                           icon: index == 0
