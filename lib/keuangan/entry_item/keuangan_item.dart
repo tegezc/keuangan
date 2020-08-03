@@ -8,7 +8,7 @@ import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/colors_utility.dart';
 import 'package:keuangan/util/common_ui.dart';
-import 'package:keuangan/util/datepicker_singlescrollview.dart';
+import 'package:keuangan/util/datepicker/calender/tgz_datepicker.dart';
 import 'package:keuangan/util/loading_view.dart';
 import 'package:keuangan/util/process_string.dart';
 
@@ -254,6 +254,9 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
   Future _selectDate() async {
     int _startDate = widget.dateTime.year - 5;
     int _endDate = widget.dateTime.year + 5;
+
+
+
     if (widget.isEditMode) {
       _startDate = widget.keuangan.tanggal.year - 5;
       _endDate = widget.keuangan.tanggal.year + 5;
@@ -261,19 +264,23 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
       _startDate = widget.dateTime.year - 5;
       _endDate = widget.dateTime.year + 5;
     }
-
-    DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: new DateTime.now(),
-        firstDate: new DateTime(_startDate),
-        lastDate: new DateTime(_endDate),
-        builder: (context, child) {
-          return CustomeDatePicker(child);
-        });
-    if (picked != null) {
-      StatePickDate statePickDate = new StatePickDate(picked);
+    DateTime dt = await openPage(context, TgzDatePicker(_startDate, _endDate));
+    if(dt != null){
+      StatePickDate statePickDate = new StatePickDate(dt);
       _blocEntryKeuangan.sinkState(statePickDate);
     }
+//    DateTime picked = await showDatePicker(
+//        context: context,
+//        initialDate: new DateTime.now(),
+//        firstDate: new DateTime(_startDate),
+//        lastDate: new DateTime(_endDate),
+//        builder: (context, child) {
+//          return CustomeDatePicker(child);
+//        });
+//    if (picked != null) {
+//      StatePickDate statePickDate = new StatePickDate(picked);
+//      _blocEntryKeuangan.sinkState(statePickDate);
+//    }
   }
 
   Future<Kategori> _asyncSimpleDialog1(
@@ -358,6 +365,15 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
     }
   }
 
+  Future openPage(context, Widget builder) async {
+    // wait until animation finished
+    await SwipeBackObserver.promise?.future;
+
+    return await Navigator.of(context).push(
+      MaterialPageRoute(builder: (ctx) => builder),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     /// di ekse pertama kali dan hanya sekali
@@ -412,8 +428,11 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
 
               //auto complete akan muncul jika user mengetikkan minimal 2 hurug
               if (_controllerTextItem.text.length > 1) {
-                p = this._setupAutoComplete(_sizeWidget, _insetsMedia.bottom,
-                    snapshot.data.stateEntryKeuangan, snapshot.data.mapItemName);
+                p = this._setupAutoComplete(
+                    _sizeWidget,
+                    _insetsMedia.bottom,
+                    snapshot.data.stateEntryKeuangan,
+                    snapshot.data.mapItemName);
               }
 
               ///end setup auto complete
@@ -466,8 +485,7 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
                             ),
                             widget.isEditMode
                                 ? Container()
-                                :_widgetButtonSave(_sizeWidget.width),
-
+                                : _widgetButtonSave(_sizeWidget.width),
                             new Container(
                               height: 70,
                               width: 40,
@@ -477,12 +495,12 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
                       ),
                     ),
                   ),
-
                   p != null
                       ? _widgetPadPositionAutoComplete1(p, _sizeWidget)
                       : new Container(),
                   p != null
-                      ? _widgetPositionAutoComplete1(snapshot.data.mapItemName, p)
+                      ? _widgetPositionAutoComplete1(
+                          snapshot.data.mapItemName, p)
                       : new Container(),
                 ]),
               );
@@ -490,15 +508,16 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
           }),
     );
   }
+
   _showToast(String messageToast) {
     showToast(messageToast,
         context: context,
         duration: Duration(seconds: 1),
-        textStyle: TextStyle(fontSize: 16,color: Colors.white),
+        textStyle: TextStyle(fontSize: 16, color: Colors.white),
         backgroundColor: Colors.cyan[600],
         toastHorizontalMargin: 10.0,
-        position: StyledToastPosition(
-            align: Alignment.topCenter, offset: 70.0));
+        position:
+            StyledToastPosition(align: Alignment.topCenter, offset: 70.0));
   }
 
   Widget _headerAppBar(EnumJenisTransaksi stateJenisKeuangan) {
