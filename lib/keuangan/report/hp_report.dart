@@ -1,14 +1,18 @@
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:keuangan/keuangan/report/report_batang/batang/report_batang.dart';
 import 'package:keuangan/keuangan/report/report_batang/cashflow/report_batang_fill.dart';
 import 'package:keuangan/keuangan/report/reporting_by_kategori/reporting_bykategori.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
+import 'package:keuangan/util/adsmob.dart';
 import 'package:keuangan/util/colors_utility.dart';
 import 'package:keuangan/util/common_ui.dart';
 
 class HpReport extends StatefulWidget {
   final Widget drawer;
+
   HpReport({this.drawer});
+
   @override
   _HpReportState createState() => _HpReportState();
 }
@@ -16,10 +20,39 @@ class HpReport extends StatefulWidget {
 class _HpReportState extends State<HpReport> {
   Map<EnumItemLaporan, HpUiItemLaporan> _mReport;
 
+  BannerAd _bannerAd;
+
   @override
   void initState() {
+    _loadBannerAd();
     _setupItemUi();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _disposeBanner();
+    super.dispose();
+  }
+
+  void _loadBannerAd() {
+    if (_bannerAd == null) {
+      _bannerAd = BannerAd(
+        adUnitId: AdManager.bannerAdUnitId(EnumBannerId.hpLaporan),
+        size: AdSize.banner,
+      );
+      _bannerAd
+        ..load().then((value) {
+          if (value) {
+            _bannerAd..show(anchorType: AnchorType.bottom);
+          }
+        });
+    }
+  }
+
+  void _disposeBanner() {
+    _bannerAd?.dispose();
+    _bannerAd = null;
   }
 
   _setupItemUi() {
@@ -87,35 +120,36 @@ class _HpReportState extends State<HpReport> {
       color = Colors.green;
     }
     return Padding(
-      padding: const EdgeInsets.only(top:8.0,bottom: 0.0,right: 8,left: 8),
+      padding: const EdgeInsets.only(top: 8.0, bottom: 0.0, right: 8, left: 8),
       child: RaisedButton(
         color: Colors.white,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(5.0),
-            side: BorderSide(color: color)
-        ),
-        onPressed: ()async{
-           await openPage(
-              context,
-               hpUiItemLaporan.widgetLaporan);
+            side: BorderSide(color: color)),
+        onPressed: () async {
+          await openPage(context, hpUiItemLaporan.widgetLaporan);
         },
         child: Container(
           width: double.infinity,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              SizedBox(height: 8,),
+              SizedBox(
+                height: 8,
+              ),
               Text(
                 hpUiItemLaporan.nama,
-                style: TextStyle(
-                  fontSize: 16,fontWeight: FontWeight.bold
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               Text(
                 hpUiItemLaporan.desc,
-                style: TextStyle(fontSize: 11,),
+                style: TextStyle(
+                  fontSize: 11,
+                ),
               ),
-              SizedBox(height: 5,),
+              SizedBox(
+                height: 5,
+              ),
             ],
           ),
         ),
@@ -161,34 +195,34 @@ class _HpReportState extends State<HpReport> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          drawer: widget.drawer,
-          appBar: AppBar(
-            bottom: TabBar(
-              tabs: [
-                Tab(
-                  child: Text('Pengeluaran'),
-                ),
-                Tab(
-                  child: Text('Pemasukan'),
-                ),
-                Tab(
-                  child: Text('Cash Flow'),
-                ),
-              ],
-            ),
-            title: Text('Laporan'),
-          ),
-          body: TabBarView(
-            children: [
-              _contentPengeluaran(),
-              _contentPemasukan(),
-              _contentCashFlow(),
+      length: 3,
+      child: Scaffold(
+        drawer: widget.drawer,
+        appBar: AppBar(
+          bottom: TabBar(
+            tabs: [
+              Tab(
+                child: Text('Pengeluaran'),
+              ),
+              Tab(
+                child: Text('Pemasukan'),
+              ),
+              Tab(
+                child: Text('Cash Flow'),
+              ),
             ],
           ),
+          title: Text('Laporan'),
         ),
-      );
+        body: TabBarView(
+          children: [
+            _contentPengeluaran(),
+            _contentPemasukan(),
+            _contentCashFlow(),
+          ],
+        ),
+      ),
+    );
   }
 
   Future openPage(context, Widget builder) async {

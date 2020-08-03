@@ -1,8 +1,10 @@
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:keuangan/keuangan/kategori/subkategori/add_subkategori.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
+import 'package:keuangan/util/adsmob.dart';
 import 'package:keuangan/util/colors_utility.dart';
 import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/loading_view.dart';
@@ -29,16 +31,63 @@ class _HomePageKategoriState extends State<HomePageKategori> {
   final Color _colorButton = Colors.cyan[600];
   final Color _colorTextBtn = Colors.white;
 
+  BannerAd _bannerAd;
+
   @override
   initState() {
+    _loadBannerAd();
     _blocHomepageKategori = new BlocHomepageKategori();
     super.initState();
   }
 
   @override
   void dispose() {
+    _disposeBanner();
     _blocHomepageKategori.dispose();
     super.dispose();
+  }
+
+  void _loadBannerAd() {
+    if (_bannerAd == null) {
+      _bannerAd = BannerAd(
+        adUnitId: AdManager.bannerAdUnitId(EnumBannerId.hpKategori),
+        size: AdSize.banner,
+      );
+      _bannerAd
+        ..load().then((value) {
+          if (value) {
+            _bannerAd..show(anchorType: AnchorType.bottom);
+          }
+        });
+    }
+  }
+
+  void _disposeBanner() {
+    _bannerAd?.dispose();
+    _bannerAd = null;
+  }
+
+  _actionPushPage(EnumActionKategori actionKategori, Kategori kategori,int idparent) {
+    /// setiap push ke entry transaksi, banner di dispose
+    this._disposeBanner();
+  switch(actionKategori){
+
+    case EnumActionKategori.baru:
+      this._baru();
+      break;
+    case EnumActionKategori.edit:
+      _edit(kategori);
+      break;
+    case EnumActionKategori.barusubkategori:
+     _addSubKategori(idparent);
+      break;
+    case EnumActionKategori.editsubkategori:
+     _editSubKategori(kategori);
+      break;
+  }
+
+    /// setiap kembali ke page ini, banner di load kembali
+    _loadBannerAd();
   }
 
   Widget _cellBelumAdaData() {
@@ -262,16 +311,7 @@ class _HomePageKategoriState extends State<HomePageKategori> {
                   icon: Icon(Icons.add),
                   // color: Colors.blue,
                   onPressed: () async {
-                    EnumFinalResult res =
-                        await openPage(context, AddCategory.baru());
-                    //prevent snacbar showing
-                    if (res != null) {
-                      if (res == EnumFinalResult.success) {
-                        _blocHomepageKategori.populateAllKategoriFromDb(
-                            EnumStatePopulateKategori.savesuccess);
-                        _showToast('Kategori berhasil di simpan.');
-                      }
-                    }
+                  _actionPushPage(EnumActionKategori.baru, null, 0);
                   }));
               return Scaffold(
                 drawer: widget.drawer,
@@ -317,10 +357,10 @@ class _HomePageKategoriState extends State<HomePageKategori> {
                 borderRadius: BorderRadius.circular(16.0),
                 side: BorderSide(color: Colors.cyan)),
             onPressed: () async {
-              _addSubKategori(kategori.id);
+              _actionPushPage(EnumActionKategori.barusubkategori, null, kategori.id);
             },
             child: Text(
-              'tambah subkategori',
+              'Tambah subkategori',
               style: TextStyle(
                   color: _colorTextBtn,
                   fontWeight: FontWeight.bold,
@@ -338,10 +378,10 @@ class _HomePageKategoriState extends State<HomePageKategori> {
                 borderRadius: BorderRadius.circular(16.0),
                 side: BorderSide(color: Colors.cyan)),
             onPressed: () async {
-              _edit(kategori);
+              this._actionPushPage(EnumActionKategori.edit, kategori, 0);
             },
             child: Text(
-              'edit',
+              'Edit',
               style: TextStyle(
                   color: _colorTextBtn,
                   fontWeight: FontWeight.bold,
@@ -364,7 +404,7 @@ class _HomePageKategoriState extends State<HomePageKategori> {
               _showDialogConfirmDelete(kategori);
             },
             child: Text(
-              'delete',
+              'Delete',
               style: TextStyle(
                   color: _colorTextBtn,
                   fontWeight: FontWeight.bold,
@@ -383,10 +423,10 @@ class _HomePageKategoriState extends State<HomePageKategori> {
                 borderRadius: BorderRadius.circular(16.0),
                 side: BorderSide(color: Colors.cyan)),
             onPressed: () async {
-              _editSubKategori(kategori);
+              this._actionPushPage(EnumActionKategori.editsubkategori, kategori, 0);
             },
             child: Text(
-              'edit subkategori',
+              'Edit subkategori',
               style: TextStyle(
                   color: _colorTextBtn,
                   fontWeight: FontWeight.bold,
@@ -488,6 +528,19 @@ class _HomePageKategoriState extends State<HomePageKategori> {
     Navigator.of(context).pop();
   }
 
+  _baru()async{
+    EnumFinalResult res =
+        await openPage(context, AddCategory.baru());
+    //prevent snacbar showing
+    if (res != null) {
+      if (res == EnumFinalResult.success) {
+        _blocHomepageKategori.populateAllKategoriFromDb(
+            EnumStatePopulateKategori.savesuccess);
+        _showToast('Kategori berhasil di simpan.');
+      }
+    }
+  }
+
   _edit(Kategori kategori) async {
     EnumFinalResult res = await openPage(context, AddCategory.edit(kategori));
 
@@ -541,4 +594,11 @@ class _HomePageKategoriState extends State<HomePageKategori> {
         position:
             StyledToastPosition(align: Alignment.topCenter, offset: 70.0));
   }
+}
+
+enum EnumActionKategori{
+  baru,
+  edit,
+  barusubkategori,
+  editsubkategori,
 }
