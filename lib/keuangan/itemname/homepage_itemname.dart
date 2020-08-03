@@ -1,9 +1,11 @@
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:keuangan/keuangan/itemname/bloc_hpitemname.dart';
 import 'package:keuangan/keuangan/itemname/itemname_entry.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
+import 'package:keuangan/util/adsmob.dart';
 import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/loading_view.dart';
 
@@ -25,11 +27,72 @@ class _HomePageItemNameState extends State<HomePageItemName> {
   final Color _colorButton = Colors.cyan[600];
   final Color _colorTextBtn = Colors.white;
 
+  BannerAd _bannerAd;
+
   @override
   initState() {
     _commonUi = new CommonUi();
     _blocHomepageItemName = new BlocHomepageItemName();
+    _loadBannerAd();
     super.initState();
+  }
+
+  @override
+  dispose(){
+    _blocHomepageItemName.dispose();
+    this._disposeBanner();
+    super.dispose();
+  }
+
+  void _loadBannerAd() {
+    if (_bannerAd == null) {
+      _bannerAd = BannerAd(
+        adUnitId: AdManager.bannerAdUnitId(EnumBannerId.hpItemName),
+        size: AdSize.banner,
+      );
+      _bannerAd
+        ..load().then((value) {
+          if (value) {
+            _bannerAd..show(anchorType: AnchorType.bottom);
+          }
+        });
+    }
+  }
+
+  void _disposeBanner() {
+    _bannerAd?.dispose();
+    _bannerAd = null;
+  }
+
+  _baruAction() async {
+    EnumFinalResult res =
+    await _commonUi.openPage(context, ItemNameEntry.baru());
+    print('res: $res');
+    if (res != null) {
+      if (res == EnumFinalResult.success) {
+        _blocHomepageItemName.populateSemuaItemNameFromDb(
+            EnumStatePopulateItemName.savesuccess);
+        _showToast('Item berhasil di disimpan.');
+      }
+    }
+    // Navigator.of(context).pop();
+  }
+
+  _actionPushPage(ItemName itemName) {
+    /// setiap push ke entry transaksi, banner di dispose
+    this._disposeBanner();
+
+    /// proses baru
+    if (itemName == null) {
+      _baruAction();
+    }
+    ///proses edit
+    else {
+      _edit(itemName);
+    }
+
+    /// setiap kembali ke page ini, banner di load kembali
+    _loadBannerAd();
   }
 
   Widget _itemNameCellPengeluaran(ItemName itemName) {
@@ -138,17 +201,7 @@ class _HomePageItemNameState extends State<HomePageItemName> {
               _actionButtons.add(IconButton(
                   icon: Icon(Icons.add),
                   onPressed: () async {
-                    EnumFinalResult res =
-                        await _commonUi.openPage(context, ItemNameEntry.baru());
-                    print('res: $res');
-                    if (res != null) {
-                      if (res == EnumFinalResult.success) {
-                        _blocHomepageItemName.populateSemuaItemNameFromDb(
-                            EnumStatePopulateItemName.savesuccess);
-                        _showToast('Item berhasil di disimpan.');
-                      }
-                    }
-                    // Navigator.of(context).pop();
+                    _actionPushPage(null);
                   }));
               return Scaffold(
                 drawer: widget.drawer,
@@ -193,7 +246,7 @@ class _HomePageItemNameState extends State<HomePageItemName> {
                         borderRadius: BorderRadius.circular(16.0),
                         side: BorderSide(color: Colors.cyan)),
                     onPressed: () async {
-                      _edit(itemName);
+                      _actionPushPage(itemName);
                     },
                     child: Text(
                       'edit',
