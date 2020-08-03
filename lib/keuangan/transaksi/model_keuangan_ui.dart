@@ -28,9 +28,10 @@ class Entry {
 class CellKeuangan extends StatefulWidget {
   final Entry entry;
   final ValueChanged<String> callbackDelete;
-  final Function callbackUpdate;
+  final Function callbackUpdateFinish;
+  final Function callbackUpdateStart;
 
-  CellKeuangan({this.entry, this.callbackDelete,this.callbackUpdate});
+  CellKeuangan({this.entry, this.callbackDelete,this.callbackUpdateFinish,this.callbackUpdateStart});
 
   @override
   _CellKeuanganState createState() => _CellKeuanganState();
@@ -206,6 +207,7 @@ class _CellKeuanganState extends State<CellKeuangan> {
   }
 
   _edit(Entry entry) async {
+    widget.callbackUpdateStart();
     EnumJenisTransaksi enumJenisTransaksi;
     if (entry.keuangan.jenisTransaksi == 0) {
       enumJenisTransaksi = EnumJenisTransaksi.pengeluaran;
@@ -222,7 +224,7 @@ class _CellKeuanganState extends State<CellKeuangan> {
         ));
 
     if (res == EnumFinalResult.success) {
-      widget.callbackUpdate(res);
+      widget.callbackUpdateFinish(res);
     } else {
       /// TODO gagal
     }

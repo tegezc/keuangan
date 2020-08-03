@@ -54,7 +54,7 @@ class MyHomePageState extends State<MyHomePage> {
 
   @override
   initState() {
-   // _testingonly();
+    _testingonly();
     _initAdMob();
     super.initState();
   }

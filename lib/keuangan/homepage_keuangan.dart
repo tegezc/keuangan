@@ -53,32 +53,29 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
   }
 
   @override
-  void dispose(){
+  void dispose() {
     _controller.dispose();
     _blocHpKeuangan.dispose();
-   this._disposeBanner();
+    this._disposeBanner();
     super.dispose();
   }
 
   void _loadBannerAd() {
-    if(_bannerAd == null){
+    if (_bannerAd == null) {
       _bannerAd = BannerAd(
-        adUnitId: AdManager.bannerAdUnitId,
+        adUnitId: AdManager.bannerAdUnitId(EnumBannerId.hpKeuangan),
         size: AdSize.banner,
       );
       _bannerAd
         ..load().then((value) {
-          if(value){
+          if (value) {
             _bannerAd..show(anchorType: AnchorType.bottom);
           }
-
         });
-
     }
-
   }
-  
-  void _disposeBanner(){
+
+  void _disposeBanner() {
     _bannerAd?.dispose();
     _bannerAd = null;
   }
@@ -268,7 +265,6 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
   }
 
   _editAction(Entry entry) async {
-
     EnumJenisTransaksi enumJenisTransaksi;
     if (entry.keuangan.jenisTransaksi == 0) {
       enumJenisTransaksi = EnumJenisTransaksi.pengeluaran;
@@ -290,18 +286,17 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
       /// TODO gagal
     }
     Navigator.of(context).pop();
-
   }
 
-  _baruAction(int index)async{
+  _baruAction(int index) async {
     /// Kembalikan FAB ke posisi normal
     if (!_controller.isDismissed) {
       _controller.reverse();
     }
     EnumJenisTransaksi enumJns;
+
     /// index == 0 : pemasukan
     if (index == 0) {
-
       enumJns = EnumJenisTransaksi.pemasukan;
     } else {
       enumJns = EnumJenisTransaksi.pengeluaran;
@@ -315,26 +310,27 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
           enumJenisTransaksi: enumJns,
         ));
 
-    if(res == null){
+    if (res == null) {
       _blocHpKeuangan.fullReload();
-    }else if (res == EnumFinalResult.success) {
+    } else if (res == EnumFinalResult.success) {
       _blocHpKeuangan.fullReload();
       _showToast('Transaksi berhasil di simpan.');
     } else {
       /// TODO gagal
     }
-
   }
 
-  _actionPushPage(Entry entry,int index){
+  _actionPushPage(Entry entry, int index) {
     /// setiap push ke entry transaksi, banner di dispose
     this._disposeBanner();
+
     /// proses baru
-    if(entry == null){
+    if (entry == null) {
       _baruAction(index);
     }
+
     ///proses edit
-    else{
+    else {
       _editAction(entry);
     }
 
@@ -387,7 +383,6 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
 
         lw.add(FlatButton(
             onPressed: () {
-
               _showDialogPilihan(ke);
             },
             child: CellKeuanganStateLess(ke)));
@@ -395,7 +390,9 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
     }
 
     /// berikan space untuk scroll (karena dapat tertutup oleh ads dan FAB
-    lw.add(Container(height: 220,));
+    lw.add(Container(
+      height: 220,
+    ));
     return lw;
   }
 
@@ -446,13 +443,14 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
                         child: new FloatingActionButton.extended(
                           onPressed: () {
                             this._actionPushPage(null, index);
-                           },
-                          label:
-                              Text('${index == 0 ? 'Pemasukan' : 'Pengeluaran'}'),
+                          },
+                          label: Text(
+                              '${index == 0 ? 'Pemasukan' : 'Pengeluaran'}'),
                           icon: index == 0
                               ? Icon(Icons.monetization_on)
                               : Icon(Icons.money_off),
-                          backgroundColor: index == 0 ? Colors.green : Colors.red,
+                          backgroundColor:
+                              index == 0 ? Colors.green : Colors.red,
                           foregroundColor: Colors.white,
                           heroTag: null,
                         ),
@@ -484,7 +482,9 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
                         },
                       ),
                     )
-                  ..add(Container(height: 40,)),
+                    ..add(Container(
+                      height: 40,
+                    )),
                 ),
               );
             } else {
@@ -502,11 +502,11 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
     showToast(messageToast,
         context: context,
         duration: Duration(seconds: 1),
-        textStyle: TextStyle(fontSize: 16,color: Colors.white),
+        textStyle: TextStyle(fontSize: 16, color: Colors.white),
         backgroundColor: Colors.cyan[600],
         toastHorizontalMargin: 10.0,
-        position: StyledToastPosition(
-            align: Alignment.topCenter, offset: 70.0));
+        position:
+            StyledToastPosition(align: Alignment.topCenter, offset: 70.0));
   }
 }
 

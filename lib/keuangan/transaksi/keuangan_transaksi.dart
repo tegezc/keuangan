@@ -1,3 +1,4 @@
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
@@ -7,6 +8,7 @@ import 'package:keuangan/keuangan/report/reporting_by_kategori/component_reporti
 import 'package:keuangan/keuangan/transaksi/model_keuangan_ui.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
+import 'package:keuangan/util/adsmob.dart';
 import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/datepicker_singlescrollview.dart';
 import 'package:keuangan/util/global_data.dart';
@@ -73,6 +75,62 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
   ];
 
   AnimationController _controller;
+  BannerAd _bannerAd;
+
+  void _loadBannerAd() {
+    if (_bannerAd == null) {
+      _bannerAd = BannerAd(
+        adUnitId: AdManager.bannerAdUnitId(EnumBannerId.hpTransaksi),
+        size: AdSize.banner,
+      );
+      _bannerAd
+        ..load().then((value) {
+          if (value) {
+            _bannerAd..show(anchorType: AnchorType.bottom);
+          }
+        });
+    }
+  }
+
+  void _disposeBanner() {
+    _bannerAd?.dispose();
+    _bannerAd = null;
+  }
+
+  void _baruAction(int index) async {
+    this._disposeBanner();
+
+    /// Kembalikan FAB ke posisi normal
+    if (!_controller.isDismissed) {
+      _controller.reverse();
+    }
+    EnumJenisTransaksi enumJns;
+
+    /// index == 0 : pemasukan
+    if (index == 0) {
+      enumJns = EnumJenisTransaksi.pemasukan;
+    } else {
+      enumJns = EnumJenisTransaksi.pengeluaran;
+    }
+    EnumFinalResult res = await openPage(
+        context,
+        KeuanganItemView(
+          dateTime: DateTime.now(),
+          isEditMode: false,
+          keuangan: null,
+          enumJenisTransaksi: enumJns,
+        ));
+
+    if (res == null) {
+      _fullReload();
+    } else if (res == EnumFinalResult.success) {
+      _fullReload();
+      _showToast('Transaksi berhasil disimpan.');
+    } else {
+      /// TODO gagal
+    }
+    _loadBannerAd();
+  }
 
   @override
   void initState() {
@@ -84,12 +142,16 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
     _valueTanggalTo = new DateTime.now();
     _processString = new ProcessString();
     _reloadFirstTime();
+
+    // TODO: Load a Banner Ad
+    _loadBannerAd();
     super.initState();
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    this._disposeBanner();
     super.dispose();
   }
 
@@ -97,13 +159,19 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
     _fullReload();
   }
 
-  _callbackActionUpdate(EnumFinalResult enumFinalResult){
-    if(enumFinalResult == null){
+  _callbackActionUpdateStart() {
+    this._disposeBanner();
+  }
+
+  _callbackActionUpdateFinish(EnumFinalResult enumFinalResult) {
+    if (enumFinalResult == null) {
       _fullReload();
-    }else if (enumFinalResult == EnumFinalResult.success){
+    } else if (enumFinalResult == EnumFinalResult.success) {
       _fullReload();
       _showToast('Transaksi berhasil di update');
     }
+
+    this._loadBannerAd();
   }
 
   _reloadFirstTime() {
@@ -403,7 +471,8 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
       lw.add(CellKeuangan(
         entry: element,
         callbackDelete: _callbackActionDelete,
-        callbackUpdate: _callbackActionUpdate,
+        callbackUpdateFinish: _callbackActionUpdateFinish,
+        callbackUpdateStart: _callbackActionUpdateStart,
       ));
     });
 
@@ -455,36 +524,7 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
                   ),
                   child: new FloatingActionButton.extended(
                     onPressed: () async {
-                      /// Kembalikan FAB ke posisi normal
-                      if (!_controller.isDismissed) {
-                        _controller.reverse();
-                      }
-                      EnumJenisTransaksi enumJns;
-
-                      /// index == 0 : pemasukan
-                      if (index == 0) {
-                        enumJns = EnumJenisTransaksi.pemasukan;
-                      } else {
-                        enumJns = EnumJenisTransaksi.pengeluaran;
-                      }
-                      EnumFinalResult res = await openPage(
-                          context,
-                          KeuanganItemView(
-                            dateTime: DateTime.now(),
-                            isEditMode: false,
-                            keuangan: null,
-                            enumJenisTransaksi: enumJns,
-                          ));
-
-
-                      if (res == null) {
-                        _fullReload();
-                      } else if (res == EnumFinalResult.success) {
-                        _fullReload();
-                        _showToast('Transaksi berhasil disimpan.');
-                      } else {
-                        /// TODO gagal
-                      }
+                      _baruAction(index);
                     },
                     label: Text('${index == 0 ? 'Pemasukan' : 'Pengeluaran'}'),
                     icon: index == 0
@@ -523,7 +563,9 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
                   },
                 ),
               )
-            ..add(Container(height: 40,)),
+              ..add(Container(
+                height: 40,
+              )),
           ),
         ),
       );
@@ -534,11 +576,11 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
     showToast(messageToast,
         context: context,
         duration: Duration(seconds: 2),
-        textStyle: TextStyle(fontSize: 16,color: Colors.white),
+        textStyle: TextStyle(fontSize: 16, color: Colors.white),
         backgroundColor: Colors.cyan[600],
         toastHorizontalMargin: 10.0,
-        position: StyledToastPosition(
-            align: Alignment.topCenter, offset: 70.0));
+        position:
+            StyledToastPosition(align: Alignment.topCenter, offset: 70.0));
   }
 }
 
