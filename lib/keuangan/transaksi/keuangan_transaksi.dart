@@ -10,6 +10,7 @@ import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/adsmob.dart';
 import 'package:keuangan/util/common_ui.dart';
+import 'package:keuangan/util/datepicker/calender/calendar_range.dart';
 import 'package:keuangan/util/datepicker_singlescrollview.dart';
 import 'package:keuangan/util/global_data.dart';
 import 'package:keuangan/util/loading_view.dart';
@@ -352,10 +353,37 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
     return items;
   }
 
-  void _changedDropDownEntry(EntryCombobox selectedECombo) {
+  void _changedDropDownEntry(EntryCombobox selectedECombo) async {
+    /// user pick custome periode
     if (selectedECombo.startDate == null) {
-      _selectDateFrom();
-    } else {
+      TgzDateRangeValue tgzDateRangeValue =
+          await openPage(context, TgzRangeDatePicker(_startDate, _endDate));
+      if (tgzDateRangeValue != null) {
+        if (tgzDateRangeValue.isValid()) {
+          _valueTanggalFrom = tgzDateRangeValue.dateStart;
+          _valueTanggalTo = tgzDateRangeValue.dateFinish;
+          print('tanggal awal: ${_valueTanggalFrom.toString()}');
+          print('tanggal selesai: ${_valueTanggalTo.toString()}');
+
+          String strStartDate =
+              _processString.dateToStringDdMmmmYyyy(_valueTanggalFrom);
+          String strEndDate =
+              _processString.dateToStringDdMmmmYyyy(_valueTanggalTo);
+          _listCombobox.insert(
+              1,
+              EntryCombobox('$strStartDate - $strEndDate', _valueTanggalFrom,
+                  _valueTanggalTo));
+          _getDataKeuanganByPeriode(_valueTanggalFrom, _valueTanggalTo);
+          _reloadComboBox();
+          setState(() {
+            _currentEntryCombo = _listCombobox[1];
+          });
+        }
+      }
+    }
+
+    /// user pick constant periode (7 hari terakhir, 30 hari terakhir
+    else {
       _getDataKeuanganByPeriode(
           selectedECombo.startDate, selectedECombo.endDate);
       setState(() {
