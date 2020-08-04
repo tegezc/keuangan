@@ -18,7 +18,7 @@ dependencies:
   flushbar: ^1.10.4
   flutter_native_splash: ^0.1.9
   sticky_headers: ^0.1.8+1
-  firebase_admob: ^0.9.3+2
+  firebase_admob: ^0.9.3+4
   rxdart: ^0.24.1
   flutter:
     sdk: flutter
