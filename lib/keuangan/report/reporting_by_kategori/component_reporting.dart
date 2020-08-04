@@ -1,10 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:intl/intl.dart';
-import 'package:keuangan/keuangan/transaksi/model_keuangan_ui.dart';
-import 'package:keuangan/util/colors_utility.dart';
-import 'package:keuangan/util/global_data.dart';
 
+import 'package:keuangan/keuangan/transaksi/model_keuangan_ui.dart';
+import 'package:keuangan/model/enum_keuangan.dart';
+import 'package:keuangan/model/keuangan.dart';
+import 'package:keuangan/util/colors_utility.dart';
+import 'package:keuangan/util/common_ui.dart';
+import 'package:keuangan/util/datepicker/calender/calendar_range.dart';
+import 'package:keuangan/util/global_data.dart';
+import 'package:keuangan/util/process_string.dart';
+
+class ItemChartReporting implements Comparable<ItemChartReporting> {
+  double total;
+  List<Keuangan> lKeuangan;
+  double persen;
+  Kategori kategori;
+  String text;
+  ItemName itemName;
+  int id;// for flutter chart
+
+  @override
+  String toString() {
+    return 'total: $total | lk: ${lKeuangan.length} | pesen: $persen '
+        '| kategori: ${kategori.nama} | text: $text | itemname: ${itemName.nama}';
+  }
+
+  @override
+  int compareTo(ItemChartReporting other) {
+    int order = other.total.compareTo(total);
+    return order;
+  }
+}
 
 class UtilUiRepByKategori {
   List<EntryCombobox> initialCombobox() {
@@ -43,39 +70,167 @@ class UtilUiRepByKategori {
     DateTime today = new DateTime.now();
     return today.subtract(new Duration(days: jmlHari));
   }
-}
 
-class ModelItemKategoriReport implements Comparable<ModelItemKategoriReport> {
-  dynamic values;
-  String text;
-  int jumlahUang;
-  String color;//
+  ItemChartReporting _refactorSetMap(Kategori kategori, ItemName itemName,
+      Keuangan keuangan, int key, Map<int, ItemChartReporting> mapK) {
+    ItemChartReporting itm;
+    if (mapK[key] == null) {
+      itm = new ItemChartReporting();
+      List<Keuangan> lk = new List();
+      lk.add(keuangan);
 
-  ModelItemKategoriReport({
-      this.values,this.text,this.jumlahUang, this.color});
+      itm.total = keuangan.jumlah;
+      itm.lKeuangan = lk;
 
-  @override
-  int compareTo(ModelItemKategoriReport other) {
-    int order = jumlahUang.compareTo(other.jumlahUang);
-    return order;
+      /// kategori hanya perlu di set sekali
+      itm.kategori = kategori;
+      itm.itemName = itemName;
+    } else {
+      itm = mapK[key];
+      List<Keuangan> lk = itm.lKeuangan;
+      lk.add(keuangan);
+
+      itm.total = itm.total + keuangan.jumlah;
+      itm.lKeuangan = lk;
+    }
+    itm.text = kategori.nama;
+    mapK[key] = itm;
+    return itm;
+  }
+
+  Map<int, ItemChartReporting> _hitungPersentasi(
+      Map<int, ItemChartReporting> mapK, total) {
+    /// menghitung persen tiap kategori
+    Map<int, ItemChartReporting> tmpMap = new Map();
+    mapK.forEach((key, itmReport) {
+      ItemChartReporting itm = itmReport;
+      itm.persen = (itm.total / total) * 100;
+      tmpMap[key] = itm;
+    });
+    return tmpMap;
+  }
+
+  List<ItemChartReporting> _convertToListAndSorting(
+      Map<int, ItemChartReporting> mapK) {
+    /// convert map to list supaya bisa di sorting
+    List<ItemChartReporting> litm = new List();
+    mapK.forEach((key, itm) {
+      litm.add(itm);
+    });
+    litm.sort();
+    return litm;
+  }
+
+  /// untuk reporting by Parent Kategori
+  List<ItemChartReporting> ayakBaseonParentKategori(List<Keuangan> lKeuangan,
+      Map<int, Kategori> mKtg, Map<int, ItemName> mItemName) {
+    double totalSeluruhTransaksi = 0;
+    Map<int, ItemChartReporting> mapK = new Map();
+    for (int i = 0; i < lKeuangan.length; i++) {
+      Keuangan keuangan = lKeuangan[i];
+      ItemName itemName = mItemName[keuangan.idItemName];
+      Kategori kategori = mKtg[itemName.idKategori];
+
+      if (kategori.idParent > 0) {
+        kategori = mKtg[kategori.idParent];
+      }
+      int key = kategori.id;
+      ItemChartReporting itm = this._refactorSetMap(kategori, itemName, keuangan, key, mapK);
+      itm.id = key;
+      mapK[key] = itm;
+
+      /// dapatkan total uang dari seluruh transaksi untuk penghitugnan persen
+      totalSeluruhTransaksi = totalSeluruhTransaksi + keuangan.jumlah;
+    }
+
+    /// menghitung persen tiap kategori
+    mapK = this._hitungPersentasi(mapK, totalSeluruhTransaksi);
+
+    /// convert map to list supaya bisa di sorting
+    return this._convertToListAndSorting(mapK);
+  }
+
+  /// untuk reporting by Sub Kategori
+  List<ItemChartReporting> ayakBaseonsubKategori(List<Keuangan> lKeuangan,
+      Map<int, Kategori> mKtg, Map<int, ItemName> mItemName, Kategori ktg) {
+    double totalSeluruhTransaksi = 0;
+    Map<int, ItemChartReporting> mapK = new Map();
+    for (int i = 0; i < lKeuangan.length; i++) {
+      Keuangan keuangan = lKeuangan[i];
+      ItemName itemName = mItemName[keuangan.idItemName];
+      Kategori kategori = mKtg[itemName.idKategori];
+
+      int key;
+
+      /// ini masuk ke subkategori bersangkutan
+      if (kategori.idParent == ktg.id) {
+        key = kategori.id;
+      }
+
+      /// ini masuk ke parent kategori
+      else if (kategori.id == ktg.id) {
+        key = ktg.id;
+      }
+
+      if (key != null) {
+        ItemChartReporting itm = this._refactorSetMap(kategori, itemName, keuangan, key, mapK);
+        itm.id = key;
+        mapK[key] =itm;
+
+
+        /// dapatkan total uang dari seluruh transaksi untuk penghitugnan persen
+        totalSeluruhTransaksi = totalSeluruhTransaksi + keuangan.jumlah;
+      }
+    }
+
+    /// menghitung persen tiap kategori
+    mapK = this._hitungPersentasi(mapK, totalSeluruhTransaksi);
+
+    /// convert map to list supaya bisa di sorting
+    return this._convertToListAndSorting(mapK);
+  }
+
+  /// untuk reporting by Sub Kategori
+  List<ItemChartReporting> ayakBaseonItemName(List<Keuangan> lKeuangan,
+      Map<int, Kategori> mKtg, Map<int, ItemName> mItemName, Kategori ktg) {
+    double totalSeluruhTransaksi = 0;
+    Map<int, ItemChartReporting> mapK = new Map();
+    for (int i = 0; i < lKeuangan.length; i++) {
+      Keuangan keuangan = lKeuangan[i];
+      ItemName itemName = mItemName[keuangan.idItemName];
+      Kategori kategori = mKtg[itemName.idKategori];
+
+      int key;
+
+      /// ini masuk ke subkategori bersangkutan
+      if (kategori.idParent == ktg.id) {
+        key = itemName.id;
+      }
+
+      /// ini masuk ke parent kategori
+      else if (kategori.id == ktg.id) {
+        key = itemName.id;
+      }
+
+      if (key != null) {
+        ItemChartReporting itm =
+            this._refactorSetMap(kategori, itemName, keuangan, key, mapK);
+        itm.text = itemName.nama;
+        itm.id = key;
+        mapK[key] = itm;
+
+        /// dapatkan total uang dari seluruh transaksi untuk penghitugnan persen
+        totalSeluruhTransaksi = totalSeluruhTransaksi + keuangan.jumlah;
+      }
+    }
+
+    /// menghitung persen tiap kategori
+    mapK = this._hitungPersentasi(mapK, totalSeluruhTransaksi);
+
+    /// convert map to list supaya bisa di sorting
+    return this._convertToListAndSorting(mapK);
   }
 }
-
-
-class ModelCategoryReport{
-  Function funcBtnClick;
-  int ecindex;
-  int total;
-  Size dimention;
-  List<ModelItemKategoriReport> itemCategories;
-  List<EntryCombobox> listCombobox;
-
-  ModelCategoryReport({this.dimention, this.itemCategories,this.listCombobox, this.total, this.ecindex,
-      this.funcBtnClick});
-
-
-}
-//}
 
 class DonutPieChart extends StatelessWidget {
   final List<charts.Series> seriesList;
@@ -93,9 +248,10 @@ class DonutPieChart extends StatelessWidget {
 
 //UI Body statistic pada reporting by kategori
 class BodyStatistic extends StatefulWidget {
-  final ModelCategoryReport modelCategoryReport;
+  final List<ItemChartReporting> listItemChart;
+  final Function callBackCellClick;
 
-  BodyStatistic(this.modelCategoryReport);
+  BodyStatistic(this.listItemChart, this.callBackCellClick);
 
   @override
   _BodyStatisticState createState() => _BodyStatisticState();
@@ -104,27 +260,25 @@ class BodyStatistic extends StatefulWidget {
 class _BodyStatisticState extends State<BodyStatistic> {
   int idKategori;
 
-  Widget _cellReportingItem(ModelCategoryReport modelCategoryReport, ModelItemKategoriReport itemKategoriReport) {
-    double percentation = (itemKategoriReport.jumlahUang / modelCategoryReport.total) * 100;
-    double widthCell = (modelCategoryReport.dimention.width / 100) * percentation;
-    if (widthCell >= modelCategoryReport.dimention.width-32) {
-      //-32 krn padding 16x2
-      widthCell = modelCategoryReport.dimention.width - 32;
+  Widget _cellReportingItem(ItemChartReporting itm, double width) {
+    double widthCell = (width / 100) * itm.persen;
+    if (widthCell >= width - 32) {
+      ///-32 krn padding 16x2
+      widthCell = width - 32;
     }
 
     final formatCurrency = new NumberFormat("#,##0", "idr");
-    final uang = formatCurrency.format(itemKategoriReport.jumlahUang);
+    final uang = formatCurrency.format(itm.total);
     return Container(
       child: FlatButton(
           onPressed: () {
-            widget.modelCategoryReport.funcBtnClick(itemKategoriReport);
+            widget.callBackCellClick(itm);
           },
           child: Column(
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  Text(
-                      '${itemKategoriReport.text}'),
+                  Text('${itm.text} ( ${itm.persen.toStringAsFixed(2)} %)'),
                   Spacer(),
                   Text('Rp. $uang'),
                 ],
@@ -134,14 +288,14 @@ class _BodyStatisticState extends State<BodyStatistic> {
               ),
               Container(
                 height: 30,
-               width: this.widget.modelCategoryReport.dimention.width,
+                width: width,
                 color: Colors.grey,
                 child: Row(
                   children: <Widget>[
                     Container(
                       height: 30,
                       width: widthCell,
-                      color: HexColor(itemKategoriReport.color),
+                      color: HexColor(itm.kategori.color),
                     ),
                     Spacer(),
                   ],
@@ -152,29 +306,47 @@ class _BodyStatisticState extends State<BodyStatistic> {
     );
   }
 
-  Widget _chartWidget(double height) {
-    var series = [
-      new charts.Series(
-        domainFn: (ModelItemKategoriReport item, _) => item.text,
-        measureFn: (ModelItemKategoriReport clickData, _) => clickData.jumlahUang,
-        colorFn: (ModelItemKategoriReport clickData, _) => charts.Color.fromHex(code:clickData.color),
-        id: 'Clicks',
-        data: widget.modelCategoryReport.itemCategories,
-      ),
+  /// Create one series with sample hard coded data.
+   List<charts.Series<ItemChartReporting, int>> _createData() {
+    return [
+      new charts.Series<ItemChartReporting, int>(
+        id: 'Sales',
+        domainFn: (ItemChartReporting itm, _) => itm.id,
+        measureFn: (ItemChartReporting itm, _) => itm.persen,
+        colorFn: (ItemChartReporting itm, _) =>
+            charts.Color.fromHex(code: '#${itm.kategori.color}'),
+        data:  widget.listItemChart,
+      )
     ];
-    double proporsionalHeight = height - (height / 3);
+  }
+
+  Widget _chartWidget(double height) {
+//    widget.listItemChart.forEach((element) {
+//      print(element.toString());
+//    });
+//    var series = [
+//      new charts.Series(
+//        domainFn: (ItemChartReporting item, _) => item.kategori.nama,
+//        measureFn: (ItemChartReporting clickData, _) => clickData.total.toInt(),
+//        colorFn: (ItemChartReporting clickData, _) =>
+//            charts.Color.fromHex(code: '#${clickData.kategori.color}'),
+//        id: 'Clicks',
+//        data: widget.listItemChart,
+//      ),
+//    ];
+
+    List<charts.Series> seriesList = this._createData();
+    double proporsionalHeight = height - (height / 4);
     return new Container(
       height: proporsionalHeight,
-      child: DonutPieChart(series),
+      child: DonutPieChart(seriesList),
     );
   }
 
   Widget _cellReporting(Size dimention) {
     List<Widget> listW = new List();
-    widget.modelCategoryReport.itemCategories.forEach((es) {
-
-      listW.add(_cellReportingItem(
-          widget.modelCategoryReport, es));
+    widget.listItemChart.forEach((itm) {
+      listW.add(_cellReportingItem(itm, dimention.width));
       listW.add(new SizedBox(
         height: 20,
       ));
@@ -201,5 +373,160 @@ class _BodyStatisticState extends State<BodyStatistic> {
   Widget build(BuildContext context) {
     final mediaQueryData = MediaQuery.of(context);
     return _formStatistic(mediaQueryData.size);
+  }
+}
+
+class ReportSceletonByCategories extends StatefulWidget {
+  final Widget drawer;
+  final EnumJenisTransaksi enumJenisTransaksi;
+  final Widget child;
+  final Function callbackChangeComboboxTanggal;
+  final String title;
+  final List<EntryCombobox> listCombobox;
+  final int posisiCombobox;
+
+  ReportSceletonByCategories(this.enumJenisTransaksi, this.title,
+      {this.drawer,
+      this.child,
+      this.callbackChangeComboboxTanggal,
+      this.listCombobox,
+      this.posisiCombobox})
+      : assert(enumJenisTransaksi != null);
+
+  @override
+  _ReportSceletonByCategoriesState createState() =>
+      _ReportSceletonByCategoriesState();
+}
+
+class _ReportSceletonByCategoriesState
+    extends State<ReportSceletonByCategories> {
+  List<DropdownMenuItem<int>> _dropDownEntry;
+
+  List<EntryCombobox> _listCombobox;
+
+  int _posisiCombobox;
+  ProcessString _processString;
+
+  @override
+  void initState() {
+    _processString = new ProcessString();
+    _initialCombobox();
+    super.initState();
+  }
+
+  _initialCombobox() {
+    if (widget.listCombobox == null) {
+      UtilUiRepByKategori utilUiRepByKategori = new UtilUiRepByKategori();
+      _listCombobox = utilUiRepByKategori.initialCombobox();
+      _posisiCombobox = 2;
+    } else {
+      _listCombobox = widget.listCombobox;
+      _posisiCombobox = widget.posisiCombobox;
+    }
+
+    _reloadComboBox();
+  }
+
+  _reloadComboBox() {
+    _dropDownEntry = _getDropDownEntry();
+  }
+
+  List<DropdownMenuItem<int>> _getDropDownEntry() {
+    List<DropdownMenuItem<int>> items = new List();
+    for (int i = 0; i < _listCombobox.length; i++) {
+      EntryCombobox eCombo = _listCombobox[i];
+      items.add(new DropdownMenuItem(
+        value: i,
+        child: new Text(eCombo.text),
+      ));
+    }
+    return items;
+  }
+
+  void _changedDropDownEntry(int index) async {
+    final int _startDate = 1990;
+    final int _endDate = 2050;
+    EntryCombobox selectedECombo = _listCombobox[index];
+
+    /// user pick custome periode
+    if (selectedECombo.startDate == null) {
+      TgzDateRangeValue tgzDateRangeValue =
+          await openPage(context, TgzRangeDatePicker(_startDate, _endDate));
+      if (tgzDateRangeValue != null) {
+        if (tgzDateRangeValue.isValid()) {
+          String strStartDate = _processString
+              .dateToStringDdMmmmYyyy(tgzDateRangeValue.dateStart);
+          String strEndDate = _processString
+              .dateToStringDdMmmmYyyy(tgzDateRangeValue.dateFinish);
+          EntryCombobox ec = EntryCombobox('$strStartDate - $strEndDate',
+              tgzDateRangeValue.dateStart, tgzDateRangeValue.dateFinish);
+          _listCombobox.insert(1, ec);
+
+          _reloadComboBox();
+          setState(() {
+            _posisiCombobox = 1;
+          });
+          widget.callbackChangeComboboxTanggal(_listCombobox, _posisiCombobox);
+        }
+      }
+    }
+
+    /// user pick constant periode (7 hari terakhir, 30 hari terakhir
+    else {
+      setState(() {
+        _posisiCombobox = index;
+      });
+      widget.callbackChangeComboboxTanggal(_listCombobox, _posisiCombobox);
+    }
+  }
+
+  Future openPage(context, Widget builder) async {
+    // wait until animation finished
+    await SwipeBackObserver.promise?.future;
+
+    return await Navigator.of(context).push(
+      MaterialPageRoute(builder: (ctx) => builder),
+    );
+  }
+
+  Widget _widgetComboBoxTanggal(double width) {
+    return Container(
+      width: width,
+      height: 80,
+      child: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: new DropdownButton(
+          value: _posisiCombobox,
+          items: _dropDownEntry,
+          onChanged: _changedDropDownEntry,
+        ),
+      ),
+    );
+  }
+
+  Widget _bodyReporting(Size dimention) {
+    return Container(
+      width: double.infinity,
+      child: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            _widgetComboBoxTanggal(dimention.width),
+            widget.child,
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final mediaQueryData = MediaQuery.of(context);
+
+    return Scaffold(
+        drawer: widget.drawer,
+        appBar: new AppBar(
+          title: new Text(widget.title),
+        ),
+        body: _bodyReporting(mediaQueryData.size));
   }
 }
