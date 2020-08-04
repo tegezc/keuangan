@@ -1,42 +1,13 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:firebase_admob/firebase_admob.dart';
 
 class AdMobUtil {
-  BannerAd createBanner(LokasiBanner lokasiBanner) {
-    AdSize adSize = AdSize.smartBanner;
-    String idUnitAd = '';
-    if (lokasiBanner == LokasiBanner.hpcalender) {
-      idUnitAd = unitAdIdFootHpCalender;
-    } else if (lokasiBanner == LokasiBanner.hpspecialday) {
-      idUnitAd = unitAdIdFootHpSpecialDay;
-    } else if (lokasiBanner == LokasiBanner.hptodolist) {
-      idUnitAd = unitAdIdFootHpTodolist;
-    }
-
-    idUnitAd = unitAdTestBannerAndroid;
-
+  BannerAd createBanner(EnumBannerId enumBannerId) {
     return BannerAd(
-        adUnitId: idUnitAd,
-        //Change BannerAd adUnitId with Admob ID
-        size: adSize,
-        targetingInfo: targetingInfo,
-        listener: (MobileAdEvent event) {
-          print("BannerAd $event");
-        });
+        adUnitId: AdManager.bannerAdUnitId(enumBannerId),
+    size: AdSize.banner,);
   }
-
-  static final isAdOn = true;
-
-  static final addAppId = 'ca-app-pub-9748508337477728~2663384646';
-  static final unitAdIdFootHpCalender =
-      'ca-app-pub-9748508337477728/6540036894';
-  static final unitAdIdFootHpTodolist =
-      'ca-app-pub-9748508337477728/8974628540';
-  static final unitAdIdFootHpSpecialDay =
-      'ca-app-pub-9748508337477728/3913873552';
-  static final unitAdIdFootHpSampah = 'ca-app-pub-9748508337477728/2920549604';
 
   static const MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
     // testDevices: testDevice != null ? <String>[testDevice] : null,
@@ -44,28 +15,11 @@ class AdMobUtil {
     testDevices: null, //null jika release
     nonPersonalizedAds: true,
     keywords: <String>[
-      'Kalender',
-      'Kalendar',
-      'Calender',
-      'Calendar',
-      'Nasional',
-      'Libur',
-      'Ticket',
-      'Tiket',
-      'Schedule',
-      'Jadwal',
-      'Holiday',
-      'Todo',
-      'Todolist',
-      'Traveling',
-      'Hotel',
-      'Libur'
+      'expense',
+      'finance',
+      'productivity'
     ],
   );
-
-  /// JANGAN LUPA COMMENT DI BAWAH INI JIKA RELEASE
-  static final unitAdTestBannerAndroid =
-      'ca-app-pub-3940256099942544/6300978111';
 // static const testDeviceId = '41a7e42d654ad81c'; //xiaomi guwa haha
 }
 
@@ -86,6 +40,10 @@ class AdManager {
     } else {
       throw new UnsupportedError("Unsupported platform");
     }
+  }
+
+  static bool isAdmobOn(){
+    return false;
   }
 
   static String bannerAdUnitId(EnumBannerId enumBannerId) {
