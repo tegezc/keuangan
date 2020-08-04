@@ -188,7 +188,7 @@ class TgzRangeDatePickerState extends State<TgzRangeDatePicker> {
               _infoRangeTanggal(mediaQueryData.size.width),
               _buildTitle(cellDimen),
               Container(
-                height: mediaQueryData.size.height - 205,
+                height: mediaQueryData.size.height - 235,
                 child: ListView.builder(
                   itemCount: _calendarController.countItems,
                   controller: _controller,
@@ -221,4 +221,10 @@ class TgzDateRangeValue {
   DateTime dateFinish;
 
   TgzDateRangeValue(this.dateStart,this.dateFinish);
+  bool isValid(){
+    if(dateStart != null && dateFinish != null){
+      return true;
+    }
+    return false;
+  }
 }

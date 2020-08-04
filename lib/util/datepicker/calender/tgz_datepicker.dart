@@ -113,7 +113,7 @@ class TgzDatePickerState extends State<TgzDatePicker> {
             children: <Widget>[
               _buildTitle(cellDimen),
               Container(
-                height: mediaQueryData.size.height - 150,
+                height: mediaQueryData.size.height - 180,
                 child: ListView.builder(
                   itemCount: _calendarController.countItems,
                   controller: _controller,
