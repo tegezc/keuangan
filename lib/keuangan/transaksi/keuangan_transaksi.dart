@@ -11,7 +11,6 @@ import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/adsmob.dart';
 import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/datepicker/calender/calendar_range.dart';
-import 'package:keuangan/util/datepicker_singlescrollview.dart';
 import 'package:keuangan/util/global_data.dart';
 import 'package:keuangan/util/loading_view.dart';
 import 'package:keuangan/util/process_string.dart';
@@ -79,18 +78,21 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
   BannerAd _bannerAd;
 
   void _loadBannerAd() {
-    if (_bannerAd == null) {
-      _bannerAd = BannerAd(
-        adUnitId: AdManager.bannerAdUnitId(EnumBannerId.hpTransaksi),
-        size: AdSize.banner,
-      );
-      _bannerAd
-        ..load().then((value) {
-          if (value) {
-            _bannerAd..show(anchorType: AnchorType.bottom);
-          }
-        });
+    if(AdManager.isAdmobOn()){
+      if (_bannerAd == null) {
+        _bannerAd = BannerAd(
+          adUnitId: AdManager.bannerAdUnitId(EnumBannerId.hpTransaksi),
+          size: AdSize.banner,
+        );
+        _bannerAd
+          ..load().then((value) {
+            if (value) {
+              _bannerAd..show(anchorType: AnchorType.bottom);
+            }
+          });
+      }
     }
+
   }
 
   void _disposeBanner() {
@@ -398,48 +400,6 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
       items: _dropDownEntry,
       onChanged: _changedDropDownEntry,
     );
-  }
-
-  Future _selectDateFrom() async {
-    DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: new DateTime.now(),
-        firstDate: new DateTime(_startDate),
-        lastDate: new DateTime(_endDate),
-        builder: (context, child) {
-          return CustomeDatePicker(child);
-        });
-    if (picked != null) {
-      _valueTanggalFrom = picked;
-      _selectDateTo();
-    }
-  }
-
-  Future _selectDateTo() async {
-    DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: new DateTime.now(),
-        firstDate: new DateTime(_startDate),
-        lastDate: new DateTime(_endDate),
-        builder: (context, child) {
-          return CustomeDatePicker(child);
-        });
-    if (picked != null) {
-      _valueTanggalTo = picked;
-      String strStartDate =
-          _processString.dateToStringDdMmmmYyyy(_valueTanggalFrom);
-      String strEndDate =
-          _processString.dateToStringDdMmmmYyyy(_valueTanggalTo);
-      _listCombobox.insert(
-          1,
-          EntryCombobox('$strStartDate - $strEndDate', _valueTanggalFrom,
-              _valueTanggalTo));
-      _getDataKeuanganByPeriode(_valueTanggalFrom, _valueTanggalTo);
-      _reloadComboBox();
-      setState(() {
-        _currentEntryCombo = _listCombobox[1];
-      });
-    }
   }
 
   Widget _bodyTransaksi(Size dimensi) {

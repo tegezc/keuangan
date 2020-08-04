@@ -48,6 +48,7 @@ class _HomePageKategoriState extends State<HomePageKategori> {
   }
 
   void _loadBannerAd() {
+    if(AdManager.isAdmobOn()){
     if (_bannerAd == null) {
       _bannerAd = BannerAd(
         adUnitId: AdManager.bannerAdUnitId(EnumBannerId.hpKategori),
@@ -59,7 +60,7 @@ class _HomePageKategoriState extends State<HomePageKategori> {
             _bannerAd..show(anchorType: AnchorType.bottom);
           }
         });
-    }
+    }}
   }
 
   void _disposeBanner() {

@@ -36,17 +36,19 @@ class _HpReportState extends State<HpReport> {
   }
 
   void _loadBannerAd() {
-    if (_bannerAd == null) {
-      _bannerAd = BannerAd(
-        adUnitId: AdManager.bannerAdUnitId(EnumBannerId.hpLaporan),
-        size: AdSize.banner,
-      );
-      _bannerAd
-        ..load().then((value) {
-          if (value) {
-            _bannerAd..show(anchorType: AnchorType.bottom);
-          }
-        });
+    if (AdManager.isAdmobOn()) {
+      if (_bannerAd == null) {
+        _bannerAd = BannerAd(
+          adUnitId: AdManager.bannerAdUnitId(EnumBannerId.hpLaporan),
+          size: AdSize.banner,
+        );
+        _bannerAd
+          ..load().then((value) {
+            if (value) {
+              _bannerAd..show(anchorType: AnchorType.bottom);
+            }
+          });
+      }
     }
   }
 
@@ -63,7 +65,7 @@ class _HpReportState extends State<HpReport> {
         'Laporan Pemasukan yang di kelompokkan berdasarkan kategori.',
         EnumJenisLaporan.pemasukan,
         EnumItemLaporan.pmByCategory,
-        new ReportByCategories(EnumJenisTransaksi.pemasukan));
+        new ReportingByCategories(EnumJenisTransaksi.pemasukan));
     _mReport[EnumItemLaporan.pmByMonth] = new HpUiItemLaporan(
         'Laporan Per Bulan',
         'Laporan Pemasukan per bulan pada tahun tertentu.',
@@ -83,7 +85,8 @@ class _HpReportState extends State<HpReport> {
         'Laporan Pengeluaran yang di kelompokkan berdasarkan kategori.',
         EnumJenisLaporan.pengeluaran,
         EnumItemLaporan.pgByCategory,
-        new ReportByCategories(EnumJenisTransaksi.pengeluaran));
+//        new ReportByCategories(EnumJenisTransaksi.pengeluaran));
+        new ReportingByCategories(EnumJenisTransaksi.pengeluaran));
     _mReport[EnumItemLaporan.pgByMonthly] = new HpUiItemLaporan(
         'Laporan Per Bulan',
         'Laporan Pengeluaran tiap bulan.',

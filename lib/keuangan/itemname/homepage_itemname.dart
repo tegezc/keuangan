@@ -45,6 +45,7 @@ class _HomePageItemNameState extends State<HomePageItemName> {
   }
 
   void _loadBannerAd() {
+    if(AdManager.isAdmobOn()){
     if (_bannerAd == null) {
       _bannerAd = BannerAd(
         adUnitId: AdManager.bannerAdUnitId(EnumBannerId.hpItemName),
@@ -56,7 +57,7 @@ class _HomePageItemNameState extends State<HomePageItemName> {
             _bannerAd..show(anchorType: AnchorType.bottom);
           }
         });
-    }
+    }}
   }
 
   void _disposeBanner() {

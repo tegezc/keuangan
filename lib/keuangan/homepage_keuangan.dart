@@ -46,7 +46,6 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
       vsync: this,
       duration: const Duration(milliseconds: 200),
     );
-
     // TODO: Load a Banner Ad
     _loadBannerAd();
     super.initState();
@@ -61,18 +60,21 @@ class _HomepageKeuanganState extends State<HomepageKeuangan>
   }
 
   void _loadBannerAd() {
-    if (_bannerAd == null) {
-      _bannerAd = BannerAd(
-        adUnitId: AdManager.bannerAdUnitId(EnumBannerId.hpKeuangan),
-        size: AdSize.banner,
-      );
-      _bannerAd
-        ..load().then((value) {
-          if (value) {
-            _bannerAd..show(anchorType: AnchorType.bottom);
-          }
-        });
+    if(AdManager.isAdmobOn()){
+      if (_bannerAd == null) {
+        _bannerAd = BannerAd(
+          adUnitId: AdManager.bannerAdUnitId(EnumBannerId.hpKeuangan),
+          size: AdSize.banner,
+        );
+        _bannerAd
+          ..load().then((value) {
+            if (value) {
+              _bannerAd..show(anchorType: AnchorType.bottom);
+            }
+          });
+      }
     }
+
   }
 
   void _disposeBanner() {
