@@ -30,8 +30,12 @@ class _ReportingByCategoriesState extends State<ReportingByCategories> {
   List<EntryCombobox> _listCombobox;
   int _posisiCombobox;
 
+  final Color colorButton = Colors.cyan[600];
+  final Color colorTextBtn = Colors.white;
+
   List<ItemChartReporting> _lItemChart;
   UtilUiRepByKategori utilUiRepByKategori;
+
   @override
   void initState() {
     utilUiRepByKategori = new UtilUiRepByKategori();
@@ -40,7 +44,6 @@ class _ReportingByCategoriesState extends State<ReportingByCategories> {
   }
 
   _populateKeuangan() {
-
     _listCombobox = utilUiRepByKategori.initialCombobox();
     _posisiCombobox = 2;
 
@@ -62,7 +65,8 @@ class _ReportingByCategoriesState extends State<ReportingByCategories> {
           _itemNameMap = new Map();
           _itemNameMap.addAll(inMap);
 
-          _lItemChart = utilUiRepByKategori.ayakBaseonParentKategori(_listKeuangan, _kategoriMap, _itemNameMap);
+          _lItemChart = utilUiRepByKategori.ayakBaseonParentKategori(
+              _listKeuangan, _kategoriMap, _itemNameMap);
 
           setState(() {});
         });
@@ -78,7 +82,8 @@ class _ReportingByCategoriesState extends State<ReportingByCategories> {
         .then((List<Keuangan> list) {
       _listKeuangan.clear();
       _listKeuangan.addAll(list);
-      _lItemChart = utilUiRepByKategori.ayakBaseonParentKategori(_listKeuangan, _kategoriMap, _itemNameMap);
+      _lItemChart = utilUiRepByKategori.ayakBaseonParentKategori(
+          _listKeuangan, _kategoriMap, _itemNameMap);
       setState(() {});
     });
   }
@@ -89,28 +94,86 @@ class _ReportingByCategoriesState extends State<ReportingByCategories> {
         context: context,
         builder: (BuildContext context) => SimpleDialog(
               title: Text('Pilihan:'),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15.0))),
               children: <Widget>[
-                new OutlineButton(
-                  onPressed: () {
-                    _showBySubKategori(kategori);
-                  },
-                  child: Text('lap ke sub kategori'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: 16.0, left: 16.0, bottom: 3.0),
+                  child: RaisedButton(
+                    color: colorButton,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(color: Colors.cyan)),
+                    onPressed: () async {
+                      _showBySubKategori(kategori);
+                    },
+                    child: Text(
+                      'Lap per sub Kategori',
+                      style: TextStyle(
+                          color: colorTextBtn,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    ),
+                  ),
                 ),
-                new OutlineButton(
-                  onPressed: () {
-                    _showByItem(kategori);
-                  },
-                  child: Text('lap per item'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: 16.0, left: 16.0, bottom: 3.0),
+                  child: RaisedButton(
+                    color: colorButton,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(color: Colors.cyan)),
+                    onPressed: () async {
+                      _showByItem(kategori);
+                    },
+                    child: Text(
+                      'Lap per Item',
+                      style: TextStyle(
+                          color: colorTextBtn,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    ),
+                  ),
                 ),
-                new OutlineButton(
-                  onPressed: () {
-                    _showTransaksi(kategori);
-                  },
-                  child: Text('tampilkan transaksi'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: 16.0, left: 16.0, bottom: 3.0),
+                  child: RaisedButton(
+                    color: colorButton,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(color: Colors.cyan)),
+                    onPressed: () async {
+                      _showTransaksi(kategori);
+                    },
+                    child: Text(
+                      'Tampilkan Transaksi',
+                      style: TextStyle(
+                          color: colorTextBtn,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    ),
+                  ),
                 ),
-                new OutlineButton(
-                  onPressed: _cancelDialog,
-                  child: Text('Cancel'),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: 16.0, left: 16.0, bottom: 3.0),
+                  child: RaisedButton(
+                    color: colorButton,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        side: BorderSide(color: Colors.cyan)),
+                    onPressed: _cancelDialog,
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                          color: colorTextBtn,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    ),
+                  ),
                 ),
               ],
             ));
@@ -178,7 +241,7 @@ class _ReportingByCategoriesState extends State<ReportingByCategories> {
 //    );
     return Container(
       width: double.infinity,
-      child: BodyStatistic(_lItemChart,_funcBtnClick),
+      child: BodyStatistic(_lItemChart, _funcBtnClick),
     );
   }
 

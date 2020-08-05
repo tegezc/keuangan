@@ -83,7 +83,6 @@ class _ReportingByItemsState extends State<ReportingByItems> {
 
 
   _funcBtnClick(ItemChartReporting itm) async {
-    Navigator.pop(context);
     await openPage(
         context,
         TransactionKeuangan.byItemName(

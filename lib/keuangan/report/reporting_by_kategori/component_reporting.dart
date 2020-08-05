@@ -321,19 +321,6 @@ class _BodyStatisticState extends State<BodyStatistic> {
   }
 
   Widget _chartWidget(double height) {
-//    widget.listItemChart.forEach((element) {
-//      print(element.toString());
-//    });
-//    var series = [
-//      new charts.Series(
-//        domainFn: (ItemChartReporting item, _) => item.kategori.nama,
-//        measureFn: (ItemChartReporting clickData, _) => clickData.total.toInt(),
-//        colorFn: (ItemChartReporting clickData, _) =>
-//            charts.Color.fromHex(code: '#${clickData.kategori.color}'),
-//        id: 'Clicks',
-//        data: widget.listItemChart,
-//      ),
-//    ];
 
     List<charts.Series> seriesList = this._createData();
     double proporsionalHeight = height - (height / 4);
