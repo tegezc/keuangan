@@ -24,11 +24,11 @@ class TransactionKeuangan extends StatefulWidget {
   final int posisiCombobox;
   final Kategori kategori;
   final ItemName itemName;
-  final StateTransaksi stateTransaksi;
+  final EnumStateTransaksi stateTransaksi;
   final Widget drawer;
 
   TransactionKeuangan.byDefault({this.drawer})
-      : this.stateTransaksi = StateTransaksi.byDefault,
+      : this.stateTransaksi = EnumStateTransaksi.byDefault,
         this.posisiCombobox = null,
         this.kategori = null,
         this.itemName = null,
@@ -36,13 +36,13 @@ class TransactionKeuangan extends StatefulWidget {
 
   TransactionKeuangan.byKategori(
       {this.kategori, this.listCombobox, this.posisiCombobox})
-      : this.stateTransaksi = StateTransaksi.byKategori,
+      : this.stateTransaksi = EnumStateTransaksi.byKategori,
         this.itemName = null,
         this.drawer = null;
 
   TransactionKeuangan.byItemName(
       {this.itemName, this.listCombobox, this.posisiCombobox})
-      : this.stateTransaksi = StateTransaksi.byItemName,
+      : this.stateTransaksi = EnumStateTransaksi.byItemName,
         this.kategori = null,
         this.drawer = null;
 
@@ -74,11 +74,14 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
     Icons.money_off
   ];
 
+  bool _isNeedHeader = false;
+  bool _isItemName = false;
+
   AnimationController _controller;
   BannerAd _bannerAd;
 
   void _loadBannerAd() {
-    if(AdManager.isAdmobOn()){
+    if (AdManager.isAdmobOn()) {
       if (_bannerAd == null) {
         _bannerAd = BannerAd(
           adUnitId: AdManager.bannerAdUnitId(EnumBannerId.hpTransaksi),
@@ -92,7 +95,6 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
           });
       }
     }
-
   }
 
   void _disposeBanner() {
@@ -144,6 +146,7 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
     _valueTanggalFrom = new DateTime.now();
     _valueTanggalTo = new DateTime.now();
     _processString = new ProcessString();
+
     _reloadFirstTime();
 
     // TODO: Load a Banner Ad
@@ -177,7 +180,20 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
     this._loadBannerAd();
   }
 
+  _setupIsNeedHeader() {
+    if (widget.stateTransaksi == EnumStateTransaksi.byKategori) {
+      _isNeedHeader = true;
+    } else if (widget.stateTransaksi == EnumStateTransaksi.byItemName) {
+      _isNeedHeader = true;
+      _isItemName = true;
+    }
+  }
+
   _reloadFirstTime() {
+    /// setup dalam kondisi bykategori atau byItemName maka perlu header di baris
+    /// pertama listview
+    _setupIsNeedHeader();
+
     DaoKategori daoKategori = new DaoKategori();
     DaoItemName daoItemName = new DaoItemName();
     daoKategori.getAllKategoriMap().then((Map<int, Kategori> kMap) {
@@ -187,17 +203,17 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
         _itemNameMap = new Map();
         _itemNameMap.addAll(inMap);
         switch (widget.stateTransaksi) {
-          case StateTransaksi.byDefault:
+          case EnumStateTransaksi.byDefault:
             {
               _initialComboboxByDefault();
             }
             break;
-          case StateTransaksi.byKategori:
+          case EnumStateTransaksi.byKategori:
             {
               _initialComboboxByVar();
             }
             break;
-          case StateTransaksi.byItemName:
+          case EnumStateTransaksi.byItemName:
             {
               _initialComboboxByVar();
             }
@@ -249,12 +265,12 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
   _sortingListKeuangan(List<Keuangan> listK) {
     List<Keuangan> filteredKeuangan = new List();
     switch (widget.stateTransaksi) {
-      case StateTransaksi.byDefault:
+      case EnumStateTransaksi.byDefault:
         {
           filteredKeuangan.addAll(listK);
         }
         break;
-      case StateTransaksi.byKategori:
+      case EnumStateTransaksi.byKategori:
         {
           listK.forEach((k) {
             ItemName itemName = _itemNameMap[k.idItemName];
@@ -266,7 +282,7 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
           });
         }
         break;
-      case StateTransaksi.byItemName:
+      case EnumStateTransaksi.byItemName:
         {
           listK.forEach((k) {
             ItemName itemName = _itemNameMap[k.idItemName];
@@ -402,6 +418,52 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
     );
   }
 
+  Widget _headerByKategori(Kategori kategori) {
+    return Container(
+      width: double.infinity,
+      color: Colors.cyan[600],
+      child: Padding(
+        padding:
+        const EdgeInsets.only(top: 12.0, left: 12, right: 10, bottom: 10),
+        child: Column(
+          children: <Widget>[
+            Text(
+              'Transaksi pada periode tersebut khusus',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal),
+            ),
+            Text(
+              'Kategori: ${kategori.nama}',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _headerByItemName(ItemName itemName) {
+    return Container(
+      width: double.infinity,
+      color: Colors.cyan[600],
+      child: Padding(
+        padding:
+            const EdgeInsets.only(top: 12.0, left: 12, right: 10, bottom: 10),
+        child: Column(
+          children: <Widget>[
+            Text(
+              'Transaksi pada periode tersebut khusus',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal),
+            ),
+            Text(
+              'Item: ${itemName.nama}',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _bodyTransaksi(Size dimensi) {
     return Container(
       width: double.infinity,
@@ -430,8 +492,17 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
             height: dimensi.height - 200,
             child: ListView.builder(
               itemBuilder: (BuildContext context, int index) {
-                if (index < _listEntry.length) {
-                  ForCellTransaksi e = _listEntry[index];
+                int idxArray = index;
+
+                if (index == 0 && _isNeedHeader) {
+                  idxArray = index - 1;
+                  if (_isItemName) {
+                    return _headerByItemName(widget.itemName);
+                  } else {
+                    return _headerByKategori(widget.kategori);
+                  }
+                } else if (idxArray < _listEntry.length) {
+                  ForCellTransaksi e = _listEntry[idxArray];
                   return StickyHeader(
                     header: HeaderCellTanggalTransaksi(
                         e.date, e.namaHari, e.namaBulan),
@@ -445,7 +516,8 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
                   );
                 }
               },
-              itemCount: _listEntry.length + 1,
+              itemCount:
+                  _isNeedHeader ? _listEntry.length + 2 : _listEntry.length + 1,
             ),
           ),
         ],
@@ -572,7 +644,7 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
   }
 }
 
-enum StateTransaksi {
+enum EnumStateTransaksi {
   byDefault,
   byKategori,
   byItemName,
