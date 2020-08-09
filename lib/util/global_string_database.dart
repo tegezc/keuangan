@@ -1,6 +1,7 @@
 
 class TbKategori {
   // id (auto_number), nama, id_parent,type
+  final realId = 'real_id';
   final name = 'kategori';
   final fId = 'id';
   final fNama = 'nama';
@@ -13,6 +14,7 @@ class TbKategori {
 
 class TbKeuangan{
   //id (auto number) tanggal, jumlah, catatan,type,
+  final realId = 'real_id';
    final name = 'keuangan';
    final fId = 'id';
    final fTgl = 'tanggal';
@@ -25,6 +27,7 @@ class TbKeuangan{
 
 class TbItemName{
   //id (auto_number) , nama, id_kategori
+  final realId = 'real_id';
    final name = 'item_name';
    final fId = 'id';
    final fNama = 'nama';

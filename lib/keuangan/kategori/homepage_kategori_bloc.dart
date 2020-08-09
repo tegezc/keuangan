@@ -73,7 +73,7 @@ class BlocHomepageKategori {
 
     bool isSuccess = true;
     List<ItemName> litemName =
-        await daoItemName.getItemNameByIdKategori(kategori.id);
+        await daoItemName.getItemNameByIdKategori(kategori.realId);
     if (litemName.isNotEmpty) {
       Kategori k = await daoKategori.getDefaultKategori(kategori.type);
       for (int i = 0; i < litemName.length; i++) {
@@ -108,7 +108,7 @@ class BlocHomepageKategori {
     DaoKategori daoKategori = new DaoKategori();
     bool isSuccess = true;
     if (kategori.idParent == 0) {
-      List<Kategori> lktg = await daoKategori.getSubkategori(kategori.id);
+      List<Kategori> lktg = await daoKategori.getSubkategori(kategori.realId);
       if (lktg.isNotEmpty) {
         for (int i = 0; i < lktg.length; i++) {
           /// set subkategori ke level 1

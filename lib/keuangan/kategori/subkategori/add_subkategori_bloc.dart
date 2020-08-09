@@ -56,7 +56,7 @@ class BlocAddSubKategori {
     DaoKategori daoKategori = new DaoKategori();
     Kategori kategoriParent = await daoKategori.getKategoriById(idparent);
     Kategori newKategori =
-        new Kategori('', idparent, kategoriParent.type, '', '');
+        new Kategori(0,'', idparent, kategoriParent.type, '', '');
 
     ItemUiAddSubKategori itemUiAddKategori = new ItemUiAddSubKategori(
         newKategori, kategoriParent, EnumStateFromBloc.progress);

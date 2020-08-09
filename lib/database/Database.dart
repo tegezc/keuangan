@@ -12,6 +12,8 @@ class DatabaseHelper {
 
   Future<Database> get db async {
     if (_db != null) return _db;
+
+
     _db = await initDb();
     return _db;
   }
@@ -42,6 +44,7 @@ class DatabaseHelper {
     await db.execute(
         "CREATE TABLE "
             "${tbKategori.name}(${tbKategori.fId} INTEGER PRIMARY KEY, "
+            ""
             "${tbKategori.fNama} TEXT, "
             "${tbKategori.fIdParent} INTEGER ,"
             "${tbKategori.fType} INTEGER,"

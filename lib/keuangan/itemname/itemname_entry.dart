@@ -60,7 +60,7 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
         for (int i = 0; i < _dropDownKategory.length; i++) {
           Kategori k = _dropDownKategory[i].value;
 
-          if (k.id == widget.itemName.idKategori) {
+          if (k.realId == widget.itemName.idKategori) {
             _currentCatogery = _dropDownKategory[i].value;
             break;
           }
@@ -97,17 +97,17 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
     if (widget.stateItemName == StateItemNameEntry.baru) {
       ItemName iname;
       if (_currentCatogery.idParent == null) {
-        iname = new ItemName(nama, 0, 0);
+        iname = new ItemName(0,nama, 0, 0);
       } else {
-        iname = new ItemName(nama, _currentCatogery.id, 0);
+        iname = new ItemName(0,nama, _currentCatogery.realId, 0);
       }
 
       daoItemName
           .getItemNameByNamaNIdKategoriVisible(iname.nama, iname.idKategori)
           .then((itemName) {
         if (itemName == null) {
-          daoItemName.saveItemName(iname).then((value) {
-            if (value > 0) {
+          daoItemName.saveItemName(iname).then((resultDb) {
+            if (resultDb.enumResultDb == EnumResultDb.success) {
               Navigator.of(context).pop(EnumFinalResult.success);
             } else {
               isShowToast = true;
@@ -124,23 +124,23 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
       });
     } else {
       if (nama.trim() == widget.itemName.nama &&
-          widget.itemName.idKategori == _currentCatogery.id) {
+          widget.itemName.idKategori == _currentCatogery.realId) {
         /// kondisi user klik edit, namun tidak melakukan perubahan apapun
         Navigator.of(context).pop(null);
       } else {
-        ItemName k;
+        ItemName itemName;
         if (_currentCatogery.idParent == null) {
-          k = new ItemName(nama, 0, 0);
+          itemName = new ItemName(0,nama, 0, 0);
         } else {
-          k = new ItemName(nama, _currentCatogery.id, 0);
+          itemName = new ItemName(0,nama, _currentCatogery.realId, 0);
         }
         ItemName oldItemName = widget.itemName;
         oldItemName.setIsDeleted(1);
         daoItemName
-            .getItemNameByNamaNIdKategoriVisible(k.nama, k.idKategori)
-            .then((itemName) {
-          if (itemName == null) {
-            daoItemName.saveItemName(k);
+            .getItemNameByNamaNIdKategoriVisible(itemName.nama, itemName.idKategori)
+            .then((itm) {
+          if (itm == null) {
+            daoItemName.saveItemName(itemName);
             daoItemName.update(oldItemName).then((value) {
               if (value == EnumResultDb.success) {
                 Navigator.of(context).pop(EnumFinalResult.success);

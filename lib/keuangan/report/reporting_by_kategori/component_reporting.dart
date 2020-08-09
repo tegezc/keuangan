@@ -163,12 +163,12 @@ class UtilUiRepByKategori {
       int key;
 
       /// ini masuk ke subkategori bersangkutan
-      if (kategori.idParent == ktg.id) {
+      if (kategori.idParent == ktg.realId) {
         key = kategori.id;
       }
 
       /// ini masuk ke parent kategori
-      else if (kategori.id == ktg.id) {
+      else if (kategori.realId == ktg.realId) {
         key = ktg.id;
       }
 
@@ -203,12 +203,12 @@ class UtilUiRepByKategori {
       int key;
 
       /// ini masuk ke subkategori bersangkutan
-      if (kategori.idParent == ktg.id) {
+      if (kategori.idParent == ktg.realId) {
         key = itemName.id;
       }
 
       /// ini masuk ke parent kategori
-      else if (kategori.id == ktg.id) {
+      else if (kategori.realId == ktg.realId) {
         key = itemName.id;
       }
 

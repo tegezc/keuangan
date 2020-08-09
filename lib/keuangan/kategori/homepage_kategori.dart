@@ -358,7 +358,7 @@ class _HomePageKategoriState extends State<HomePageKategori> {
                 borderRadius: BorderRadius.circular(16.0),
                 side: BorderSide(color: Colors.cyan)),
             onPressed: () async {
-              _actionPushPage(EnumActionKategori.barusubkategori, null, kategori.id);
+              _actionPushPage(EnumActionKategori.barusubkategori, null, kategori.realId);
             },
             child: Text(
               'Tambah subkategori',

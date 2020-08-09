@@ -1,14 +1,24 @@
-class DbUtility{
+class DbUtility {
+  int generateId() {
+    return DateTime.now().millisecondsSinceEpoch;
+  }
+
+  int generateDateToMiliseconds() {
+    return DateTime.now().millisecondsSinceEpoch;
+  }
+
+
 
 }
 
-class ResultDb{
+class ResultDb {
   EnumResultDb enumResultDb;
   int value;
+
   ResultDb(this.value);
 }
 
-enum EnumResultDb{
+enum EnumResultDb {
   success,
   failed,
   duplicate,

@@ -275,8 +275,8 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
           listK.forEach((k) {
             ItemName itemName = _itemNameMap[k.idItemName];
             Kategori kategori = _kategoriMap[itemName.idKategori];
-            if (kategori.idParent == widget.kategori.id ||
-                kategori.id == widget.kategori.id) {
+            if (kategori.idParent == widget.kategori.realId ||
+                kategori.realId == widget.kategori.realId) {
               filteredKeuangan.add(k);
             }
           });
@@ -286,7 +286,7 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
         {
           listK.forEach((k) {
             ItemName itemName = _itemNameMap[k.idItemName];
-            if (itemName.id == widget.itemName.id) {
+            if (itemName.realId == widget.itemName.realId) {
               filteredKeuangan.add(k);
             }
           });

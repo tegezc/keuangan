@@ -5,6 +5,7 @@ import 'package:keuangan/util/process_string.dart';
 class Kategori {
   TbKategori tb = new TbKategori();
   int id;
+  int _realId;
   String _nama;
   int _idParent;
   EnumJenisTransaksi _type;
@@ -13,14 +14,22 @@ class Kategori {
   int isAbadi;
   String _color;
 
-  Kategori(this._nama, this._idParent, this._type, this._catatan, this._color)
-      : assert(_nama != null &&
+  Kategori(this._realId, this._nama, this._idParent, this._type, this._catatan,
+      this._color)
+      : assert(_realId != null &&
+            _nama != null &&
             _idParent != null &&
             _type != null &&
             _catatan != null) {
     if (isAbadi == null) {
       isAbadi = 0;
     }
+  }
+
+  int get realId => this._realId;
+
+  void setRealId(int rid) {
+    this._realId = rid;
   }
 
   String get nama => this._nama;
@@ -35,6 +44,7 @@ class Kategori {
 
   Map<String, dynamic> toMap() {
     var map = new Map<String, dynamic>();
+    map[tb.realId] = _realId;
     map[tb.fNama] = _nama;
     map[tb.fIdParent] = _idParent;
     map[tb.fType] = _type.index;
@@ -71,20 +81,33 @@ class Kategori {
 
   @override
   String toString() {
-    return '|ID: $id |nama: $_nama |Catatan: $catatan |ID Parent: $_idParent |Type: $_type | abadi: $isAbadi |color: $_color';
+    return '|ID: $id |realid: $_realId |nama: $_nama '
+        '|Catatan: $catatan |ID Parent: $_idParent |Type: $_type '
+        '| abadi: $isAbadi |color: $_color';
   }
 }
 
 class ItemName {
   TbItemName tb = new TbItemName();
   int id;
+  int _realId;
+
   String _nama;
   int _idKategori;
   Kategori _kategori;
   int _isDeleted;
 
-  ItemName(this._nama, this._idKategori, this._isDeleted)
-      : assert(_nama != null && _idKategori != null && _isDeleted != null);
+  ItemName(this._realId, this._nama, this._idKategori, this._isDeleted)
+      : assert(_realId != null &&
+            _nama != null &&
+            _idKategori != null &&
+            _isDeleted != null);
+
+  int get realId => this._realId;
+
+  void setRealId(int rid) {
+    this._realId = rid;
+  }
 
   Kategori get kategori => this._kategori;
 
@@ -96,6 +119,7 @@ class ItemName {
 
   Map<String, dynamic> toMap() {
     var map = new Map<String, dynamic>();
+    map[tb.realId] = _realId;
     map[tb.fNama] = _nama;
     map[tb.fIdKategori] = _idKategori;
     map[tb.fDeleted] = _isDeleted;
@@ -121,13 +145,14 @@ class ItemName {
 
   @override
   String toString() {
-    return '$id | $_nama | $_idKategori | $_isDeleted';
+    return '$id | $_realId | $_nama | $_idKategori | $_isDeleted';
   }
 }
 
 class Keuangan {
   TbKeuangan tb = new TbKeuangan();
   int id;
+  int _realId;
   DateTime _tanggal;
   int _idItemName;
   ItemName lazyItemName;
@@ -138,6 +163,8 @@ class Keuangan {
 
   Keuangan();
 
+  /// constructor from ui tidak mencantumkan jenis transaksi , lastupdate
+  /// dan realId karena akan di set saat proses save ke DB.
   Keuangan.fromUI(
       DateTime tanggal, int idItemName, double jumlah, String catatan) {
     this._tanggal = tanggal;
@@ -147,15 +174,22 @@ class Keuangan {
     this._lastupdate = DateTime.now().millisecondsSinceEpoch;
   }
 
-  Keuangan.fromDB(String tanggal, int idItemName, double jumlah, String catatan,
-      int newlastupdate, int newjenisTransaksi) {
+  Keuangan.fromDB(int realId, String tanggal, int idItemName, double jumlah,
+      String catatan, int newlastupdate, int newjenisTransaksi) {
     ProcessString processString = new ProcessString();
+    this._realId = realId;
     this._tanggal = processString.dateFromDbToDateTime(tanggal);
     this._idItemName = idItemName;
     this._jumlah = jumlah;
     this._catatan = catatan;
     this._lastupdate = newlastupdate;
     this._jenisTransaksi = newjenisTransaksi;
+  }
+
+  int get realId => this._realId;
+
+  void setRealId(int rid) {
+    this._realId = rid;
   }
 
   DateTime get tanggal => this._tanggal;
@@ -173,6 +207,7 @@ class Keuangan {
   Map<String, dynamic> toMap() {
     ProcessString processString = new ProcessString();
     var map = new Map<String, dynamic>();
+    map[tb.realId] = _realId;
     map[tb.fTgl] = processString.dateFormatForDB(_tanggal);
     map[tb.fIdItemName] = _idItemName;
     map[tb.fJumlah] = _jumlah;
@@ -211,20 +246,22 @@ class Keuangan {
     this._jenisTransaksi = newvalue;
   }
 
+  ///
   bool isValid() {
     if (_idItemName > 0 &&
         _tanggal != null &&
         (_jenisTransaksi == 0 || _jenisTransaksi == 1) &&
-        _lastupdate > 0) {
+        _lastupdate > 0 &&
+        _realId > 0) {
       return true;
-    }else{
-      print('gak valid');
+    } else {
+      return false;
     }
-    return false;
   }
 
   String toString() {
-    return 'idkeuangan: $id| '
+    return 'idkeuangan: $id | '
+        'realid: $_realId |'
         'iditemname: $_idItemName | '
         'jumlah: $_jumlah | '
         'tanggal: $_tanggal | '

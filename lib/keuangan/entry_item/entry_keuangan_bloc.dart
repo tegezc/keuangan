@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:keuangan/database/db_utility.dart';
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/database/keuangan/dao_keuangan.dart';
 import 'package:keuangan/database/keuangan/dao_kategori.dart';
@@ -25,7 +26,7 @@ class BlocEntryKeuangan {
       mapKategori: Map(),
       mapItemName: Map(),
       jenisKeuangan: EnumJenisTransaksi.pengeluaran,
-      itemName: new ItemName('', 0, 0),
+      itemName: new ItemName(0,'', 0, 0),
       stateEntryKeuangan: null,
       finalResult: EnumFinalResult.inprogres,
     );
@@ -148,9 +149,9 @@ class BlocEntryKeuangan {
         });
       } else {
         ItemName itemName = entryKeuangan.itemName;
-        daoItemName.saveItemName(itemName).then((v) {
-          if (v > 0) {
-            entryKeuangan.keuangan.setIdItemName(v);
+        daoItemName.saveItemName(itemName).then((resultdb) {
+          if (resultdb.enumResultDb == EnumResultDb.success) {
+            entryKeuangan.keuangan.setIdItemName(resultdb.value);
             daoKeuangan.saveKeuangan(entryKeuangan.keuangan).then((value) {
               StateFinishLagi stateFinishLagi = StateFinishLagi();
               this.sinkState(stateFinishLagi);
@@ -175,7 +176,7 @@ class BlocEntryKeuangan {
     ItemName itemName = await daoItemName.getItemNameByNamaNIdKategori(
         strItemName, entryKeuangan.itemName.idKategori);
     if (itemName != null) {
-      entryKeuangan.keuangan.setIdItemName(itemName.id);
+      entryKeuangan.keuangan.setIdItemName(itemName.realId);
       int resDb = await daoKeuangan.saveKeuangan(entryKeuangan.keuangan);
 
       if (resDb > 0) {
@@ -185,11 +186,11 @@ class BlocEntryKeuangan {
       }
     } else {
       ItemName itemName =
-          new ItemName(strItemName, entryKeuangan.itemName.idKategori, 0);
-      int resDb = await daoItemName.saveItemName(itemName);
+          new ItemName(0,strItemName, entryKeuangan.itemName.idKategori, 0);
+      ResultDb resDb = await daoItemName.saveItemName(itemName);
 
-      if (resDb > 0) {
-        entryKeuangan.keuangan.setIdItemName(resDb);
+      if (resDb.enumResultDb == EnumResultDb.success) {
+        entryKeuangan.keuangan.setIdItemName(resDb.value);
         int resK = await daoKeuangan.saveKeuangan(entryKeuangan.keuangan);
         if (resK > 0) {
           enumFinalResult = EnumFinalResult.success;
@@ -228,11 +229,11 @@ class BlocEntryKeuangan {
       }
     } else {
       ItemName itemName =
-          new ItemName(strItemName, entryKeuangan.itemName.idKategori, 0);
-      int resDb = await daoItemName.saveItemName(itemName);
+          new ItemName(0,strItemName, entryKeuangan.itemName.idKategori, 0);
+      ResultDb resDb = await daoItemName.saveItemName(itemName);
 
-      if (resDb > 0) {
-        entryKeuangan.keuangan.setIdItemName(resDb);
+      if (resDb.enumResultDb == EnumResultDb.success) {
+        entryKeuangan.keuangan.setIdItemName(resDb.value);
         bool resK = await daoKeuangan.update1(entryKeuangan.keuangan);
         if (resK) {
           enumFinalResult = EnumFinalResult.success;
@@ -320,7 +321,7 @@ class BlocEntryKeuangan {
 
   void _handleFinishDanLagi(EnumJenisTransaksi enumJenisTransaksi) {
     _cacheEntry.keuangan = new Keuangan.fromUI(DateTime.now(), 0, 0, '');
-    _cacheEntry.itemName = new ItemName('', 0, 0);
+    _cacheEntry.itemName = new ItemName(0,'', 0, 0);
     _cacheEntry.stateEntryKeuangan = EnumEntryKeuangan.finishLagi;
     _cacheEntry.finalResult = EnumFinalResult.inprogres;
     DaoKategori daoKategori = new DaoKategori();

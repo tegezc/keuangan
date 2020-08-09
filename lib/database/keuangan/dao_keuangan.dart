@@ -1,4 +1,5 @@
 import 'package:keuangan/database/Database.dart';
+import 'package:keuangan/database/db_utility.dart';
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/database/keuangan/dao_kategori.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
@@ -8,6 +9,7 @@ import 'package:keuangan/util/process_string.dart';
 
 class DaoKeuangan {
   TbKeuangan tb = new TbKeuangan();
+  DbUtility _dbUtility = new DbUtility();
 
   Future<int> saveKeuangan(Keuangan keuangan) async {
     /// set jenis transaksi
@@ -23,7 +25,10 @@ class DaoKeuangan {
     keuangan.setJenisTransaksi(jnsTransaksi);
 
     /// set lastupdate
-    keuangan.setLastupdate(DateTime.now().millisecondsSinceEpoch);
+    keuangan.setLastupdate(_dbUtility.generateDateToMiliseconds());
+
+    ///  set realId
+    keuangan.setRealId(_dbUtility.generateId());
 
     if (keuangan.isValid()) {
       var dbClient = await DatabaseHelper().db;
@@ -32,8 +37,6 @@ class DaoKeuangan {
       return res;
     }
     return 0;
-
-    ///failed save record
   }
 
 //  Future<List<Keuangan>> getAllKeuangan() async {
@@ -62,7 +65,8 @@ class DaoKeuangan {
         .rawQuery('SELECT * FROM ${tb.name} ORDER BY ${tb.fLastUpdate} DESC limit 5');
     List<Keuangan> keuangans = new List();
     for (int i = 0; i < list.length; i++) {
-      var keuangan = new Keuangan.fromDB(
+      Keuangan keuangan = new Keuangan.fromDB(
+          list[i][tb.realId],
           list[i][tb.fTgl],
           list[i][tb.fIdItemName],
           list[i][tb.fJumlah],
@@ -93,7 +97,8 @@ class DaoKeuangan {
         'SELECT * FROM ${tb.name} WHERE ${tb.fTgl} BETWEEN \'$strStartDate\' AND \'$strEndDate\'  ORDER BY date(${tb.fTgl}) DESC');
     List<Keuangan> keuangans = new List();
     for (int i = 0; i < list.length; i++) {
-      var keuangan = new Keuangan.fromDB(
+      Keuangan keuangan = new Keuangan.fromDB(
+          list[i][tb.realId],
           list[i][tb.fTgl],
           list[i][tb.fIdItemName],
           list[i][tb.fJumlah],
@@ -128,7 +133,8 @@ class DaoKeuangan {
     List<Map> list = await dbClient.rawQuery(sql);
     List<Keuangan> keuangans = new List();
     for (int i = 0; i < list.length; i++) {
-      var keuangan = new Keuangan.fromDB(
+      Keuangan keuangan = new Keuangan.fromDB(
+          list[i][tb.realId],
           list[i][tb.fTgl],
           list[i][tb.fIdItemName],
           list[i][tb.fJumlah],
@@ -151,6 +157,7 @@ class DaoKeuangan {
     if (list != null) {
       if (list.length > 0) {
         keuangan = new Keuangan.fromDB(
+            list[0][tb.realId],
             list[0][tb.fTgl],
             list[0][tb.fIdItemName],
             list[0][tb.fJumlah],
@@ -184,7 +191,8 @@ class DaoKeuangan {
 
     List<Keuangan> keuangans = new List();
     for (int i = 0; i < list.length; i++) {
-      var keuangan = new Keuangan.fromDB(
+      Keuangan keuangan = new Keuangan.fromDB(
+          list[i][tb.realId],
           list[i][tb.fTgl],
           list[i][tb.fIdItemName],
           list[i][tb.fJumlah],
