@@ -44,7 +44,7 @@ class DatabaseHelper {
     await db.execute(
         "CREATE TABLE "
             "${tbKategori.name}(${tbKategori.fId} INTEGER PRIMARY KEY, "
-            ""
+            "${tbKategori.realId} INTEGER,"
             "${tbKategori.fNama} TEXT, "
             "${tbKategori.fIdParent} INTEGER ,"
             "${tbKategori.fType} INTEGER,"
@@ -53,11 +53,13 @@ class DatabaseHelper {
             "${tbKategori.fColor} TEXT)");
     await db.execute(
         "CREATE TABLE ${tbItemName.name}(${tbItemName.fId} INTEGER PRIMARY KEY, "
+            "${tbItemName.realId} INTEGER,"
             "${tbItemName.fNama} TEXT, "
             "${tbItemName.fIdKategori} INTEGER,"
             "${tbItemName.fDeleted} INTEGER)");
     await db.execute(
         "CREATE TABLE ${tbKeuangan.name}(${tbKeuangan.fId} INTEGER PRIMARY KEY, "
+            "${tbKeuangan.realId} INTEGER,"
             "${tbKeuangan.fTgl} TEXT, "
             "${tbKeuangan.fIdItemName} INTEGER,"
             "${tbKeuangan.fJumlah} REAL,"
@@ -68,7 +70,7 @@ class DatabaseHelper {
     await db.execute(
         "CREATE TABLE ${tbSetup.name}(${tbSetup.fId} INTEGER PRIMARY KEY, "
             "${tbSetup.fNama} TEXT, "
-            "${tbSetup.fTglInput} TEXT,"
-            "${tbSetup.fIsSuccess} INTEGER)");
+            "${tbSetup.fValue} TEXT,"
+            "${tbSetup.fTglInput} INTEGER)");
   }
 }

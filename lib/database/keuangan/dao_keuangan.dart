@@ -39,6 +39,32 @@ class DaoKeuangan {
     return 0;
   }
 
+  Future<int> saveKeuanganForTesting(Keuangan keuangan) async {
+    /// set jenis transaksi
+    DaoItemName daoItemName = new DaoItemName();
+    ItemName itemName = await daoItemName.getItemNameById(keuangan.idItemName);
+    DaoKategori daoKategori = new DaoKategori();
+    Kategori kategori = await daoKategori.getKategoriById(itemName.idKategori);
+    int jnsTransaksi = 1; // nilai lihat dimodel keuangan
+    if (kategori.type == EnumJenisTransaksi.pengeluaran) {
+      jnsTransaksi = 0;
+    }
+
+    keuangan.setJenisTransaksi(jnsTransaksi);
+
+    /// set lastupdate
+    keuangan.setLastupdate(_dbUtility.generateDateToMiliseconds());
+
+
+    if (keuangan.isValid()) {
+      var dbClient = await DatabaseHelper().db;
+      int res = await dbClient.insert(tb.name, keuangan.toMap());
+
+      return res;
+    }
+    return 0;
+  }
+
 //  Future<List<Keuangan>> getAllKeuangan() async {
 //    var dbClient = await DatabaseHelper().db;
 //    List<Map> list = await dbClient.rawQuery('SELECT * FROM ${tb.name}');

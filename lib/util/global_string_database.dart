@@ -41,7 +41,7 @@ class TbSetup{
   final name = 'setup';
   final fId = 'id';
   final fNama = 'nama';
+  final fValue = 'value';
   final fTglInput = 'tgl_input';
-  final fIsSuccess = 'success';
 
 }

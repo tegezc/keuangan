@@ -5,10 +5,12 @@ import 'package:keuangan/file_non_production/bulk_insert.dart';
 import 'package:keuangan/keuangan/itemname/homepage_itemname.dart';
 import 'package:keuangan/keuangan/kategori/homepage_kategori.dart';
 import 'package:keuangan/keuangan/report/hp_report.dart';
+import 'package:keuangan/keuangan/setting/setting_app.dart';
 import 'package:keuangan/keuangan/transaksi/keuangan_transaksi.dart';
 import 'package:flutter/material.dart';
 import 'package:keuangan/util/adsmob.dart';
 import 'package:keuangan/util/common_ui.dart';
+import 'package:keuangan/util/sceleten_firstime.dart';
 import 'package:keuangan/util/style.dart';
 
 import 'keuangan/homepage_keuangan.dart';
@@ -50,11 +52,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class MyHomePageState extends State<MyHomePage> {
-  int _selectedDrawerIndex = 0;
+  int _selectedDrawerIndex = 5;
 
   @override
   initState() {
     //_testingonly();
+    _setupFirstime();
     _initAdMob();
     super.initState();
   }
@@ -64,18 +67,28 @@ class MyHomePageState extends State<MyHomePage> {
     return FirebaseAdMob.instance.initialize(appId: AdManager.appId);
   }
 
-  _testingonly() {
-    //for test only
-    Persiapan persiapan = new Persiapan();
-    persiapan.deleteAllItemName();
-    persiapan.insertItemNameDummy();
+  _setupFirstime() async {
+    SettingApp settingApp = new SettingApp();
+    settingApp.prepareFirstTimeInstall().then((value) {
+      bool isTestOn = false;
+      if(isTestOn){
+        /// for testing only
+        _testOnly();
+      }else{
+        setState(() {
+          _selectedDrawerIndex = 0;
+        });
+      }
+    });
+  }
 
-    persiapan.deleteAllKategori();
-    persiapan.insertKategoriDummy();
-
-    persiapan.deleteAllKeuangan();
-    persiapan.bulkinsertall();
-    //end test only
+  _testOnly() async {
+    GenerateDymmyDataTest generateDymmyDataTest = new GenerateDymmyDataTest();
+    generateDymmyDataTest.generateKeuangan().then((value) {
+      setState(() {
+        _selectedDrawerIndex = 0;
+      });
+    });
   }
 
   _getDrawerItemWidget(int pos) {
@@ -105,6 +118,11 @@ class MyHomePageState extends State<MyHomePage> {
       case 4:
         {
           return new HomePageItemName(drawer: _createDrawer(pos));
+        }
+        break;
+      case 5:
+        {
+          return new FirtimeSceleton();
         }
         break;
       default:

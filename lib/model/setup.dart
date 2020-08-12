@@ -6,25 +6,29 @@ class Setup{
   TbSetup tb = new TbSetup();
   int id;
   String _nama;
-  DateTime _tglInput;
-  bool _isSuccess;
+  String _value;
+  int _tglInput;
 
-  Setup(this._nama,this._tglInput,this._isSuccess);
+  Setup(this._nama,this._value,this._tglInput);
 
   String get nama => _nama;
-  DateTime get tglInput => _tglInput;
-  bool get isSuccess => _isSuccess;
+  int get tglInput => _tglInput;
+  String get value => _value;
 
   Map<String, dynamic> toMap() {
     var map = new Map<String, dynamic>();
     map[tb.fNama] = _nama;
+    map[tb.fValue] = _value;
     map[tb.fTglInput] = _tglInput;
-    map[tb.fIsSuccess] = _isSuccess;
 
     return map;
   }
 
   void setId(int id){
     this.id = id;
+  }
+
+  void setTanggalInput(int tgl){
+    this._tglInput = tgl;
   }
 }

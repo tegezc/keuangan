@@ -22,9 +22,8 @@ class DaoItemName {
       var dbClient = await DatabaseHelper().db;
       int res = await dbClient.insert(tb.name, itemName.toMap());
       if (res > 0) {
-        ItemName itm = await this._getItemNameById(res);
         resultDb.enumResultDb = EnumResultDb.success;
-        resultDb.value = itm.realId;
+        resultDb.value = realId;
         return resultDb;
       } else {
         resultDb.enumResultDb = EnumResultDb.failed;
@@ -128,19 +127,6 @@ class DaoItemName {
     ItemName itemName;
     if (list.length > 0) {
        itemName = new ItemName(list[0][tb.realId], list[0][tb.fNama],
-          list[0][tb.fIdKategori], list[0][tb.fDeleted]);
-      itemName.setId(list[0][tb.fId]);
-    }
-    return itemName;
-  }
-
-  Future<ItemName> _getItemNameById(int id) async {
-    var dbClient = await DatabaseHelper().db;
-    List<Map> list =
-    await dbClient.rawQuery('SELECT * FROM ${tb.name} WHERE ${tb.fId}=$id');
-    ItemName itemName;
-    if (list.length > 0) {
-      itemName = new ItemName(list[0][tb.realId], list[0][tb.fNama],
           list[0][tb.fIdKategori], list[0][tb.fDeleted]);
       itemName.setId(list[0][tb.fId]);
     }
