@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:firebase_admob/firebase_admob.dart';
+import 'package:keuangan/database/dao_setup.dart';
+import 'package:keuangan/database/keuangan/dao_kategori.dart';
 import 'package:keuangan/file_non_production/bulk_insert.dart';
 import 'package:keuangan/keuangan/itemname/homepage_itemname.dart';
 import 'package:keuangan/keuangan/kategori/homepage_kategori.dart';
@@ -8,6 +10,8 @@ import 'package:keuangan/keuangan/report/hp_report.dart';
 import 'package:keuangan/keuangan/setting/setting_app.dart';
 import 'package:keuangan/keuangan/transaksi/keuangan_transaksi.dart';
 import 'package:flutter/material.dart';
+import 'package:keuangan/model/enum_keuangan.dart';
+import 'package:keuangan/model/keuangan.dart';
 import 'package:keuangan/util/adsmob.dart';
 import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/sceleten_firstime.dart';
@@ -56,8 +60,7 @@ class MyHomePageState extends State<MyHomePage> {
 
   @override
   initState() {
-    //_testingonly();
-    _setupFirstime();
+    _setupFirstimeForTEST();
     _initAdMob();
     super.initState();
   }
@@ -67,21 +70,27 @@ class MyHomePageState extends State<MyHomePage> {
     return FirebaseAdMob.instance.initialize(appId: AdManager.appId);
   }
 
-  _setupFirstime() async {
-    SettingApp settingApp = new SettingApp();
-    settingApp.prepareFirstTimeInstall().then((value) {
-      bool isTestOn = false;
-      if(isTestOn){
-        /// for testing only
-        _testOnly();
-      }else{
-        setState(() {
-          _selectedDrawerIndex = 0;
+  _setupFirstimeForTEST() async {
+    DaoKategori daoKategori = new DaoKategori();
+    DaoSetup daoSetup = new DaoSetup();
+    daoSetup.deleteAllSetup().then((value) {
+      daoKategori.deleteAllKategori().then((value) {
+        SettingApp settingApp = new SettingApp();
+        settingApp.prepareFirstTimeInstall().then((value) {
+          this._testOnly();
         });
-      }
+      });
     });
   }
 
+  _setupFirstime() async {
+    SettingApp settingApp = new SettingApp();
+    settingApp.prepareFirstTimeInstall().then((value) {
+      setState(() {
+        _selectedDrawerIndex = 0;
+      });
+    });
+  }
   _testOnly() async {
     GenerateDymmyDataTest generateDymmyDataTest = new GenerateDymmyDataTest();
     generateDymmyDataTest.generateKeuangan().then((value) {

@@ -9,6 +9,7 @@ import '../Database.dart';
 class DaoItemName {
   TbItemName tb = new TbItemName();
   DbUtility _dbUtility = new DbUtility();
+
   Future<ResultDb> saveItemName(ItemName itemName) async {
     ResultDb resultDb = new ResultDb(null);
     bool isDuplicate = await this.isDuplicate(itemName);
@@ -19,6 +20,7 @@ class DaoItemName {
       itemName.setIsDeleted(0);
       int realId = _dbUtility.generateId();
       itemName.setRealId(realId);
+      itemName.lastupdate = realId;
       var dbClient = await DatabaseHelper().db;
       int res = await dbClient.insert(tb.name, itemName.toMap());
       if (res > 0) {
@@ -32,6 +34,41 @@ class DaoItemName {
     }
   }
 
+  /// save untuk kondisi mass insert, untuk menghndari duplikasi realid
+  /// maka realid di handle di luar saveItemName
+  Future<ResultDb> saveItemNameForMassInsert(ItemName itemName) async {
+    ResultDb resultDb = new ResultDb(null);
+    bool isDuplicate = await this.isDuplicate(itemName);
+    if (isDuplicate) {
+      resultDb.enumResultDb = EnumResultDb.duplicate;
+      return resultDb;
+    } else {
+      itemName.setIsDeleted(0);
+      itemName.lastupdate = _dbUtility.generateId();
+      var dbClient = await DatabaseHelper().db;
+      int res = await dbClient.insert(tb.name, itemName.toMap());
+
+      if (res > 0) {
+        resultDb.enumResultDb = EnumResultDb.success;
+        resultDb.value = itemName.realId;
+        return resultDb;
+      } else {
+        resultDb.enumResultDb = EnumResultDb.failed;
+        return resultDb;
+      }
+    }
+  }
+
+  ItemName _createItemName(Map<String,dynamic> map){
+    return new ItemName.fromDb(
+        map[tb.fId],
+        map[tb.realId],
+        map[tb.fNama],
+        map[tb.fIdKategori],
+        map[tb.fDeleted],
+        map[tb.fLastupdate]);
+  }
+
   Future<List<ItemName>> getAllItemName() async {
     var dbClient = await DatabaseHelper().db;
     List<Map> list = await dbClient
@@ -39,9 +76,8 @@ class DaoItemName {
 
     List<ItemName> itemNames = new List();
     for (int i = 0; i < list.length; i++) {
-      ItemName itemName = new ItemName(list[i][tb.realId], list[i][tb.fNama],
-          list[i][tb.fIdKategori], list[i][tb.fDeleted]);
-      itemName.setId(list[i][tb.fId]);
+      ItemName itemName = this._createItemName(list[i]);
+
       itemNames.add(itemName);
     }
     return itemNames;
@@ -54,9 +90,7 @@ class DaoItemName {
 
     List<ItemName> itemNames = new List();
     for (int i = 0; i < list.length; i++) {
-      ItemName itemName = new ItemName(list[i][tb.realId], list[i][tb.fNama],
-          list[i][tb.fIdKategori], list[i][tb.fDeleted]);
-      itemName.setId(list[i][tb.fId]);
+      ItemName itemName = this._createItemName(list[i]);
       itemNames.add(itemName);
     }
     return itemNames;
@@ -67,17 +101,16 @@ class DaoItemName {
     var dbClient = await DatabaseHelper().db;
     List<Map> list = await dbClient.rawQuery(
         'SELECT * FROM ${tb.name} WHERE ${tb.fDeleted}=0 ORDER BY ${tb.fNama}');
-
     List<ItemName> itemNamesPengeluaran = new List();
     List<ItemName> itemNamesPemasukan = new List();
     for (int i = 0; i < list.length; i++) {
-      ItemName itemName = new ItemName(list[i][tb.realId], list[i][tb.fNama],
-          list[i][tb.fIdKategori], list[i][tb.fDeleted]);
-      itemName.setId(list[i][tb.fId]);
+      ItemName itemName = this._createItemName(list[i]);
 
       Kategori kategori =
           await daoKategori.getKategoriById(itemName.idKategori);
       itemName.setKategori(kategori);
+//      print(
+//          'itemName: ${itemName.toString()}|kategori: ${kategori.toString1()}');
       if (kategori.type == EnumJenisTransaksi.pemasukan) {
         itemNamesPemasukan.add(itemName);
       } else {
@@ -95,11 +128,9 @@ class DaoItemName {
 
     Map<int, ItemName> itemNameMap = new Map();
     for (int i = 0; i < list.length; i++) {
-      ItemName itemName = new ItemName(list[i][tb.realId], list[i][tb.fNama],
-          list[i][tb.fIdKategori], list[i][tb.fDeleted]);
-      itemName.setId(list[i][tb.fId]);
+      ItemName itemName = this._createItemName(list[i]);
 
-      itemNameMap[list[i][tb.fId]] = itemName;
+      itemNameMap[list[i][tb.realId]] = itemName;
     }
     return itemNameMap;
   }
@@ -111,24 +142,20 @@ class DaoItemName {
 
     Map<int, ItemName> itemNameMap = new Map();
     for (int i = 0; i < list.length; i++) {
-      ItemName itemName = new ItemName(list[i][tb.realId], list[i][tb.fNama],
-          list[i][tb.fIdKategori], list[i][tb.fDeleted]);
-      itemName.setId(list[i][tb.fId]);
+      ItemName itemName = this._createItemName(list[i]);
 
-      itemNameMap[list[i][tb.fId]] = itemName;
+      itemNameMap[list[i][tb.realId]] = itemName;
     }
     return itemNameMap;
   }
 
   Future<ItemName> getItemNameById(int id) async {
     var dbClient = await DatabaseHelper().db;
-    List<Map> list =
-        await dbClient.rawQuery('SELECT * FROM ${tb.name} WHERE ${tb.realId}=$id');
+    List<Map> list = await dbClient
+        .rawQuery('SELECT * FROM ${tb.name} WHERE ${tb.realId}=$id');
     ItemName itemName;
     if (list.length > 0) {
-       itemName = new ItemName(list[0][tb.realId], list[0][tb.fNama],
-          list[0][tb.fIdKategori], list[0][tb.fDeleted]);
-      itemName.setId(list[0][tb.fId]);
+      itemName = this._createItemName(list[0]);
     }
     return itemName;
   }
@@ -144,9 +171,7 @@ class DaoItemName {
 
     ItemName itemName;
     if (list.length > 0) {
-       itemName = new ItemName(list[0][tb.realId], list[0][tb.fNama],
-          list[0][tb.fIdKategori], list[0][tb.fDeleted]);
-      itemName.setId(list[0][tb.fId]);
+      itemName = this._createItemName(list[0]);
     }
     return itemName;
   }
@@ -161,9 +186,7 @@ class DaoItemName {
     List<ItemName> litem = new List();
     if (litem != null) {
       for (int i = 0; i < list.length; i++) {
-        ItemName itemName = new ItemName(list[i][tb.realId], list[i][tb.fNama],
-            list[i][tb.fIdKategori], list[i][tb.fDeleted]);
-        itemName.setId(list[i][tb.fId]);
+        ItemName itemName = this._createItemName(list[i]);
         litem.add(itemName);
       }
     }
@@ -181,9 +204,7 @@ class DaoItemName {
 
     ItemName itemName;
     if (list.length > 0) {
-      itemName = new ItemName(list[0][tb.realId],
-          list[0][tb.fNama], list[0][tb.fIdKategori], list[0][tb.fDeleted]);
-      itemName.setId(list[0][tb.fId]);
+      itemName = this._createItemName(list[0]);
     }
     return itemName;
   }
@@ -215,18 +236,16 @@ class DaoItemName {
   }
 
   Future<EnumResultDb> update(ItemName itemName) async {
-
     bool isDup = await this.isDuplicate(itemName);
-    if(isDup){
+    if (isDup) {
       return EnumResultDb.duplicate;
-    }else{
+    } else {
       var dbClient = await DatabaseHelper().db;
 
       int res = await dbClient.update(tb.name, itemName.toMap(),
           where: "${tb.fId} = ?", whereArgs: <int>[itemName.id]);
       return res > 0 ? EnumResultDb.success : EnumResultDb.failed;
     }
-
   }
 
   Future<ResultDb> updateBatch(List<ItemName> litemName) async {

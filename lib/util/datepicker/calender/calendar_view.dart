@@ -24,7 +24,7 @@ class _CalendarViewState extends State<CalendarView> {
   final namaHari = GlobalData.nhari;
 
   _handleCellPress(DateTime dateTime, BuildContext context) async {
-    print('cell di click');
+
     widget.calbackCellClick(dateTime);
   }
 

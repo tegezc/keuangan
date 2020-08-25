@@ -8,20 +8,22 @@ import '../db_utility.dart';
 class DaoKategori {
   TbKategori tb = new TbKategori();
   DbUtility _dbUtility = new DbUtility();
+
   Future<ResultDb> saveKategori(Kategori kategori) async {
     ResultDb rdb = new ResultDb(null);
     Kategori k = await this.getKategoriByNameAndCategori(
-        kategori.nama, kategori.idParent, kategori.type);
+        kategori.nama, kategori.type, kategori.realId);
 
     if (k == null) {
       var dbClient = await DatabaseHelper().db;
       int generateRealId = _dbUtility.generateId();
       kategori.setRealId(generateRealId);
+      kategori.lastupdate = generateRealId;
       int res = await dbClient.insert(tb.name, kategori.toMap());
 
-      if (res > 1) {
+      if (res > 0) {
         rdb.enumResultDb = EnumResultDb.success;
-        rdb.value = res;
+        rdb.value = generateRealId;
       } else {
         rdb.enumResultDb = EnumResultDb.failed;
       }
@@ -30,6 +32,46 @@ class DaoKategori {
     }
 
     return rdb;
+  }
+
+  /// untuk save dalam jumlah banyak, untuk menghindari duplikasi realID
+  /// maka realId di handle diluar savekategori
+  Future<ResultDb> saveKategoriInitial(Kategori kategori) async {
+    ResultDb rdb = new ResultDb(null);
+    Kategori k = await this.getKategoriByNameAndCategori(
+        kategori.nama, kategori.type, kategori.realId);
+
+    if (k == null) {
+      int generateRealId = _dbUtility.generateId();
+      kategori.lastupdate = generateRealId;
+      var dbClient = await DatabaseHelper().db;
+      int res = await dbClient.insert(tb.name, kategori.toMap());
+
+      if (res > 0) {
+        rdb.enumResultDb = EnumResultDb.success;
+        rdb.value = kategori.realId;
+      } else {
+        rdb.enumResultDb = EnumResultDb.failed;
+      }
+    } else {
+      rdb.enumResultDb = EnumResultDb.duplicate;
+    }
+
+    return rdb;
+  }
+
+  Kategori _createCategori(Map<String, dynamic> map) {
+    EnumJenisTransaksi type = EnumJenisTransaksi.values[map[tb.fType]];
+    return new Kategori.fromDb(
+        map[tb.fId],
+        map[tb.realId],
+        map[tb.fNama],
+        map[tb.fIdParent],
+        type,
+        map[tb.fCatatan],
+        map[tb.fIsAbadi],
+        map[tb.fColor],
+        map[tb.fLastupdate]);
   }
 
   Future<Kategori> getDefaultKategori(
@@ -43,15 +85,7 @@ class DaoKategori {
         'SELECT * FROM ${tb.name} WHERE ${tb.fIsAbadi}=1 AND ${tb.fType}=$i');
     Kategori kategori;
     if (list.length > 0) {
-      EnumJenisTransaksi type = EnumJenisTransaksi.values[list[0][tb.fType]];
-      kategori = new Kategori(
-          list[0][tb.realId],
-          list[0][tb.fNama],
-          list[0][tb.fIdParent],
-          type,
-          list[0][tb.fCatatan],
-          list[0][tb.fColor]);
-      kategori.setId(list[0][tb.fId]);
+      kategori = this._createCategori(list[0]);
     }
     return kategori;
   }
@@ -62,15 +96,7 @@ class DaoKategori {
 
     List<Kategori> kategories = new List();
     for (int i = 0; i < list.length; i++) {
-      EnumJenisTransaksi type = EnumJenisTransaksi.values[list[i][tb.fType]];
-      Kategori kategori = new Kategori(
-          list[i][tb.realId],
-          list[i][tb.fNama],
-          list[i][tb.fIdParent],
-          type,
-          list[i][tb.fCatatan],
-          list[i][tb.fColor]);
-      kategori.setId(list[i][tb.fId]);
+      Kategori kategori = this._createCategori(list[i]);
 
       kategories.add(kategori);
     }
@@ -90,16 +116,7 @@ class DaoKategori {
 
     List<Kategori> kategories = new List();
     for (int i = 0; i < list.length; i++) {
-      EnumJenisTransaksi type = EnumJenisTransaksi.values[list[i][tb.fType]];
-      Kategori kategori = new Kategori(
-          list[i][tb.realId],
-          list[i][tb.fNama],
-          list[i][tb.fIdParent],
-          type,
-          list[i][tb.fCatatan],
-          list[i][tb.fColor]);
-      kategori.setId(list[i][tb.fId]);
-
+      Kategori kategori = this._createCategori(list[i]);
 
       kategories.add(kategori);
     }
@@ -115,19 +132,11 @@ class DaoKategori {
     }
     var dbClient = await DatabaseHelper().db;
     List<Map> list = await dbClient.rawQuery(
-        'SELECT * FROM ${tb.name} WHERE ${tb.fType}=$i ORDER BY ${tb.fNama}');
+        'SELECT * FROM ${tb.name} WHERE ${tb.fType}=$i ORDER BY ${tb.fId}');
 
     List<Kategori> kategories = new List();
     for (int i = 0; i < list.length; i++) {
-      EnumJenisTransaksi type = EnumJenisTransaksi.values[list[i][tb.fType]];
-      Kategori kategori = new Kategori(
-          list[i][tb.realId],
-          list[i][tb.fNama],
-          list[i][tb.fIdParent],
-          type,
-          list[i][tb.fCatatan],
-          list[i][tb.fColor]);
-      kategori.setId(list[i][tb.fId]);
+      Kategori kategori = this._createCategori(list[i]);
 
       kategories.add(kategori);
     }
@@ -143,16 +152,7 @@ class DaoKategori {
 
     List<Kategori> kategories = new List();
     for (int i = 0; i < list.length; i++) {
-      EnumJenisTransaksi type = EnumJenisTransaksi.values[list[i][tb.fType]];
-      Kategori kategori = new Kategori(
-          list[i][tb.realId],
-          list[i][tb.fNama],
-          list[i][tb.fIdParent],
-          type,
-          list[i][tb.fCatatan],
-          list[i][tb.fColor]);
-      kategori.setId(list[i][tb.fId]);
-
+      Kategori kategori = this._createCategori(list[i]);
 
       kategories.add(kategori);
     }
@@ -167,15 +167,7 @@ class DaoKategori {
 
     List<Kategori> kategories = new List();
     for (int i = 0; i < list.length; i++) {
-      EnumJenisTransaksi type = EnumJenisTransaksi.values[list[i][tb.fType]];
-      Kategori kategori = new Kategori(
-          list[i][tb.realId],
-          list[i][tb.fNama],
-          list[i][tb.fIdParent],
-          type,
-          list[i][tb.fCatatan],
-          list[i][tb.fColor]);
-      kategori.setId(list[i][tb.fId]);
+      Kategori kategori = this._createCategori(list[i]);
 
       kategories.add(kategori);
     }
@@ -190,17 +182,7 @@ class DaoKategori {
 
     List<Kategori> kategories = new List();
     for (int i = 0; i < list.length; i++) {
-      EnumJenisTransaksi type = EnumJenisTransaksi.values[list[i][tb.fType]];
-      Kategori kategori = new Kategori(
-          list[i][tb.realId],
-          list[i][tb.fNama],
-          list[i][tb.fIdParent],
-          type,
-          list[i][tb.fCatatan],
-          list[i][tb.fColor]);
-      kategori.setId(list[i][tb.fId]);
-
-
+      Kategori kategori = this._createCategori(list[i]);
       kategories.add(kategori);
     }
 
@@ -213,17 +195,9 @@ class DaoKategori {
 
     Map<int, Kategori> mapKtgr = new Map();
     for (int i = 0; i < list.length; i++) {
-      EnumJenisTransaksi type = EnumJenisTransaksi.values[list[i][tb.fType]];
-      Kategori kategori = new Kategori(
-          list[i][tb.realId],
-          list[i][tb.fNama],
-          list[i][tb.fIdParent],
-          type,
-          list[i][tb.fCatatan],
-          list[i][tb.fColor]);
-      kategori.setId(list[i][tb.fId]);
+      Kategori kategori = this._createCategori(list[i]);
 
-      mapKtgr[list[i][tb.fId]] = kategori;
+      mapKtgr[list[i][tb.realId]] = kategori;
     }
 
     return mapKtgr;
@@ -232,42 +206,26 @@ class DaoKategori {
   /// kategori dikatakan duplicate jika memiliki nama dan jenis transaksi yang sama.
   /// sedangkan parent tidak di hitung.
   Future<Kategori> getKategoriByNameAndCategori(
-      String name, int idparent, EnumJenisTransaksi tp) async {
+      String name, EnumJenisTransaksi tp, int realid) async {
     int type = tp.index;
     String lowerName = name.toLowerCase().trim();
     var dbClient = await DatabaseHelper().db;
     List<Map> list = await dbClient.rawQuery(
-        'SELECT * FROM ${tb.name} WHERE  ${tb.fType}=$type AND ${tb.fNama} = \'$lowerName\' COLLATE NOCASE');
+        'SELECT * FROM ${tb.name} WHERE  ${tb.fType}=$type AND ${tb.realId}=$realid AND ${tb.fNama} = \'$lowerName\' COLLATE NOCASE');
     Kategori kategori;
     if (list.length > 0) {
-      EnumJenisTransaksi type = EnumJenisTransaksi.values[list[0][tb.fType]];
-      kategori = new Kategori(
-          list[0][tb.realId],
-          list[0][tb.fNama],
-          list[0][tb.fIdParent],
-          type,
-          list[0][tb.fCatatan],
-          list[0][tb.fColor]);
-      kategori.setId(list[0][tb.fId]);
+      kategori = this._createCategori(list[0]);
     }
     return kategori;
   }
 
   Future<Kategori> getKategoriById(int realid) async {
     var dbClient = await DatabaseHelper().db;
-    List<Map> list =
-        await dbClient.rawQuery('SELECT * FROM ${tb.name} WHERE ${tb.realId}=$realid');
+    List<Map> list = await dbClient
+        .rawQuery('SELECT * FROM ${tb.name} WHERE ${tb.realId}=$realid');
     Kategori kategori;
     if (list.length > 0) {
-      EnumJenisTransaksi type = EnumJenisTransaksi.values[list[0][tb.fType]];
-      kategori = new Kategori(
-          list[0][tb.realId],
-          list[0][tb.fNama],
-          list[0][tb.fIdParent],
-          type,
-          list[0][tb.fCatatan],
-          list[0][tb.fColor]);
-      kategori.setId(list[0][tb.fId]);
+      kategori = this._createCategori(list[0]);
     }
     return kategori;
   }
@@ -289,7 +247,7 @@ class DaoKategori {
   Future<ResultDb> update(Kategori kategori) async {
     ResultDb resultDb = new ResultDb(null);
     Kategori k = await this.getKategoriByNameAndCategori(
-        kategori.nama, kategori.idParent, kategori.type);
+        kategori.nama, kategori.type, kategori.realId);
     var dbClient = await DatabaseHelper().db;
     if (k == null) {
       int res = await dbClient.update(tb.name, kategori.toMap(),

@@ -13,14 +13,22 @@ class Kategori {
   List<Kategori> listKategori; // list subkategori
   int isAbadi;
   String _color;
+  int lastupdate;
 
-  Kategori(this._realId, this._nama, this._idParent, this._type, this._catatan,
-      this._color)
+  Kategori.fromDb(this.id,this._realId, this._nama, this._idParent, this._type, this._catatan,this.isAbadi,
+      this._color,this.lastupdate)
       : assert(_realId != null &&
             _nama != null &&
             _idParent != null &&
             _type != null &&
-            _catatan != null) {
+            _catatan != null);
+
+  Kategori.fromUI(this._nama, this._idParent, this._type, this._catatan,
+      this._color)
+      : assert(_nama != null &&
+      _idParent != null &&
+      _type != null &&
+      _catatan != null) {
     if (isAbadi == null) {
       isAbadi = 0;
     }
@@ -85,23 +93,32 @@ class Kategori {
         '|Catatan: $catatan |ID Parent: $_idParent |Type: $_type '
         '| abadi: $isAbadi |color: $_color';
   }
+
+  String toString1() {
+    return '$id|$_realId |$_nama |$catatan |$_idParent |$_type |$isAbadi |$_color';
+  }
 }
 
 class ItemName {
   TbItemName tb = new TbItemName();
   int id;
   int _realId;
-
   String _nama;
   int _idKategori;
   Kategori _kategori;
   int _isDeleted;
+  int lastupdate;
 
-  ItemName(this._realId, this._nama, this._idKategori, this._isDeleted)
+  ItemName.fromDb(this.id,this._realId, this._nama, this._idKategori, this._isDeleted,this.lastupdate)
       : assert(_realId != null &&
             _nama != null &&
             _idKategori != null &&
             _isDeleted != null);
+
+  ItemName.fromUI(this._nama, this._idKategori, this._isDeleted)
+      : assert(_nama != null &&
+      _idKategori != null &&
+      _isDeleted != null);
 
   int get realId => this._realId;
 
@@ -140,7 +157,7 @@ class ItemName {
 
   void setKategori(Kategori k) {
     this._kategori = k;
-    this._idKategori = k.id;
+    this._idKategori = k.realId;
   }
 
   @override

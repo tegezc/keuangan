@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:keuangan/database/db_utility.dart';
 import 'package:keuangan/database/keuangan/dao_itemname.dart';
 import 'package:keuangan/database/keuangan/dao_keuangan.dart';
 import 'package:keuangan/database/keuangan/dao_kategori.dart';
@@ -12,10 +13,12 @@ class GenerateDymmyDataTest {
   Random _random = new Random();
   DaoItemName daoItemName = new DaoItemName();
   DaoKeuangan daoKeuangan = new DaoKeuangan();
+  DaoKategori daoKategori = new DaoKategori();
 
   Future<bool> generateKeuangan() async {
     await daoKeuangan.deleteAllKeuangan();
     await daoItemName.deleteAllItemName();
+
     bool insertedPengeluaran = await this._insertItemCepatPengeluaran();
     bool insertedPemasukan = await this._insertItemCepatPemasukan();
     if (insertedPengeluaran && insertedPemasukan) {
@@ -67,6 +70,8 @@ class GenerateDymmyDataTest {
         ItemName itm = litmPengeluaran[idxitemname];
 
         int jml = this.next(10000, 50000);
+        int m = jml % 1000;
+        jml = jml - m;
 
         realId = realId + 60000;
         Keuangan k =
@@ -93,7 +98,8 @@ class GenerateDymmyDataTest {
       ItemName itm = litmPemasukan[idxitemname];
 
       int jml = this.next(min, max);
-
+      int m = jml % 1000000;
+      jml = jml - m;
       realId = realId + 60000;
       Keuangan k =
           new Keuangan.fromUI(dt, itm.realId, jml.toDouble(), 'catatan');
@@ -105,27 +111,33 @@ class GenerateDymmyDataTest {
   }
 
   Future<bool> _insertItemCepatPengeluaran() async {
-    DaoKategori daoKategori = new DaoKategori();
     List<Kategori> lk = await daoKategori
         .getAllKategoriTermasukAbadi(EnumJenisTransaksi.pengeluaran);
     int realId = DateTime.now().millisecondsSinceEpoch;
     for (int i = 0; i < lk.length; i++) {
       realId = realId + 60000;
-      ItemName itemName = new ItemName(realId, 'Item$i', lk[i].realId, 0);
-      await daoItemName.saveItemName(itemName);
+      ItemName itemName = new ItemName.fromUI( 'Itempg$i', lk[i].realId, 0);
+      itemName.setKategori(lk[i]);
+      itemName.setRealId(realId);
+      await daoItemName.saveItemNameForMassInsert(itemName);
     }
     return true;
   }
 
   Future<bool> _insertItemCepatPemasukan() async {
-    DaoKategori daoKategori = new DaoKategori();
     List<Kategori> lk = await daoKategori
         .getAllKategoriTermasukAbadi(EnumJenisTransaksi.pemasukan);
     int realId = DateTime.now().millisecondsSinceEpoch;
     for (int i = 0; i < lk.length; i++) {
       realId = realId + 60000;
-      ItemName itemName = new ItemName(realId, 'Item$i', lk[i].realId, 0);
-      await daoItemName.saveItemName(itemName);
+
+      ItemName itemName = new ItemName.fromUI('Itemp$i', lk[i].realId, 0);
+      itemName.setKategori(lk[i]);
+      itemName.setRealId(realId);
+
+      ResultDb resultDb = await daoItemName.saveItemNameForMassInsert(itemName);
+      if(resultDb.enumResultDb == EnumResultDb.success){}
+
     }
     return true;
   }

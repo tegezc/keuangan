@@ -380,8 +380,6 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
         if (tgzDateRangeValue.isValid()) {
           _valueTanggalFrom = tgzDateRangeValue.dateStart;
           _valueTanggalTo = tgzDateRangeValue.dateFinish;
-          print('tanggal awal: ${_valueTanggalFrom.toString()}');
-          print('tanggal selesai: ${_valueTanggalTo.toString()}');
 
           String strStartDate =
               _processString.dateToStringDdMmmmYyyy(_valueTanggalFrom);
@@ -614,10 +612,8 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
                   ),
                   onPressed: () {
                     if (_controller.isDismissed) {
-                      print('contoller dismiss');
                       _controller.forward();
                     } else {
-                      print('controller tdk dismiss');
                       _controller.reverse();
                     }
                   },

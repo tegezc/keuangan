@@ -56,7 +56,7 @@ class BlocAddKategori {
 
   ItemUiAddKategori _stateBaru() {
     Kategori newKategori =
-        new Kategori(0,'', 0, EnumJenisTransaksi.pengeluaran, '', '');
+        new Kategori.fromUI('', 0, EnumJenisTransaksi.pengeluaran, '', '');
     ItemUiAddKategori itemUiAddKategori =
         new ItemUiAddKategori(newKategori, EnumStateFromBloc.progress);
 

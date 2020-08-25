@@ -26,7 +26,7 @@ class BlocEntryKeuangan {
       mapKategori: Map(),
       mapItemName: Map(),
       jenisKeuangan: EnumJenisTransaksi.pengeluaran,
-      itemName: new ItemName(0,'', 0, 0),
+      itemName: new ItemName.fromUI('', 0, 0),
       stateEntryKeuangan: null,
       finalResult: EnumFinalResult.inprogres,
     );
@@ -78,7 +78,6 @@ class BlocEntryKeuangan {
           break;
         case EnumEntryKeuangan.amount:
           {
-            print('masuk amount');
             StateAmount v = entryState;
             _cacheEntry.keuangan.setJumlah(v.amount.toDouble());
           }
@@ -186,7 +185,7 @@ class BlocEntryKeuangan {
       }
     } else {
       ItemName itemName =
-          new ItemName(0,strItemName, entryKeuangan.itemName.idKategori, 0);
+          new ItemName.fromUI(strItemName, entryKeuangan.itemName.idKategori, 0);
       ResultDb resDb = await daoItemName.saveItemName(itemName);
 
       if (resDb.enumResultDb == EnumResultDb.success) {
@@ -229,7 +228,7 @@ class BlocEntryKeuangan {
       }
     } else {
       ItemName itemName =
-          new ItemName(0,strItemName, entryKeuangan.itemName.idKategori, 0);
+          new ItemName.fromUI(strItemName, entryKeuangan.itemName.idKategori, 0);
       ResultDb resDb = await daoItemName.saveItemName(itemName);
 
       if (resDb.enumResultDb == EnumResultDb.success) {
@@ -265,7 +264,7 @@ class BlocEntryKeuangan {
   Map<int, Kategori> _lkategoriToMap(List<Kategori> lk) {
     Map<int, Kategori> mk = new Map();
     lk.forEach((k) {
-      mk[k.id] = k;
+      mk[k.realId] = k;
     });
     return mk;
   }
@@ -273,7 +272,7 @@ class BlocEntryKeuangan {
   Map<int, ItemName> _lItmNameToMap(List<ItemName> lin) {
     Map<int, ItemName> mi = new Map();
     lin.forEach((itn) {
-      mi[itn.id] = itn;
+      mi[itn.realId] = itn;
     });
     return mi;
   }
@@ -321,7 +320,7 @@ class BlocEntryKeuangan {
 
   void _handleFinishDanLagi(EnumJenisTransaksi enumJenisTransaksi) {
     _cacheEntry.keuangan = new Keuangan.fromUI(DateTime.now(), 0, 0, '');
-    _cacheEntry.itemName = new ItemName(0,'', 0, 0);
+    _cacheEntry.itemName = new ItemName.fromUI('', 0, 0);
     _cacheEntry.stateEntryKeuangan = EnumEntryKeuangan.finishLagi;
     _cacheEntry.finalResult = EnumFinalResult.inprogres;
     DaoKategori daoKategori = new DaoKategori();

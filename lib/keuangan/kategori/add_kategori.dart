@@ -54,8 +54,11 @@ class _AddCategoryState extends State<AddCategory> {
     hintText: 'keterangan',
   );
 
+  bool isHaveSubkategori;
+
   @override
   void initState() {
+    isHaveSubkategori = widget.kategori.listKategori.length > 0;
     _blocAddKategori = new BlocAddKategori();
     _txtController = new TextEditingController();
     _txtCatatanController = new TextEditingController();
@@ -106,12 +109,6 @@ class _AddCategoryState extends State<AddCategory> {
     return items;
   }
 
-//  _eksekusiAfterBuild(BuildContext context, ItemUiAddKategori data)async{
-//    if(data.enumStateFromBloc == EnumStateFromBloc.finish){
-//      Navigator.of(context).pop(1);
-//    }
-//  }
-
   @override
   Widget build(BuildContext context) {
     if (_counterBuild == 0) {
@@ -134,8 +131,6 @@ class _AddCategoryState extends State<AddCategory> {
                   )),
                   body: LoadingView());
             } else {
-//            WidgetsBinding.instance.addPostFrameCallback(
-//                    (_) => _eksekusiAfterBuild(context, snapshot.data));
               _txtController.text = snapshot.data.currentKategori.nama;
               _txtCatatanController.text =
                   snapshot.data.currentKategori.catatan;
@@ -170,11 +165,20 @@ class _AddCategoryState extends State<AddCategory> {
                           'Jenis Transaksi:',
                           style: _styleTextDesc,
                         ),
-                        new DropdownButton(
-                          value: snapshot.data.currentKategori.type.index,
-                          items: dropDownTransaksi,
-                          onChanged: _changedDropDownTransaksi,
-                        ),
+                        isHaveSubkategori
+                            ? Container(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top:3.0,bottom: 8.0),
+                                  child: Text(
+                                      '${widget.kategori.type == EnumJenisTransaksi.pengeluaran ? 'Pengeluaran' : 'Pemasukan'}',
+                                  style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
+                                ),
+                              )
+                            : new DropdownButton(
+                                value: snapshot.data.currentKategori.type.index,
+                                items: dropDownTransaksi,
+                                onChanged: _changedDropDownTransaksi,
+                              ),
                         Text(
                           'Nama Kategori:',
                           style: _styleTextDesc,

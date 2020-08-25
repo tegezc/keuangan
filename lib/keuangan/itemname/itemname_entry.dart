@@ -97,9 +97,9 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
     if (widget.stateItemName == StateItemNameEntry.baru) {
       ItemName iname;
       if (_currentCatogery.idParent == null) {
-        iname = new ItemName(0,nama, 0, 0);
+        iname = new ItemName.fromUI(nama, 0, 0);
       } else {
-        iname = new ItemName(0,nama, _currentCatogery.realId, 0);
+        iname = new ItemName.fromUI(nama, _currentCatogery.realId, 0);
       }
 
       daoItemName
@@ -130,9 +130,9 @@ class _ItemNameEntryState extends State<ItemNameEntry> {
       } else {
         ItemName itemName;
         if (_currentCatogery.idParent == null) {
-          itemName = new ItemName(0,nama, 0, 0);
+          itemName = new ItemName.fromUI(nama, 0, 0);
         } else {
-          itemName = new ItemName(0,nama, _currentCatogery.realId, 0);
+          itemName = new ItemName.fromUI(nama, _currentCatogery.realId, 0);
         }
         ItemName oldItemName = widget.itemName;
         oldItemName.setIsDeleted(1);

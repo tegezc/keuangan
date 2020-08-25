@@ -105,8 +105,6 @@ class _ReportingByItemsState extends State<ReportingByItems> {
     _listCombobox = lcombo;
     _posisiCombobox = index;
     EntryCombobox entryCombobox = lcombo[index];
-    print('Text : ${entryCombobox.text} start: ${entryCombobox.startDate}'
-        'end: ${entryCombobox.endDate}');
 
     this._getDataKeuanganByPeriode(
         entryCombobox.startDate, entryCombobox.endDate);

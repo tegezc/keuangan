@@ -39,7 +39,7 @@ class TgzDatePickerState extends State<TgzDatePicker> {
     new CalendarController(widget.startYear, widget.endYear);
     DateTime dt = new DateTime.now();
     _indexNow = _calendarController.tahunFromDate(dt.year, dt.month) - 1;
-    print('index: $_indexNow');
+
     _controller =
         ScrollController(initialScrollOffset: _itemExtends * _indexNow);
     super.initState();

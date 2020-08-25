@@ -670,6 +670,5 @@ class IsiTextAmount {
 
     this._formatedCurrency = formatCurrency.format(tmpValue);
 
-    print('realvalue2: $_realValue || Currency: $_formatedCurrency');
   }
 }

@@ -5,7 +5,6 @@ class CalendarController {
   CalendarController(this.startYear,this.endYear);
 
   int get countItems{
-    print('coiuntitems');
     int count = endYear-startYear+1;
     return count*12;
   }

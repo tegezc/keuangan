@@ -136,9 +136,9 @@ class BlocHomepageKategori {
     for (int i = 0; i < lk.length; i++) {
       if (lk[i].idParent == 0) {
         listParent.add(lk[i]);
-        if (mapKategori[lk[i].id] == null) {
+        if (mapKategori[lk[i].realId] == null) {
           List<Kategori> subkategori = new List();
-          mapKategori[lk[i].id] = subkategori;
+          mapKategori[lk[i].realId] = subkategori;
         }
       } else {
         List<Kategori> subkategori;
@@ -155,8 +155,8 @@ class BlocHomepageKategori {
     List<Kategori> returnList = new List();
     for (int i = 0; i < listParent.length; i++) {
       Kategori kategori = listParent[i];
-      if (mapKategori[kategori.id] != null) {
-        kategori.listKategori = mapKategori[kategori.id];
+      if (mapKategori[kategori.realId] != null) {
+        kategori.listKategori = mapKategori[kategori.realId];
         returnList.add(kategori);
       }
     }

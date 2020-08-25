@@ -15,7 +15,6 @@ class BlocHpKeuangan {
   Stream<UIHPKeuangan> get uiHPKeuangan => _uiHPKeuangan.stream;
 
   void _sinkUIHPKeuangan(UIHPKeuangan item) {
-    print('SINK KEUANGAN HOME PAGE');
     _uiHPKeuangan.sink.add(item);
   }
 
