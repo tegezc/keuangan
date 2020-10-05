@@ -7,7 +7,7 @@ import 'package:keuangan/file_non_production/bulk_insert.dart';
 import 'package:keuangan/keuangan/itemname/homepage_itemname.dart';
 import 'package:keuangan/keuangan/kategori/homepage_kategori.dart';
 import 'package:keuangan/keuangan/report/hp_report.dart';
-import 'package:keuangan/keuangan/setting/setting_app.dart';
+import 'package:keuangan/keuangan/startup/startupapp.dart';
 import 'package:keuangan/keuangan/transaksi/keuangan_transaksi.dart';
 import 'package:flutter/material.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
@@ -57,10 +57,14 @@ class MyHomePage extends StatefulWidget {
 
 class MyHomePageState extends State<MyHomePage> {
   int _selectedDrawerIndex = 5;
-
+  final _textStyleNormal = new TextStyle(fontSize: 16, color: Colors.black);
+  final _textStyleSelected = new TextStyle(fontSize: 16, color: Colors.blue);
+  final _textStyleNormalKecil = new TextStyle(fontSize: 14, color: Colors.black);
+  final _textStyleSelectedKecil = new TextStyle(fontSize: 14, color: Colors.blue);
   @override
   initState() {
-    _setupFirstimeForTEST();
+   // _setupFirstimeForTEST();
+    _setupFirstime();
     _initAdMob();
     super.initState();
   }
@@ -134,6 +138,16 @@ class MyHomePageState extends State<MyHomePage> {
           return new FirtimeSceleton();
         }
         break;
+      case 6:
+        {
+          return new HomePageItemName(drawer: _createDrawer(pos));
+        }
+        break;
+      case 7:
+        {
+          return new HomePageItemName(drawer: _createDrawer(pos));
+        }
+        break;
       default:
         return new Text("Error");
         break;
@@ -146,8 +160,7 @@ class MyHomePageState extends State<MyHomePage> {
   }
 
   List<Widget> _createDrawerItem(int pos) {
-    final textStyleNormal = new TextStyle(fontSize: 16, color: Colors.black);
-    final textStyleSelected = new TextStyle(fontSize: 16, color: Colors.blue);
+   
     List<Widget> drawerOptions = [];
     drawerOptions.add(new SizedBox(
       height: 8.0,
@@ -157,7 +170,7 @@ class MyHomePageState extends State<MyHomePage> {
           color: _selectedDrawerIndex == 0 ? Colors.blue : Colors.black),
       title: new Text("Home",
           style:
-              _selectedDrawerIndex == 0 ? textStyleSelected : textStyleNormal),
+              _selectedDrawerIndex == 0 ? _textStyleSelected : _textStyleNormal),
       onTap: () => _onSelectItem(0),
     ));
     drawerOptions.add(new ListTile(
@@ -165,7 +178,7 @@ class MyHomePageState extends State<MyHomePage> {
           color: _selectedDrawerIndex == 1 ? Colors.blue : Colors.black),
       title: new Text("Transaksi",
           style:
-              _selectedDrawerIndex == 1 ? textStyleSelected : textStyleNormal),
+              _selectedDrawerIndex == 1 ? _textStyleSelected : _textStyleNormal),
       onTap: () => _onSelectItem(1),
     ));
     drawerOptions.add(new ListTile(
@@ -173,17 +186,18 @@ class MyHomePageState extends State<MyHomePage> {
           color: _selectedDrawerIndex == 2 ? Colors.blue : Colors.black),
       title: new Text("Laporan",
           style:
-              _selectedDrawerIndex == 2 ? textStyleSelected : textStyleNormal),
+              _selectedDrawerIndex == 2 ? _textStyleSelected : _textStyleNormal),
       onTap: () => _onSelectItem(2),
     ));
+    drawerOptions.add(new Divider());
     drawerOptions.add(new ListTile(
       leading: new Icon(
         Icons.playlist_add_check,
         color: _selectedDrawerIndex == 3 ? Colors.blue : Colors.black,
       ),
-      title: new Text("Manage Kategori",
+      title: new Text("Kategori",
           style:
-              _selectedDrawerIndex == 3 ? textStyleSelected : textStyleNormal),
+              _selectedDrawerIndex == 3 ? _textStyleSelectedKecil : _textStyleNormalKecil),
       //selected: i == _selectedDrawerIndex,
       onTap: () => _onSelectItem(3),
     ));
@@ -193,10 +207,33 @@ class MyHomePageState extends State<MyHomePage> {
         Icons.fast_forward,
         color: _selectedDrawerIndex == 4 ? Colors.blue : Colors.black,
       ),
-      title: new Text("Manage Item Cepat",
+      title: new Text("Item Cepat",
           style:
-              _selectedDrawerIndex == 4 ? textStyleSelected : textStyleNormal),
+              _selectedDrawerIndex == 4 ? _textStyleSelectedKecil : _textStyleNormalKecil),
       onTap: () => _onSelectItem(4),
+    ));
+
+    drawerOptions.add(new Divider());
+    drawerOptions.add(new ListTile(
+      leading: new Icon(
+        Icons.settings_applications,
+        color: _selectedDrawerIndex == 6 ? Colors.blue : Colors.black,
+      ),
+      title: new Text("Setting",
+          style:
+          _selectedDrawerIndex == 6 ? _textStyleSelectedKecil : _textStyleNormalKecil),
+      onTap: () => _onSelectItem(6),
+    ));
+
+    drawerOptions.add(new ListTile(
+      leading: new Icon(
+        Icons.info,
+        color: _selectedDrawerIndex == 7 ? Colors.blue : Colors.black,
+      ),
+      title: new Text("About",
+          style:
+          _selectedDrawerIndex == 7 ? _textStyleSelectedKecil : _textStyleNormalKecil),
+      onTap: () => _onSelectItem(7),
     ));
 
     drawerOptions.add(new Divider());
