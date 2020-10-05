@@ -22,7 +22,7 @@ class BlocHpKeuangan {
     _uiHPKeuangan.close();
   }
 
-  fullReload() async {
+  fullReload() {
     _setupBalance().then((item) {
       this._sinkUIHPKeuangan(item);
     });
@@ -41,27 +41,15 @@ class BlocHpKeuangan {
 
   Future<UIHPKeuangan> _setupBalance() async {
     DaoKeuangan daoKeuangan = new DaoKeuangan();
-    List<Keuangan> lkp = await daoKeuangan
-        .getKeuanganByJenisTransaksi(EnumJenisTransaksi.pemasukan);
-    _uihpKeuanganItem.pemasukan = this._hitungTotal(lkp);
+    double totalpemasukan = await daoKeuangan
+        .getSum(EnumJenisTransaksi.pemasukan);
+   _uihpKeuanganItem.pemasukan = totalpemasukan.toInt();
 
-    List<Keuangan> lkk = await daoKeuangan
-        .getKeuanganByJenisTransaksi(EnumJenisTransaksi.pengeluaran);
-    _uihpKeuanganItem.pengeluaran = this._hitungTotal(lkk);
+    double totalpengeluaran= await daoKeuangan
+        .getSum(EnumJenisTransaksi.pengeluaran);
+    _uihpKeuanganItem.pengeluaran = totalpengeluaran.toInt();//this._hitungTotal(lkk);
     _uihpKeuanganItem.listKeuangan = await _getLazyListKeuangan();
     return _uihpKeuanganItem;
-  }
-
-  int _hitungTotal(List<Keuangan> lk) {
-    if (lk != null) {
-      double tmpJum = 0;
-      lk.forEach((k) {
-        tmpJum = tmpJum + k.jumlah;
-      });
-      return tmpJum.toInt();
-    } else {
-      return 0;
-    }
   }
 
   Future<List<Keuangan>> _getLazyListKeuangan() async {

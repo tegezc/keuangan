@@ -197,6 +197,27 @@ class DaoKeuangan {
     return keuangan;
   }
 
+  Future<double> getSum(EnumJenisTransaksi jt)async{
+    var dbClient = await DatabaseHelper().db;
+
+    int type = 0; // nilai check di model keuangan
+    if (jt == EnumJenisTransaksi.pemasukan) {
+      type = 1;
+    }
+
+    String str = 'SELECT SUM(jumlah) as total FROM ${tb.name} WHERE ${tb.fJenisTransaksi}=$type';
+
+    List<dynamic> list = await dbClient.rawQuery(str);
+
+   if(list != null){
+     if(list.isNotEmpty){
+       double sumtotal = list[0]['total'];
+       return sumtotal;
+     }
+   }
+   return 0.0;
+  }
+
   Future<List<Keuangan>> getKeuanganByJenisTransaksi(
       EnumJenisTransaksi jt) async {
     var dbClient = await DatabaseHelper().db;
