@@ -9,9 +9,9 @@ class TgzDatePicker extends StatefulWidget {
   final int startYear;
   final int endYear;
 
-  TgzDatePicker(
-      this.startYear,
-      this.endYear, {
+  TgzDatePicker({
+      this.startYear=1990,
+      this.endYear=2030,
         Key key,
       }) : super(key: key);
 

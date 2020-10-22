@@ -12,6 +12,7 @@ import 'package:keuangan/keuangan/transaksi/keuangan_transaksi.dart';
 import 'package:flutter/material.dart';
 import 'package:keuangan/model/enum_keuangan.dart';
 import 'package:keuangan/model/keuangan.dart';
+import 'package:keuangan/settings/hpsettings.dart';
 import 'package:keuangan/util/adsmob.dart';
 import 'package:keuangan/util/common_ui.dart';
 import 'package:keuangan/util/sceleten_firstime.dart';
@@ -63,8 +64,8 @@ class MyHomePageState extends State<MyHomePage> {
   final _textStyleSelectedKecil = new TextStyle(fontSize: 14, color: Colors.blue);
   @override
   initState() {
-   // _setupFirstimeForTEST();
-    _setupFirstime();
+    _setupFirstimeForTEST();
+    //_setupFirstime();
     _initAdMob();
     super.initState();
   }
@@ -140,7 +141,7 @@ class MyHomePageState extends State<MyHomePage> {
         break;
       case 6:
         {
-          return new HomePageItemName(drawer: _createDrawer(pos));
+          return new HpSettings(_createDrawer(pos));
         }
         break;
       case 7:
@@ -182,7 +183,7 @@ class MyHomePageState extends State<MyHomePage> {
       onTap: () => _onSelectItem(1),
     ));
     drawerOptions.add(new ListTile(
-      leading: new Icon(Icons.pie_chart,
+      leading: new Icon(Icons.stacked_bar_chart,
           color: _selectedDrawerIndex == 2 ? Colors.blue : Colors.black),
       title: new Text("Laporan",
           style:
@@ -204,7 +205,7 @@ class MyHomePageState extends State<MyHomePage> {
 
     drawerOptions.add(new ListTile(
       leading: new Icon(
-        Icons.fast_forward,
+        Icons.push_pin,
         color: _selectedDrawerIndex == 4 ? Colors.blue : Colors.black,
       ),
       title: new Text("Item Cepat",

@@ -252,19 +252,7 @@ class _KeuanganItemViewState extends State<KeuanganItemView>
   }
 
   Future _selectDate() async {
-    int _startDate = widget.dateTime.year - 5;
-    int _endDate = widget.dateTime.year + 5;
-
-
-
-    if (widget.isEditMode) {
-      _startDate = widget.keuangan.tanggal.year - 5;
-      _endDate = widget.keuangan.tanggal.year + 5;
-    } else {
-      _startDate = widget.dateTime.year - 5;
-      _endDate = widget.dateTime.year + 5;
-    }
-    DateTime dt = await openPage(context, TgzDatePicker(_startDate, _endDate));
+    DateTime dt = await openPage(context, TgzDatePicker());
     if(dt != null){
       StatePickDate statePickDate = new StatePickDate(dt);
       _blocEntryKeuangan.sinkState(statePickDate);

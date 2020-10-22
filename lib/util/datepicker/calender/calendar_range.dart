@@ -10,10 +10,10 @@ class TgzRangeDatePicker extends StatefulWidget {
   final int endYear;
 
   TgzRangeDatePicker(
-    this.startYear,
-    this.endYear, {
-    Key key,
-  }) : super(key: key);
+  {this.startYear=1990,
+    this.endYear=2030,
+    Key key}
+  ) : super(key: key);
 
   @override
   TgzRangeDatePickerState createState() => TgzRangeDatePickerState();

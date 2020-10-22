@@ -10,6 +10,7 @@ import 'package:keuangan/util/process_string.dart';
 class DaoKeuangan {
   TbKeuangan tb = new TbKeuangan();
   DbUtility _dbUtility = new DbUtility();
+  ProcessString processString = new ProcessString();
 
   Future<int> saveKeuangan(Keuangan keuangan) async {
     /// set jenis transaksi
@@ -216,6 +217,38 @@ class DaoKeuangan {
      }
    }
    return 0.0;
+  }
+
+  Future<DateTime> getMaxDate()async{
+
+    var dbClient = await DatabaseHelper().db;
+    String str = 'SELECT MAX(${tb.fTgl}) as max FROM ${tb.name}';
+
+    List<dynamic> list = await dbClient.rawQuery(str);
+
+    if(list != null){
+      if(list.isNotEmpty){
+        String max = list[0]['max'];
+        return processString.dateFromDbToDateTime(max);
+      }
+    }
+
+    return DateTime.now();
+  }
+
+  Future<DateTime> getMinDate()async{
+    var dbClient = await DatabaseHelper().db;
+    String str = 'SELECT MIN(${tb.fTgl}) as min FROM ${tb.name}';
+
+    List<dynamic> list = await dbClient.rawQuery(str);
+
+    if(list != null){
+      if(list.isNotEmpty){
+        String min = list[0]['min'];
+        return processString.dateFromDbToDateTime(min);
+      }
+    }
+    return DateTime.now();
   }
 
   Future<List<Keuangan>> getKeuanganByJenisTransaksi(

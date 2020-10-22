@@ -431,14 +431,14 @@ class _ReportSceletonByCategoriesState
   }
 
   void _changedDropDownEntry(int index) async {
-    final int _startDate = 1990;
-    final int _endDate = 2050;
+    // final int _startDate = 1990;
+    // final int _endDate = 2050;
     EntryCombobox selectedECombo = _listCombobox[index];
 
     /// user pick custome periode
     if (selectedECombo.startDate == null) {
       TgzDateRangeValue tgzDateRangeValue =
-          await openPage(context, TgzRangeDatePicker(_startDate, _endDate));
+          await openPage(context, TgzRangeDatePicker());
       if (tgzDateRangeValue != null) {
         if (tgzDateRangeValue.isValid()) {
           String strStartDate = _processString

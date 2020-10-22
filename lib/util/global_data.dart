@@ -1,6 +1,8 @@
 class GlobalData {
   static final idKategoriOther = 1;
 
+  static final DateTime endDate = DateTime(2050,12,31);
+
   static final namaBulan = const [
     '',
     'Januari',

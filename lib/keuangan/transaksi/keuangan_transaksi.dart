@@ -66,8 +66,8 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
   DateTime _valueTanggalFrom;
   DateTime _valueTanggalTo;
 
-  final int _startDate = 1990;
-  final int _endDate = 2050;
+  // final int _startDate = 1990;
+  // final int _endDate = 2050;
 
   static const List<IconData> icons = const [
     Icons.monetization_on,
@@ -375,7 +375,7 @@ class _TransactionKeuanganState extends State<TransactionKeuangan>
     /// user pick custome periode
     if (selectedECombo.startDate == null) {
       TgzDateRangeValue tgzDateRangeValue =
-          await openPage(context, TgzRangeDatePicker(_startDate, _endDate));
+          await openPage(context, TgzRangeDatePicker());
       if (tgzDateRangeValue != null) {
         if (tgzDateRangeValue.isValid()) {
           _valueTanggalFrom = tgzDateRangeValue.dateStart;

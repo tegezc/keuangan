@@ -63,6 +63,8 @@ class ProcessString {
     return tanggal;
   }
 
+  /// param:
+  /// ex :2020-10-07 (biasanya format dari DB)
   DateTime dateFromDbToDateTime(String tanggal) {
     var tmp = tanggal.split('-');
     if (tmp.length == 3) {
